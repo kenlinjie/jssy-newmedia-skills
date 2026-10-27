@@ -2,6 +2,14 @@
 
 本项目包含 **35 个通用技能**，覆盖 AI 工作环境、公众号、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。
 
+## 固定下载入口
+
+[国内镜像下载 · 主分支](https://gh-proxy.org/https://github.com/kenlinjie/xdf-province-new-media-skills/archive/refs/heads/main.zip)
+
+这个地址始终指向主分支，后续更新沿用同一入口。解压完整项目后按下方说明使用。镜像由第三方运营，服务可用性与缓存刷新由服务方决定。
+
+备用入口：[GitHub 原始下载](https://github.com/kenlinjie/xdf-province-new-media-skills/archive/refs/heads/main.zip)；[项目仓库](https://github.com/kenlinjie/xdf-province-new-media-skills)。
+
 ## 怎么使用
 
 把项目目录交给已有的 WorkBuddy、Claude Code、Codex 或其他可读技能的 agent：
@@ -65,7 +73,7 @@ python3 scripts/skillpack.py package
 
 `core` 是 12 个常用技能，`team` 是全部 35 个。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
 
-[团队版 ZIP](dist/XDF-省域新媒体-skills-团队版.zip) 可直接分发；同目录的 `.sha256` 文件用于核对下载完整性。
+日常下载直接使用上面的固定入口，无需等待单独的安装包。需要自行分发时可运行打包命令，生成的文件保存在本地 `dist/`，不会自动上传。
 
 ## 共享内容与个人状态
 
@@ -79,4 +87,4 @@ python3 scripts/skillpack.py package
 
 公开来源、许可文件、依赖和整合适配见 [catalog.json](catalog.json) 与 [许可说明](THIRD_PARTY.md)。保留各技能必要的公开署名和许可。更新技能后复核正文和资源，再更新哈希并运行检查。
 
-这是本地整理的通用技能项目，未发布新的远程仓库。
+项目同步到 [GitHub 仓库](https://github.com/kenlinjie/xdf-province-new-media-skills)，只维护通用技能、公开参考和空白模板。后续更新先执行检查，再提交并推送 `main` 分支。
