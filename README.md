@@ -1,6 +1,6 @@
 # 新东方省域新媒体技能包
 
-本项目包含 **19 个通用技能**，覆盖 AI 工作环境、公众号、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。
+本项目包含 **20 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。
 
 ## 固定下载入口
 
@@ -27,6 +27,7 @@
 | 公众号写稿与排版 | [gzh-design](skills/gzh-design/SKILL.md) |
 | 团队通用日报 | [daily-report-universal](skills/daily-report-universal/SKILL.md) |
 | 公开抖音账号对标 | [douyin-benchmark](skills/douyin-benchmark/SKILL.md) |
+| 直播后台数据填表 | [live-backend-to-sheet](skills/live-backend-to-sheet/SKILL.md) |
 | 文案修改与去AI腔 | [write](skills/write/SKILL.md) |
 | 文风与口播长期学习 | [voice-loop](skills/voice-loop/SKILL.md) |
 | 看视频与按时间点复盘 | [watch](skills/watch/SKILL.md) |
@@ -56,9 +57,19 @@ python3 scripts/skillpack.py install --target workbuddy --profile core --apply
 python3 scripts/skillpack.py package
 ```
 
-`core` 是 7 个常用技能，`team` 是全部 19 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
+`core` 是 8 个常用技能，`team` 是全部 20 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
 
 日常下载直接使用上面的固定入口，无需等待单独的安装包。需要自行分发时可运行打包命令，生成的文件保存在本地 `dist/`，不会自动上传。
+
+## 直播后台填表怎么用
+
+老师可以直接说：
+
+> 帮我把这周的直播后台数据填到表里，先带我确定用哪个直播号、有没有登录，以及填哪张表。
+
+`live-backend-to-sheet` 会用 ego Lite 检查真实登录状态，再引导确定目标表链接或 Excel 文件、直播周期和字段。扫码、切号或授权由老师在官方界面完成；填前给出具体预览，填后读回核对，重跑先查重。已明确的任务信息直接沿用。
+
+浏览器从 [ego Lite 官网](https://www.egolite.ai/download)按当前说明安装，操作前读取 `ego-browser skill`。目标是钉钉表时使用 `dws`，其他在线表使用可见编辑界面，本地 Excel 在后台处理。账号、表链接和执行记录保存在使用者自己的项目外目录。
 
 ## 共享内容与个人状态
 

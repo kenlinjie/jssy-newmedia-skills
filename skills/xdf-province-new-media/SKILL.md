@@ -1,6 +1,6 @@
 ---
 name: xdf-province-new-media
-description: 新东方省域新媒体工作的技能入口。用于跨公众号、公开账号对标、视频、日报、培训汇报和钉钉协作的综合任务，或用户不知道该用哪个技能时选择工作流。明确单项任务直接使用对应技能，不为普通聊天加载全部技能。
+description: 新东方省域新媒体工作的技能入口。用于跨公众号、直播后台填表、公开账号对标、视频、日报、培训汇报和钉钉协作的综合任务，或用户不知道该用哪个技能时选择工作流。明确单项任务直接使用对应技能，不为普通聊天加载全部技能。
 ---
 
 # 省域新媒体工作入口
@@ -12,6 +12,7 @@ description: 新东方省域新媒体工作的技能入口。用于跨公众号�
 - AI 工作环境：`ai-environment-setup`，沿用已有 agent，按目标电脑、网络和办公平台配置。
 - 升学公众号写稿与排版：`gzh-design`，已有原稿直接处理，检索写作保留事实核验与来源披露。
 - 文案润色：`write`；长期学习本人风格：`voice-loop`，授权语料与个人画像单独保存在项目外。
+- 直播后台数据填表：`live-backend-to-sheet`，用 ego Lite 实查登录账号，引导老师确定目标表、周期和字段后填写并读回；钉钉目标表用 `dws`。
 - 公开抖音对标：`douyin-benchmark`；视频与画面复盘：`watch`；转写：`local-sota-transcription`；口播剪辑：`remotion-talking-head`。
 - 日报：`daily-report-universal`，按使用者本人的真实素材和历史习惯生成。个人配置与样本保存在项目外，不改写共享模板。
 - 可编辑 PPT：`open-kimi-ppt` 或 `ppt-master`；网页演示：`guizang-ppt-skill`。以用户要求的格式为准。

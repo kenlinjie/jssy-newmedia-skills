@@ -204,7 +204,7 @@ def main():
     if args.command == 'package':
         package(args, data)
     elif args.command == 'doctor':
-        for name in ['python3', 'git', 'dws', 'node', 'npm', 'ffmpeg', 'ffprobe', 'uv', 'obsidian', 'egolite']:
+        for name in ['python3', 'git', 'dws', 'node', 'npm', 'ffmpeg', 'ffprobe', 'uv', 'obsidian', 'ego-browser']:
             print(f"{name}: {shutil.which(name) or '未在 PATH 找到'}")
         print('这只检查本地命令位置，不验证登录、组织权限、模型资源或软件实际可用性。')
     else:

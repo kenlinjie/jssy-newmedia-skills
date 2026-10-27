@@ -1,0 +1,4 @@
+interface:
+  display_name: "直播后台数据填表"
+  short_description: "用 ego Lite 核验直播号登录与数据，带老师确定目标表、场次和字段后填写并核对"
+  default_prompt: "使用 $live-backend-to-sheet，带我确认直播后台账号是否登录、数据填到哪张表，再按确定的场次和字段填写并核对。"

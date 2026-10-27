@@ -24,9 +24,10 @@
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "f297f211c37d644637c8fea78a2bb4044c5148b670d2f0587e50d01f27a346f7",
+      "sha256": "a7bce758377533ea8ad7448ba84b1516df0c166c8d2e67d5a8cb87adcb732e18",
       "external_tools": [
-        "dingtalk-cli"
+        "dingtalk-cli",
+        "ego-browser"
       ]
     },
     {
@@ -51,7 +52,8 @@
         "LICENSE"
       ],
       "external_tools": [
-        "dingtalk-cli"
+        "dingtalk-cli",
+        "ego-browser"
       ]
     },
     {
@@ -118,7 +120,37 @@
       "sha256": "7ff2d47a0fa780c1b14f81b295e24b1a584e70a21c38d472bcfdec884e8c7da4",
       "license_files": [
         "LICENSE"
+      ],
+      "external_tools": [
+        "ego-browser"
       ]
+    },
+    {
+      "id": "live-backend-to-sheet",
+      "title": "直播后台数据填表",
+      "category": "03 抖音与调研",
+      "scope": "team",
+      "path": "skills/live-backend-to-sheet",
+      "core": true,
+      "requirements": "ego Lite 与 ego-browser；本人或获授权的直播后台；老师指定目标表；钉钉写表另需 dws",
+      "source": {
+        "kind": "created-in-project",
+        "reference": "2026-10-27 直播后台填表与老师引导请求"
+      },
+      "adaptations": [
+        "实查登录账号；引导确定目标表与字段；按场次查重、写后读回；个人执行状态在项目外"
+      ],
+      "required_files": [
+        "references/field-mapping-and-writeback.md",
+        "agents/openai.yaml"
+      ],
+      "license_files": [],
+      "external_tools": [
+        "ego-browser",
+        "dingtalk-cli"
+      ],
+      "file_count": 3,
+      "sha256": "200c5992f7388aac5175a90c85cd7aa8d7b98c90e149c0943ddb0c3b14d7334e"
     },
     {
       "id": "write",
@@ -390,6 +422,13 @@
       "documentation": "https://open.dingtalk.com/dingtalk-dev/wiki",
       "bundled": false,
       "requirements": "按官网当前说明安装CLI、接入官方技能并完成本人授权；业务统一使用dws"
+    },
+    {
+      "id": "ego-browser",
+      "title": "ego Lite 浏览器（ego-browser）",
+      "homepage": "https://www.egolite.ai/download",
+      "bundled": false,
+      "requirements": "按官网当前说明安装并接入已有agent；操作前完整读取 ego-browser skill；登录态现场核验"
     }
   ]
 }

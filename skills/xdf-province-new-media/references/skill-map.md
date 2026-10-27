@@ -8,6 +8,7 @@
 | 公众号写稿与排版 | [gzh-design](../../gzh-design/SKILL.md) | Python 3；检索与头图按当前宿主实际能力使用 |
 | 团队通用日报 | [daily-report-universal](../../daily-report-universal/SKILL.md) | 本人历史日报与真实工作素材；钉钉读取用 dws |
 | 公开抖音账号对标 | [douyin-benchmark](../../douyin-benchmark/SKILL.md) | ego Lite；Node.js；只采公开资料 |
+| 直播后台数据填表 | [live-backend-to-sheet](../../live-backend-to-sheet/SKILL.md) | ego Lite；老师确认账号、目标表与场次；钉钉写表用 dws |
 | 文案修改与去AI腔 | [write](../../write/SKILL.md) | 用户原稿或明确的写作事实 |
 | 文风与口播长期学习 | [voice-loop](../../voice-loop/SKILL.md) | 授权语料；每人单独本地 profile，不包含人物数据 |
 | 看视频与按时间点复盘 | [watch](../../watch/SKILL.md) | Python、ffmpeg、ffprobe；无字幕时需要本地转写运行时 |

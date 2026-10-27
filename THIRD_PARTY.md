@@ -15,3 +15,5 @@
 文件哈希、依赖、适配和许可证位置见 `catalog.json`。路径通用化、共享配置隔离和隐私清理只作用于本项目副本。运行时、模型和服务在使用时按实际环境配置。
 
 钉钉相关只保留[CLI 官方站](https://open.dingtalk.com/dingtalk-cli)与[官方命令参考](https://open.dingtalk.com/dingtalk-dev/wiki)外链，不再分发钉钉产品技能或参考副本。
+
+`live-backend-to-sheet` 是本项目编写的通用填表工作流，浏览器运行时从 [ego Lite 官网](https://www.egolite.ai/download)获取，操作指南通过 `ego-browser skill` 现场读取，不随包复制浏览器程序或账号状态。
