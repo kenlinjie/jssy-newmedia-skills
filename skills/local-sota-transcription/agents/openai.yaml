@@ -1,0 +1,4 @@
+interface:
+  display_name: "本地轻量分级转写"
+  short_description: "用 Apple SpeechAnalyzer 或轻量 Qwen 在 Mac 本地转写"
+  default_prompt: "Use $local-sota-transcription to choose the lightest adequate local transcription route, verify it, and preserve resumable outputs when needed."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "小白 AI 环境配置"
+  short_description: "按网络条件配置 Mac 或 Windows 的 AI、办公平台连接和 Obsidian Git 知识库"
+  default_prompt: "请用 $ai-environment-setup 帮我配置 AI 工作环境，接上我使用的办公平台，并装好 Obsidian 和 Git 插件。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "省域新媒体工作台"
+  short_description: "按公众号、直播、视频、日报、培训和钉钉任务找到对应技能并衔接交付"
+  default_prompt: "使用 $xdf-province-new-media，根据我的省域新媒体工作要求找到对应技能并完成交付。"

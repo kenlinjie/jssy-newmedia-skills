@@ -1,0 +1,4 @@
+interface:
+  display_name: "Remotion 口播成片"
+  short_description: "先做五版视觉效果图审稿，再制作可复用的 Remotion 口播成片"
+  default_prompt: "使用 $remotion-talking-head 分析这条口播视频，先提交五版效果图供我选版，再制作最终成片并保留工程。"

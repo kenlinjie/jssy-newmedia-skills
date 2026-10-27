@@ -1,0 +1,12 @@
+# Generated personal profiles never belong in this generic skill repository.
+voice-profiles/
+profiles/
+corpus/
+corrections.jsonl
+eval/results/
+versions/
+
+# Local noise
+__pycache__/
+*.py[cod]
+.DS_Store

@@ -1,0 +1,24 @@
+# Local operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Device-specific Obsidian state and cached/plugin data
+.obsidian/workspace*.json
+.obsidian/cache/
+.obsidian/plugins/
+.trash/
+
+# Credentials and task-local installation reports
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.ssh/
+.npmrc
+.netrc
+.ai-environment-setup/
+
+# Keep notes and common Obsidian settings in version control.
+# Review files before the first commit; ignore rules do not remove tracked files.

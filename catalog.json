@@ -1,0 +1,719 @@
+{
+  "name": "新东方省域新媒体技能包",
+  "version": "2026.10.27",
+  "python_minimum": "3.9",
+  "skills": [
+    {
+      "id": "xdf-province-new-media",
+      "title": "省域新媒体综合工作入口",
+      "category": "00 项目入口",
+      "scope": "team",
+      "path": "skills/xdf-province-new-media",
+      "core": true,
+      "requirements": "已有可读技能的agent；按任务使用当前真实工具与数据",
+      "source": {
+        "kind": "created-in-project",
+        "reference": "2026-10-27 省域整合请求"
+      },
+      "adaptations": [],
+      "required_files": [
+        "references/skill-map.md",
+        "agents/openai.yaml"
+      ],
+      "license_files": [],
+      "file_count": 3,
+      "sha256": "a6771f8685def19ea4903b143cd6ffdc82d67c69d025621ed5b3899c55d66927"
+    },
+    {
+      "id": "ai-environment-setup",
+      "title": "AI环境配置",
+      "category": "01 AI与工作台",
+      "scope": "team",
+      "path": "skills/ai-environment-setup",
+      "core": true,
+      "requirements": "Mac／Windows；安装时实时核验官方版本",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "ai-environment-setup",
+        "repository": "https://github.com/kenlinjie/ai-environment-setup"
+      },
+      "adaptations": [],
+      "file_count": 14,
+      "sha256": "deeeb25af4087652294c365800e1b03ee586b4c513a4bf09df7d7b8a505e6fc3",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "gzh-design",
+      "title": "公众号写稿与排版",
+      "category": "02 内容生产",
+      "scope": "team",
+      "path": "skills/gzh-design",
+      "core": true,
+      "requirements": "Python 3；检索与头图按当前宿主实际能力使用",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "gzh-design",
+        "upstream_family": "https://github.com/X-hub-spec/gzh-design-skill"
+      },
+      "adaptations": [
+        "保留本机完整主题库与写作排版流程；补回已核实上游AGPL许可"
+      ],
+      "file_count": 21,
+      "sha256": "7d979e47b35ad94c2515831f1c4a96d553a43c291da45a28043277cf7acdcd45",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "daily-report-universal",
+      "title": "团队通用日报",
+      "category": "06 日报与知识管理",
+      "scope": "team",
+      "path": "skills/daily-report-universal",
+      "core": true,
+      "requirements": "本人历史日报与真实工作素材；钉钉读取用 dws",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "日报-skill-daily-report-universal-2026-10-19.zip"
+      },
+      "adaptations": [
+        "个人画像改用空白example模板；安装时生成local-config.md",
+        "钉钉读取入口统一dws；保留先审后写与真实数据规则"
+      ],
+      "file_count": 2,
+      "sha256": "4c3c51e4a6a5b10fcbef04e1e1642a08f282979152667ebf9cbe9220aa6d5936",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "douyin-benchmark",
+      "title": "公开抖音账号对标",
+      "category": "03 抖音与调研",
+      "scope": "team",
+      "path": "skills/douyin-benchmark",
+      "core": true,
+      "requirements": "ego Lite；Node.js；只采公开资料",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "douyin-benchmark",
+        "repository": "https://github.com/kenlinjie/douyin-benchmark"
+      },
+      "adaptations": [],
+      "file_count": 19,
+      "sha256": "7ff2d47a0fa780c1b14f81b295e24b1a584e70a21c38d472bcfdec884e8c7da4",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "write",
+      "title": "文案修改与去AI腔",
+      "category": "02 内容生产",
+      "scope": "team",
+      "path": "skills/write",
+      "core": true,
+      "requirements": "用户原稿或明确的写作事实",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "write"
+      },
+      "adaptations": [
+        "把非标准顶层when_to_use与dispatch_intent保留到metadata，兼容标准技能frontmatter"
+      ],
+      "file_count": 12,
+      "sha256": "f10ae71d942dca9f89bc4760c7153cf225fe1998aef3d9549896725bdc909f9e",
+      "license_files": []
+    },
+    {
+      "id": "voice-loop",
+      "title": "文风与口播长期学习",
+      "category": "02 内容生产",
+      "scope": "team",
+      "path": "skills/voice-loop",
+      "core": false,
+      "requirements": "授权语料；每人单独本地 profile，不包含人物数据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "voice-loop"
+      },
+      "adaptations": [],
+      "file_count": 15,
+      "sha256": "71928cce94f96279f255d3e69566ca6cf800eba591ce64a9827057681bed3498",
+      "license_files": []
+    },
+    {
+      "id": "watch",
+      "title": "看视频与按时间点复盘",
+      "category": "04 视频制作",
+      "scope": "team",
+      "path": "skills/watch",
+      "core": false,
+      "requirements": "Python、ffmpeg、ffprobe；无字幕时需要本地转写运行时",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "watch"
+      },
+      "adaptations": [
+        "本地ASR辅助脚本从同一技能安装目录寻找转写技能"
+      ],
+      "file_count": 13,
+      "sha256": "129b7e99202d143ee50ad772e153a616fec55543a021b45d449af5bc6c601b6f",
+      "license_files": [
+        "LICENSE"
+      ],
+      "depends_on": [
+        "local-sota-transcription"
+      ]
+    },
+    {
+      "id": "local-sota-transcription",
+      "title": "本地中文音视频转写",
+      "category": "04 视频制作",
+      "scope": "team",
+      "path": "skills/local-sota-transcription",
+      "core": false,
+      "requirements": "仅 Apple Silicon Mac；uv、本地模型与语言资源按需配置",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "local-sota-transcription"
+      },
+      "adaptations": [
+        "将开发者绝对主目录改为当前用户HOME；uv从PATH定位；技能路径用SKILL_DIR"
+      ],
+      "file_count": 10,
+      "sha256": "bdd5c76fa90b7b7066bb6df0c7449889b01256c0129acdf15f57480526d42cd7",
+      "license_files": []
+    },
+    {
+      "id": "remotion-talking-head",
+      "title": "口播视频剪辑与包装",
+      "category": "04 视频制作",
+      "scope": "team",
+      "path": "skills/remotion-talking-head",
+      "core": false,
+      "requirements": "Node.js、Remotion、授权源视频；生成视频时再安装依赖",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "remotion-talking-head",
+        "repository": "https://github.com/kenlinjie/remotion-talking-head"
+      },
+      "adaptations": [],
+      "file_count": 9,
+      "sha256": "fc9b32e9272cea339cd91df3da028796ce8292615bd56eaeaa48e17c25ea2a7a",
+      "license_files": []
+    },
+    {
+      "id": "guizang-ppt-skill",
+      "title": "网页演示与培训分享",
+      "category": "05 培训与汇报",
+      "scope": "team",
+      "path": "skills/guizang-ppt-skill",
+      "core": false,
+      "requirements": "HTML演示；脚本验收需要 Node.js；页面动效可离线降级",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "guizang-ppt-skill",
+        "repository": "https://github.com/op7418/guizang-ppt-skill"
+      },
+      "adaptations": [
+        "将示例路径、手机号或邮箱统一为非个人示例"
+      ],
+      "file_count": 41,
+      "sha256": "21e38bc93de0fe64c445fbd91b807cd7efb8e6d94c3ed97e402f248317644bce",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "open-kimi-ppt",
+      "title": "可编辑PPT与PPTD项目",
+      "category": "05 培训与汇报",
+      "scope": "team",
+      "path": "skills/open-kimi-ppt",
+      "core": false,
+      "requirements": "Python、Node.js 18+、Chromium；导出需访问 Kimi 官方资源",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "open-kimi-ppt"
+      },
+      "adaptations": [
+        "入口命令使用当前技能目录SKILL_DIR，不依赖原机器安装路径"
+      ],
+      "file_count": 80,
+      "sha256": "f293ee3d38b16339269a9e7f5ba2571eea5feaf25698d3aa5558a3dd83fabbd4",
+      "license_files": []
+    },
+    {
+      "id": "ppt-master",
+      "title": "SVG转可编辑PPT",
+      "category": "05 培训与汇报",
+      "scope": "team",
+      "path": "skills/ppt-master",
+      "core": false,
+      "requirements": "Python虚拟环境与 requirements.txt；可选配图另需对应能力",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "ppt-master"
+      },
+      "adaptations": [
+        "入口命令使用当前技能目录SKILL_DIR，不依赖原机器安装路径",
+        "补入上游模板架构文档并改为技能内相对引用，独立安装仍能读取",
+        "移除私人设备说明，运行环境按使用者现场检查"
+      ],
+      "file_count": 12141,
+      "sha256": "864c38eb1a6df34f9e3de11f598ca7ddf0e52cd997da6bbb581bde776646c8b7",
+      "license_files": []
+    },
+    {
+      "id": "agent-reach",
+      "title": "联网检索与平台资料读取",
+      "category": "03 抖音与调研",
+      "scope": "team",
+      "path": "skills/agent-reach",
+      "core": false,
+      "requirements": "优先当前可用的连接器；外部CLI与账号按需核验",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "agent-reach"
+      },
+      "adaptations": [],
+      "file_count": 9,
+      "sha256": "98b3e060395f9ed3860eac6eb42b7bb73d96e6493eccd96d84a39f40e029e3e0",
+      "license_files": []
+    },
+    {
+      "id": "defuddle",
+      "title": "网页正文转Markdown",
+      "category": "03 抖音与调研",
+      "scope": "team",
+      "path": "skills/defuddle",
+      "core": false,
+      "requirements": "Defuddle CLI；需要时再安装，不代表已有登录态",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "defuddle"
+      },
+      "adaptations": [],
+      "file_count": 1,
+      "sha256": "35b98b1114bdc8f0c1829cf00b8064f579c95e998089d121b84d6071acf9b2f5",
+      "license_files": []
+    },
+    {
+      "id": "obsidian-cli",
+      "title": "Obsidian笔记操作",
+      "category": "06 日报与知识管理",
+      "scope": "team",
+      "path": "skills/obsidian-cli",
+      "core": false,
+      "requirements": "Obsidian与CLI；用户主动打开目标知识库后使用",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "obsidian-cli"
+      },
+      "adaptations": [],
+      "file_count": 1,
+      "sha256": "e872fdf8931880ba097f5206de667272e2b33763e35cc7e44751ea99dcd3f6ba",
+      "license_files": []
+    },
+    {
+      "id": "obsidian-markdown",
+      "title": "Obsidian笔记格式",
+      "category": "06 日报与知识管理",
+      "scope": "team",
+      "path": "skills/obsidian-markdown",
+      "core": true,
+      "requirements": "用户指定知识库；无外部账号依赖",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "obsidian-markdown"
+      },
+      "adaptations": [],
+      "file_count": 4,
+      "sha256": "7ccccf454d251ca36557afdf042e14d89f980a4a3a1c37e1064b2a1157a0a642",
+      "license_files": []
+    },
+    {
+      "id": "obsidian-bases",
+      "title": "Obsidian数据视图",
+      "category": "06 日报与知识管理",
+      "scope": "team",
+      "path": "skills/obsidian-bases",
+      "core": false,
+      "requirements": "Obsidian Bases；指定笔记与字段",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "obsidian-bases"
+      },
+      "adaptations": [],
+      "file_count": 2,
+      "sha256": "4af5e1d24d62f93864e33b02f4fef7501b59ac2a746c879992355dd7278278b2",
+      "license_files": []
+    },
+    {
+      "id": "json-canvas",
+      "title": "Obsidian思维画布",
+      "category": "06 日报与知识管理",
+      "scope": "team",
+      "path": "skills/json-canvas",
+      "core": false,
+      "requirements": "Obsidian或兼容JSON Canvas的工具",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "json-canvas"
+      },
+      "adaptations": [],
+      "file_count": 2,
+      "sha256": "0bb96479383f4237e8e249a4f476488c9f8f18539fcb09535f128ad1b6ef29bf",
+      "license_files": []
+    },
+    {
+      "id": "dingtalk-shared",
+      "title": "钉钉入口与认证规则",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-shared",
+      "core": true,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-shared"
+      },
+      "adaptations": [
+        "将示例路径、手机号或邮箱统一为非个人示例"
+      ],
+      "file_count": 15,
+      "sha256": "d6834dfcbaced8740510d921babe0d0584306446972b5923eae5ccab58c878bc",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-aicard",
+      "title": "钉钉AI卡片",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-aicard",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-aicard"
+      },
+      "adaptations": [],
+      "file_count": 31,
+      "sha256": "8e584651ec535bf4e58ba0931f88835c561fb7e5b56d6e24c5789cc65d798ab8",
+      "license_files": [
+        "LICENSE",
+        "references/protocol/LICENSE"
+      ],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-aisearch",
+      "title": "钉钉跨源搜索",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-aisearch",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-aisearch"
+      },
+      "adaptations": [],
+      "file_count": 4,
+      "sha256": "3b75ca34cd316abf2ac05117a5290f70684cf576dd0758f68321b7880e875bba",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-aitable",
+      "title": "钉钉AI表格",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-aitable",
+      "core": true,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-aitable"
+      },
+      "adaptations": [
+        "将示例路径、手机号或邮箱统一为非个人示例"
+      ],
+      "file_count": 45,
+      "sha256": "bfe0f7f5e4636ee97ee77b9def750b492043a21a807f3097f9e93f44dad165f9",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-calendar",
+      "title": "钉钉日历",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-calendar",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-calendar"
+      },
+      "adaptations": [],
+      "file_count": 8,
+      "sha256": "38d2aef337e334bb88271dcdcc6d6d32fb72fa6384e88370372a123f816ede07",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-chat",
+      "title": "钉钉群消息",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-chat",
+      "core": true,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-chat"
+      },
+      "adaptations": [],
+      "file_count": 19,
+      "sha256": "54cab5ead67a05e2bba24ca27908c9de1556bb1ec75f8f30f0848515abddc185",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-contact",
+      "title": "钉钉通讯录",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-contact",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-contact"
+      },
+      "adaptations": [
+        "将示例路径、手机号或邮箱统一为非个人示例"
+      ],
+      "file_count": 7,
+      "sha256": "c4aca6efb3103544060445871e360f9caaa870fc483c79d917c43b87fbc97109",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-doc",
+      "title": "钉钉在线文档",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-doc",
+      "core": true,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-doc"
+      },
+      "adaptations": [],
+      "file_count": 20,
+      "sha256": "ee77fd3d6e61e8c97f2e1a9ff36954f1192900a36992651d592e766d972c53eb",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-drive",
+      "title": "钉钉文件与钉盘",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-drive",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-drive"
+      },
+      "adaptations": [],
+      "file_count": 5,
+      "sha256": "8d0088746349605afd4c7021921b1a92a1ac612276d75055895a76d9f8956ea0",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-event",
+      "title": "钉钉事件监听",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-event",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-event"
+      },
+      "adaptations": [],
+      "file_count": 10,
+      "sha256": "753eb8308b386206271f1c95bac36427f9b38f7f289cc2c1ac761fea72403203",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-mail",
+      "title": "钉钉邮箱",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-mail",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-mail"
+      },
+      "adaptations": [
+        "将示例路径、手机号或邮箱统一为非个人示例"
+      ],
+      "file_count": 8,
+      "sha256": "b2221ab55fe2c4d55bef98fded6ba50f073d83d0247b04df4da6cb658bce77ea",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-minutes",
+      "title": "钉钉AI听记",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-minutes",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-minutes"
+      },
+      "adaptations": [],
+      "file_count": 12,
+      "sha256": "15bc6579d48bb22af3144c453e56c355e99f40808b32703ff3d81a49ebcc5659",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-misc",
+      "title": "钉钉日志与电子表格等",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-misc",
+      "core": true,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-misc"
+      },
+      "adaptations": [
+        "将示例路径、手机号或邮箱统一为非个人示例"
+      ],
+      "file_count": 184,
+      "sha256": "0bace23d380b99e5d82e14a3208f42776921ad3c18e9f32494210636aa519e76",
+      "license_files": []
+    },
+    {
+      "id": "dingtalk-tag",
+      "title": "钉钉数字员工",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-tag",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-tag"
+      },
+      "adaptations": [],
+      "file_count": 6,
+      "sha256": "df2d9cd093ebfcb975cbe6e477fc9f5e36c7c0eb726a385c5107f7d57cdca160",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-todo",
+      "title": "钉钉待办",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-todo",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-todo"
+      },
+      "adaptations": [],
+      "file_count": 9,
+      "sha256": "fa5194156b50a06837feaf629c3ddf71f622281dece69f7c91762dfbdb885338",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    },
+    {
+      "id": "dingtalk-wiki",
+      "title": "钉钉知识库",
+      "category": "07 钉钉协作",
+      "scope": "team",
+      "path": "skills/dingtalk-wiki",
+      "core": false,
+      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "dingtalk-wiki"
+      },
+      "adaptations": [],
+      "file_count": 6,
+      "sha256": "e7f85f39cd254e2b4bf3370a80106900fe861f57d5d78f6d12f2304db1784529",
+      "license_files": [],
+      "depends_on": [
+        "dingtalk-shared",
+        "dingtalk-misc"
+      ]
+    }
+  ]
+}

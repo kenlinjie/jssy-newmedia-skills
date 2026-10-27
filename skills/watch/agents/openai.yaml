@@ -1,0 +1,7 @@
+interface:
+  display_name: "本地视频理解"
+  short_description: "本地 Qwen 转写与画面证据联合分析"
+  default_prompt: "Use $watch to analyze this video from verified local transcript and timestamped visual evidence."
+
+policy:
+  allow_implicit_invocation: true

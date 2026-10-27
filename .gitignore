@@ -1,0 +1,14 @@
+.DS_Store
+.local/
+dist/
+*.zip
+*.zip.sha256
+**/.git/
+**/.env
+**/local-config.md
+**/node_modules/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/voice-profiles/
