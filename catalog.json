@@ -24,7 +24,7 @@
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "a7bce758377533ea8ad7448ba84b1516df0c166c8d2e67d5a8cb87adcb732e18",
+      "sha256": "1bdd9a28f7cc3a267c45c6942e91bddfd7045954fcb9e37cff820b6c8a1cdfd5",
       "external_tools": [
         "dingtalk-cli",
         "ego-browser"
@@ -138,7 +138,7 @@
         "reference": "2026-10-27 直播后台填表与老师引导请求"
       },
       "adaptations": [
-        "实查登录账号；引导确定目标表与字段；按场次查重、写后读回；个人执行状态在项目外"
+        "实查登录账号；按老师提供表头填写确定值；不确定先不写，填后主动用大白话问清方向；场次查重与写后读回；个人状态在项目外"
       ],
       "required_files": [
         "references/field-mapping-and-writeback.md",
@@ -150,7 +150,7 @@
         "dingtalk-cli"
       ],
       "file_count": 3,
-      "sha256": "200c5992f7388aac5175a90c85cd7aa8d7b98c90e149c0943ddb0c3b14d7334e"
+      "sha256": "ca5c19e7947d88ea4559d42581a764abdb5e598f8dc9173e14566b233f4a0e9b"
     },
     {
       "id": "write",
