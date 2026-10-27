@@ -13,48 +13,15 @@
 - 多账号不能选列表第一项：复用明确的当前组织，否则请用户选择。安装报告只写用户能认出的账号／组织简称，不导出联系人列表或办公正文。
 - 安装后确认当前 agent 进程能找到 CLI，必要时重载会话。检查官方随 CLI 提供的 skill 是否被当前宿主发现；未发现时按宿主现行路径接入所需 skill，不覆盖同名实体目录。此 skill 不依赖另一份必须预先存在的私有 skill。
 
-## 钉钉：统一使用 DWS
+## 钉钉：直接使用官方 CLI
 
-来源：[官方 GitHub](https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli)、[官方 Gitee](https://gitee.com/DingTalk-Real-AI/dingtalk-workspace-cli)、[开放平台](https://open.dingtalk.com/dingtalk-dev/wiki)。
+国内入口：[钉钉 CLI 官方站](https://open.dingtalk.com/dingtalk-cli)。命令细节见[官方命令参考](https://open.dingtalk.com/dingtalk-dev/wiki)。
 
-### 安装与更新
+安装、更新、登录与官方技能接入均以官网当次说明为准，本项目不维护钉钉产品技能副本，也不把固定安装命令或旧版本作为当前事实。
 
-先读当次 README 的当前平台安装部分。不能科学上网时优先检查官方 Gitee 的当前安装与发布；GitHub 受阻时不去找随机镜像。两处都不可达时，说明下载条件缺失，继续本地知识库部分。
+复用现有安装与可用登录。核对当前 CLI 版本、本人身份和当前组织，再做一次用户授权范围内的最小只读业务读取。仅安装或登录成功，不代表文档、消息与表格均已获权；组织审批或权限受阻时如实记录具体缺口，继续其他独立部分。
 
-官方 npm 安装方式在当次文档中仍有效、且 Node 可用时，可采用：
-
-```bash
-npm install -g dingtalk-workspace-cli@latest
-dws --version
-```
-
-独立二进制与 npm 是不同更新渠道。已有二进制按其当前官方更新方式处理；npm 安装按 npm 升级，避免重复安装或命令仍指向旧版。Windows 调用当前支持的 PowerShell 安装器或 npm，不能复制 Mac 的 shell 管道。
-
-### 登录与最小验收
-
-```bash
-dws auth status --format json
-```
-
-已有可用登录则直接核对当前组织；未登录才执行：
-
-```bash
-dws auth login
-```
-
-无图形环境时，按当前官方说明使用 `dws auth login --device` 并让用户完成官方设备授权。明确使用国际版／`.io` 区域时用 `dws auth login --intl`，不能先按国内账号登录。登录是目标电脑上的动作，不把另一台执行器的登录算作完成。
-
-然后验证一次真实 API 读取：
-
-```bash
-dws contact user get-self --format json
-```
-
-这里只核对本人身份与组织，不把完整返回保存进知识库。若用户指定了可读文档，再按当前官方产品 skill／命令 Schema 读取标题或一小段，验证该能力；基本通讯录读取通过不代表所有消息、文档、表格权限都已授予。
-
-组织未开通 CLI 访问时，把 CLI 给出的官方申请入口、管理员需处理的事项和重试条件讲清楚。用户自行提交申请；不要代发申请卡片、聊天消息或通知。等待批准期间保留“已安装，企业授权待完成”。
-
-DWS 业务能力、参数和权限以当前准确命令的 Schema 或官方 skill 为准。参数漂移时读取对应叶子命令说明修正一次，不能猜命令循环尝试。CLI 做不到时说明具体限制，不改用浏览器、MCP 或自行拼接口读写钉钉业务数据。
+授权、扫码与管理员审批在官方界面由用户完成，不索要聊天中的凭据，不发送测试消息或新建业务文档。官方技能、参数和权限按当前官网与准确命令的 Schema 核验；业务统一用 `dws`，CLI 无法完成时说明限制，不改用浏览器或其他连接器读写钉钉数据。
 
 ## 飞书：官方 lark-cli
 

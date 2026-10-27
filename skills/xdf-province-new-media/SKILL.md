@@ -15,7 +15,7 @@ description: 新东方省域新媒体工作的技能入口。用于跨公众号�
 - 公开抖音对标：`douyin-benchmark`；视频与画面复盘：`watch`；转写：`local-sota-transcription`；口播剪辑：`remotion-talking-head`。
 - 日报：`daily-report-universal`，按使用者本人的真实素材和历史习惯生成。个人配置与样本保存在项目外，不改写共享模板。
 - 可编辑 PPT：`open-kimi-ppt` 或 `ppt-master`；网页演示：`guizang-ppt-skill`。以用户要求的格式为准。
-- 钉钉协作：明确产品直接读对应 `dingtalk-*`；跨产品或入口不明才读 `dingtalk-shared`。业务操作统一用 `dws`。
+- 钉钉协作：直接使用[钉钉 CLI 官方站](https://open.dingtalk.com/dingtalk-cli)提供的安装、授权和官方技能；命令细节按[官方命令参考](https://open.dingtalk.com/dingtalk-dev/wiki)及当前 CLI 核验。本项目不附带钉钉产品技能，业务操作统一用 `dws`。
 - 笔记、视图与画布：`obsidian-markdown`、`obsidian-bases`、`json-canvas`；操作已打开的 Obsidian 时用 `obsidian-cli`。
 
 ## 数据与衔接

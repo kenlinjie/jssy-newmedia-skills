@@ -22,19 +22,4 @@
 | Obsidian笔记格式 | [obsidian-markdown](../../obsidian-markdown/SKILL.md) | 用户指定知识库；无外部账号依赖 |
 | Obsidian数据视图 | [obsidian-bases](../../obsidian-bases/SKILL.md) | Obsidian Bases；指定笔记与字段 |
 | Obsidian思维画布 | [json-canvas](../../json-canvas/SKILL.md) | Obsidian或兼容JSON Canvas的工具 |
-| 钉钉入口与认证规则 | [dingtalk-shared](../../dingtalk-shared/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉AI卡片 | [dingtalk-aicard](../../dingtalk-aicard/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉跨源搜索 | [dingtalk-aisearch](../../dingtalk-aisearch/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉AI表格 | [dingtalk-aitable](../../dingtalk-aitable/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉日历 | [dingtalk-calendar](../../dingtalk-calendar/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉群消息 | [dingtalk-chat](../../dingtalk-chat/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉通讯录 | [dingtalk-contact](../../dingtalk-contact/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉在线文档 | [dingtalk-doc](../../dingtalk-doc/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉文件与钉盘 | [dingtalk-drive](../../dingtalk-drive/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉事件监听 | [dingtalk-event](../../dingtalk-event/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉邮箱 | [dingtalk-mail](../../dingtalk-mail/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉AI听记 | [dingtalk-minutes](../../dingtalk-minutes/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉日志与电子表格等 | [dingtalk-misc](../../dingtalk-misc/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉数字员工 | [dingtalk-tag](../../dingtalk-tag/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉待办 | [dingtalk-todo](../../dingtalk-todo/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
-| 钉钉知识库 | [dingtalk-wiki](../../dingtalk-wiki/SKILL.md) | dws；本人组织账号及所用产品权限；不打包登录凭据 |
+| 钉钉消息、文档、AI 表格、日历等 | [钉钉 CLI 官方站](https://open.dingtalk.com/dingtalk-cli) | 外部工具；按官网当前说明安装、授权并接入官方技能 |

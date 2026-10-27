@@ -75,7 +75,11 @@ def select(args, data):
 def check(data, entries=None):
     entries = data['skills'] if entries is None else entries
     errors = audit_project()
+    external_ids = {item['id'] for item in data.get('external_tools', [])}
     for item in entries:
+        for dependency in item.get('external_tools', []):
+            if dependency not in external_ids:
+                errors.append(f"{item['id']}：缺少外部工具入口 {dependency}")
         folder = ROOT / item['path']
         entry = folder / 'SKILL.md'
         if not entry.is_file():
@@ -208,7 +212,9 @@ def main():
         if args.command == 'list':
             for item in entries:
                 print(f"{item['category']} | {item['id']} | {item['title']} | {item['scope']}")
-            print(f'共 {len(entries)} 个技能。')
+            print(f'共 {len(entries)} 个随附技能。')
+            for item in data.get('external_tools', []):
+                print(f"外部官方工具（按需） | {item['title']} | {item['homepage']}")
         elif args.command == 'check':
             errors = check(data, entries)
             if errors:

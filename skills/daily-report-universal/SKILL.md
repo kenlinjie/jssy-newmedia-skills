@@ -40,6 +40,8 @@ description: 团队通用日报 skill：一个包、自动认人。全体成员�
 
 ### 第一步：获取历史日报（按优先级回退）
 
+需要钉钉时，先按[钉钉 CLI 官方站](https://open.dingtalk.com/dingtalk-cli)完成安装、官方技能接入与本人授权。命令以官网和当前 CLI 为准，本项目不附带钉钉产品技能。
+
 1. **钉钉 CLI（首选）**——只读拉取「本人发出的日志」。按当前环境实际可用的方式调用，本项目使用：
    - **`dws`（钉钉全产品能力，WorkBuddy / Codex / CC 等已接入钉钉的环境通用）**：`dws report template list --format json` 定日报模板 → `dws report outbox list --cursor 0 --size 20 --format json` 拉「我发出」的日志列表 → 对每篇执行 `dws report entry get --report-id <id> --format json` 取完整正文。注意单次查询时间跨度上限 20 天，拉历史全量要按不超过 20 天的窗口用 `--start` 向前滚动查询；
    - 钉钉业务只使用 `dws`；CLI 无法完成时说明限制，转用用户提供的本地导出，不自行换连接器；

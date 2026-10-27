@@ -11,6 +11,7 @@
 | `remotion-talking-head` | https://github.com/kenlinjie/remotion-talking-head ，未随附独立 LICENSE |
 | `watch` | 技能内说明帧抽取核心来自 bradautomates/claude-video ，保留现有 MIT LICENSE |
 | `daily-report-universal` | 通用日报技能分发包，仅保留通用流程与空白模板 |
-| `dingtalk-*` | DWS MultiSkill 通用产品说明与参考，不含 CLI 二进制或登录状态 |
 
 文件哈希、依赖、适配和许可证位置见 `catalog.json`。路径通用化、共享配置隔离和隐私清理只作用于本项目副本。运行时、模型和服务在使用时按实际环境配置。
+
+钉钉相关只保留[CLI 官方站](https://open.dingtalk.com/dingtalk-cli)与[官方命令参考](https://open.dingtalk.com/dingtalk-dev/wiki)外链，不再分发钉钉产品技能或参考副本。

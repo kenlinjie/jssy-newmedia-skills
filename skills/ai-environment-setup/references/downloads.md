@@ -38,7 +38,7 @@
 | Obsidian | [下载](https://obsidian.md/download)、[更新说明](https://obsidian.md/help/updates)、[官方发布](https://github.com/obsidianmd/obsidian-releases/releases/latest) | 以官网下载页标出的当前公开版为准；区分应用版本和安装器版本，不能只更新应用而一直留下旧安装器。禁用 Insider／Catalyst 作为默认安装目标。 |
 | Git | [官网安装入口](https://git-scm.com/install/)、[Mac](https://git-scm.com/install/mac)、[Windows](https://git-scm.com/install/windows) | 核对目标平台的当前发行版并读回 `git --version`。Apple Git、Homebrew Git 和 Git for Windows 的版本标识不同，要写清发行渠道。 |
 | Obsidian Git | [插件主页](https://github.com/Vinzent03/obsidian-git)、[安装说明](https://publish.obsidian.md/git-doc/Installation)、[正式发布](https://github.com/Vinzent03/obsidian-git/releases/latest) | 社区插件里的 Git，插件 ID 为 `obsidian-git`。核对作者／仓库、发布版本、插件 manifest 的 `minAppVersion`、实际启用状态。 |
-| 钉钉 DWS | [官方仓库](https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli)、[官方 Gitee](https://gitee.com/DingTalk-Real-AI/dingtalk-workspace-cli)、[开发者入口](https://open.dingtalk.com/dingtalk-dev/wiki) | 从当次官方安装说明选择二进制或 npm 渠道；`dws --version`。国内访问优先核对官方 Gitee 的当前正式发布。 |
+| 钉钉 DWS | [CLI 官方站](https://open.dingtalk.com/dingtalk-cli)、[官方命令参考](https://open.dingtalk.com/dingtalk-dev/wiki) | 国内优先直接打开官方站，安装、授权和官方技能接入以当次官网为准；版本与实际读取在安装后核验。 |
 | 飞书 CLI | [飞书团队官方仓库](https://github.com/larksuite/cli)、[开放平台](https://open.feishu.cn/) | 核对官方说明、npm `@larksuite/cli` 的 `latest`，按当前官方安装器获取 `lark-cli`，读回 CLI 版本。不要混用同名第三方 CLI。 |
 | Node.js（仅缺少且需要时） | [官网](https://nodejs.org/en/download)、[官方发布索引](https://nodejs.org/dist/index.json) | 先检查现有 Node／npm 是否满足目标 CLI 的当前要求。需要新装时选最新受支持 LTS，匹配系统和架构；LTS 不等于 Current。 |
 

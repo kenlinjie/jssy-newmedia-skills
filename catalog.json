@@ -15,14 +15,19 @@
         "kind": "created-in-project",
         "reference": "2026-10-27 省域整合请求"
       },
-      "adaptations": [],
+      "adaptations": [
+        "钉钉能力仅引用国内可访问的CLI官方站，使用官方当前技能，不随附产品技能副本"
+      ],
       "required_files": [
         "references/skill-map.md",
         "agents/openai.yaml"
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "a6771f8685def19ea4903b143cd6ffdc82d67c69d025621ed5b3899c55d66927"
+      "sha256": "f297f211c37d644637c8fea78a2bb4044c5148b670d2f0587e50d01f27a346f7",
+      "external_tools": [
+        "dingtalk-cli"
+      ]
     },
     {
       "id": "ai-environment-setup",
@@ -37,11 +42,16 @@
         "reference": "ai-environment-setup",
         "repository": "https://github.com/kenlinjie/ai-environment-setup"
       },
-      "adaptations": [],
+      "adaptations": [
+        "钉钉能力仅引用国内可访问的CLI官方站，使用官方当前技能，不随附产品技能副本"
+      ],
       "file_count": 14,
-      "sha256": "deeeb25af4087652294c365800e1b03ee586b4c513a4bf09df7d7b8a505e6fc3",
+      "sha256": "9a9acad6b6618d7e21fb10d46bd311c5762a96759e91a8f80822160a81f8ba18",
       "license_files": [
         "LICENSE"
+      ],
+      "external_tools": [
+        "dingtalk-cli"
       ]
     },
     {
@@ -80,14 +90,14 @@
       },
       "adaptations": [
         "个人画像改用空白example模板；安装时生成local-config.md",
-        "钉钉读取入口统一dws；保留先审后写与真实数据规则"
+        "钉钉读取入口统一dws；保留先审后写与真实数据规则",
+        "钉钉能力仅引用国内可访问的CLI官方站，使用官方当前技能，不随附产品技能副本"
       ],
       "file_count": 2,
-      "sha256": "4c3c51e4a6a5b10fcbef04e1e1642a08f282979152667ebf9cbe9220aa6d5936",
+      "sha256": "cc49f84b3dd5b7ea709d69067f50d1817f14fcac805ab578ad5d644748f0c040",
       "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
+      "external_tools": [
+        "dingtalk-cli"
       ]
     },
     {
@@ -370,350 +380,16 @@
       "file_count": 2,
       "sha256": "0bb96479383f4237e8e249a4f476488c9f8f18539fcb09535f128ad1b6ef29bf",
       "license_files": []
-    },
+    }
+  ],
+  "external_tools": [
     {
-      "id": "dingtalk-shared",
-      "title": "钉钉入口与认证规则",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-shared",
-      "core": true,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-shared"
-      },
-      "adaptations": [
-        "将示例路径、手机号或邮箱统一为非个人示例"
-      ],
-      "file_count": 15,
-      "sha256": "d6834dfcbaced8740510d921babe0d0584306446972b5923eae5ccab58c878bc",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-aicard",
-      "title": "钉钉AI卡片",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-aicard",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-aicard"
-      },
-      "adaptations": [],
-      "file_count": 31,
-      "sha256": "8e584651ec535bf4e58ba0931f88835c561fb7e5b56d6e24c5789cc65d798ab8",
-      "license_files": [
-        "LICENSE",
-        "references/protocol/LICENSE"
-      ],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-aisearch",
-      "title": "钉钉跨源搜索",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-aisearch",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-aisearch"
-      },
-      "adaptations": [],
-      "file_count": 4,
-      "sha256": "3b75ca34cd316abf2ac05117a5290f70684cf576dd0758f68321b7880e875bba",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-aitable",
-      "title": "钉钉AI表格",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-aitable",
-      "core": true,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-aitable"
-      },
-      "adaptations": [
-        "将示例路径、手机号或邮箱统一为非个人示例"
-      ],
-      "file_count": 45,
-      "sha256": "bfe0f7f5e4636ee97ee77b9def750b492043a21a807f3097f9e93f44dad165f9",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-calendar",
-      "title": "钉钉日历",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-calendar",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-calendar"
-      },
-      "adaptations": [],
-      "file_count": 8,
-      "sha256": "38d2aef337e334bb88271dcdcc6d6d32fb72fa6384e88370372a123f816ede07",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-chat",
-      "title": "钉钉群消息",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-chat",
-      "core": true,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-chat"
-      },
-      "adaptations": [],
-      "file_count": 19,
-      "sha256": "54cab5ead67a05e2bba24ca27908c9de1556bb1ec75f8f30f0848515abddc185",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-contact",
-      "title": "钉钉通讯录",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-contact",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-contact"
-      },
-      "adaptations": [
-        "将示例路径、手机号或邮箱统一为非个人示例"
-      ],
-      "file_count": 7,
-      "sha256": "c4aca6efb3103544060445871e360f9caaa870fc483c79d917c43b87fbc97109",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-doc",
-      "title": "钉钉在线文档",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-doc",
-      "core": true,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-doc"
-      },
-      "adaptations": [],
-      "file_count": 20,
-      "sha256": "ee77fd3d6e61e8c97f2e1a9ff36954f1192900a36992651d592e766d972c53eb",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-drive",
-      "title": "钉钉文件与钉盘",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-drive",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-drive"
-      },
-      "adaptations": [],
-      "file_count": 5,
-      "sha256": "8d0088746349605afd4c7021921b1a92a1ac612276d75055895a76d9f8956ea0",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-event",
-      "title": "钉钉事件监听",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-event",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-event"
-      },
-      "adaptations": [],
-      "file_count": 10,
-      "sha256": "753eb8308b386206271f1c95bac36427f9b38f7f289cc2c1ac761fea72403203",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-mail",
-      "title": "钉钉邮箱",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-mail",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-mail"
-      },
-      "adaptations": [
-        "将示例路径、手机号或邮箱统一为非个人示例"
-      ],
-      "file_count": 8,
-      "sha256": "b2221ab55fe2c4d55bef98fded6ba50f073d83d0247b04df4da6cb658bce77ea",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-minutes",
-      "title": "钉钉AI听记",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-minutes",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-minutes"
-      },
-      "adaptations": [],
-      "file_count": 12,
-      "sha256": "15bc6579d48bb22af3144c453e56c355e99f40808b32703ff3d81a49ebcc5659",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-misc",
-      "title": "钉钉日志与电子表格等",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-misc",
-      "core": true,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-misc"
-      },
-      "adaptations": [
-        "将示例路径、手机号或邮箱统一为非个人示例"
-      ],
-      "file_count": 184,
-      "sha256": "0bace23d380b99e5d82e14a3208f42776921ad3c18e9f32494210636aa519e76",
-      "license_files": []
-    },
-    {
-      "id": "dingtalk-tag",
-      "title": "钉钉数字员工",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-tag",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-tag"
-      },
-      "adaptations": [],
-      "file_count": 6,
-      "sha256": "df2d9cd093ebfcb975cbe6e477fc9f5e36c7c0eb726a385c5107f7d57cdca160",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-todo",
-      "title": "钉钉待办",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-todo",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-todo"
-      },
-      "adaptations": [],
-      "file_count": 9,
-      "sha256": "fa5194156b50a06837feaf629c3ddf71f622281dece69f7c91762dfbdb885338",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
-    },
-    {
-      "id": "dingtalk-wiki",
-      "title": "钉钉知识库",
-      "category": "07 钉钉协作",
-      "scope": "team",
-      "path": "skills/dingtalk-wiki",
-      "core": false,
-      "requirements": "dws；本人组织账号及所用产品权限；不打包登录凭据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "dingtalk-wiki"
-      },
-      "adaptations": [],
-      "file_count": 6,
-      "sha256": "e7f85f39cd254e2b4bf3370a80106900fe861f57d5d78f6d12f2304db1784529",
-      "license_files": [],
-      "depends_on": [
-        "dingtalk-shared",
-        "dingtalk-misc"
-      ]
+      "id": "dingtalk-cli",
+      "title": "钉钉 CLI（dws）",
+      "homepage": "https://open.dingtalk.com/dingtalk-cli",
+      "documentation": "https://open.dingtalk.com/dingtalk-dev/wiki",
+      "bundled": false,
+      "requirements": "按官网当前说明安装CLI、接入官方技能并完成本人授权；业务统一使用dws"
     }
   ]
 }

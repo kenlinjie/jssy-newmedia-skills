@@ -1,6 +1,6 @@
 # 新东方省域新媒体技能包
 
-本项目包含 **35 个通用技能**，覆盖 AI 工作环境、公众号、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。
+本项目包含 **19 个通用技能**，覆盖 AI 工作环境、公众号、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。
 
 ## 固定下载入口
 
@@ -41,26 +41,11 @@
 | Obsidian笔记格式 | [obsidian-markdown](skills/obsidian-markdown/SKILL.md) |
 | Obsidian数据视图 | [obsidian-bases](skills/obsidian-bases/SKILL.md) |
 | Obsidian思维画布 | [json-canvas](skills/json-canvas/SKILL.md) |
-| 钉钉入口与认证规则 | [dingtalk-shared](skills/dingtalk-shared/SKILL.md) |
-| 钉钉AI卡片 | [dingtalk-aicard](skills/dingtalk-aicard/SKILL.md) |
-| 钉钉跨源搜索 | [dingtalk-aisearch](skills/dingtalk-aisearch/SKILL.md) |
-| 钉钉AI表格 | [dingtalk-aitable](skills/dingtalk-aitable/SKILL.md) |
-| 钉钉日历 | [dingtalk-calendar](skills/dingtalk-calendar/SKILL.md) |
-| 钉钉群消息 | [dingtalk-chat](skills/dingtalk-chat/SKILL.md) |
-| 钉钉通讯录 | [dingtalk-contact](skills/dingtalk-contact/SKILL.md) |
-| 钉钉在线文档 | [dingtalk-doc](skills/dingtalk-doc/SKILL.md) |
-| 钉钉文件与钉盘 | [dingtalk-drive](skills/dingtalk-drive/SKILL.md) |
-| 钉钉事件监听 | [dingtalk-event](skills/dingtalk-event/SKILL.md) |
-| 钉钉邮箱 | [dingtalk-mail](skills/dingtalk-mail/SKILL.md) |
-| 钉钉AI听记 | [dingtalk-minutes](skills/dingtalk-minutes/SKILL.md) |
-| 钉钉日志与电子表格等 | [dingtalk-misc](skills/dingtalk-misc/SKILL.md) |
-| 钉钉数字员工 | [dingtalk-tag](skills/dingtalk-tag/SKILL.md) |
-| 钉钉待办 | [dingtalk-todo](skills/dingtalk-todo/SKILL.md) |
-| 钉钉知识库 | [dingtalk-wiki](skills/dingtalk-wiki/SKILL.md) |
+| 钉钉消息、文档、AI 表格、日历等 | [钉钉 CLI 官方站](https://open.dingtalk.com/dingtalk-cli)（外部工具） |
 
 ## 安装与打包
 
-需要 Python 3.9+。安装器只复制技能，不安装软件、不登录账号，已有同名技能会保留。
+需要 Python 3.9+。安装器只复制随附技能，不安装软件、不登录账号，已有同名技能会保留。钉钉相关直接使用[官方 CLI 站点](https://open.dingtalk.com/dingtalk-cli)提供的安装、授权与官方技能；本项目不再随附钉钉产品技能副本。
 
 ```bash
 python3 scripts/skillpack.py list --profile core
@@ -71,7 +56,7 @@ python3 scripts/skillpack.py install --target workbuddy --profile core --apply
 python3 scripts/skillpack.py package
 ```
 
-`core` 是 12 个常用技能，`team` 是全部 35 个。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
+`core` 是 7 个常用技能，`team` 是全部 19 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
 
 日常下载直接使用上面的固定入口，无需等待单独的安装包。需要自行分发时可运行打包命令，生成的文件保存在本地 `dist/`，不会自动上传。
 
