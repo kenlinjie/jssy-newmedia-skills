@@ -1,0 +1,48 @@
+name: 镜像到 Gitee
+
+# 每次推送到 main 或打标签时，把 GitHub 仓库同步一份到 Gitee。
+# 需要的仓库 Secrets：
+#   GITEE_TOKEN  Gitee 私人令牌（仓库级，仅限目标仓库，权限 projects）
+#   GITEE_REPO   Gitee 仓库路径，形如 用户名/仓库名
+
+on:
+  push:
+    branches: [main]
+    tags: ['**']
+  workflow_dispatch:
+
+concurrency:
+  group: gitee-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 检出完整历史
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 推送到 Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          GITEE_REPO: ${{ secrets.GITEE_REPO }}
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          set -euo pipefail
+          if [ -z "${GITEE_TOKEN}" ] || [ -z "${GITEE_REPO}" ]; then
+            echo "缺少 GITEE_TOKEN 或 GITEE_REPO" >&2
+            exit 1
+          fi
+          owner="${GITEE_REPO%%/*}"
+          url="https://${owner}:${GITEE_TOKEN}@gitee.com/${GITEE_REPO}.git"
+
+          git push --force "$url" "refs/remotes/origin/main:refs/heads/main"
+          if [ -n "$(git tag)" ]; then
+            git push --force --tags "$url"
+          fi
+
+          echo "已同步 ${GITEE_REPO} @ $(git rev-parse --short HEAD)"
