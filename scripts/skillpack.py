@@ -155,12 +155,12 @@ def package(args, data):
     errors = check(data, entries)
     if errors:
         raise ValueError('\n'.join(errors))
-    output = Path(args.output).expanduser().absolute() if args.output else ROOT / 'dist/XDF-省域新媒体-skills-团队版.zip'
+    output = Path(args.output).expanduser().absolute() if args.output else ROOT / 'dist/省域新媒体-skills-团队版.zip'
     output.parent.mkdir(parents=True, exist_ok=True)
     portable = {k: v for k, v in data.items() if k != 'skills'}
     portable['skills'] = entries
-    prefix = 'XDF-省域新媒体-skills'
-    handle, temporary = tempfile.mkstemp(prefix='.xdf-package-', suffix='.tmp', dir=output.parent)
+    prefix = '省域新媒体-skills'
+    handle, temporary = tempfile.mkstemp(prefix='.province-package-', suffix='.tmp', dir=output.parent)
     os.close(handle)
     try:
         with zipfile.ZipFile(temporary, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:

@@ -1,4 +1,4 @@
-# 新东方省域新媒体技能包
+# 省域新媒体技能包
 
 本项目包含 **17 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。PPT 统一使用 `ppt-master`。
 
@@ -22,7 +22,7 @@
 
 | 场景 | 技能 |
 | --- | --- |
-| 省域新媒体综合工作入口 | [xdf-province-new-media](skills/xdf-province-new-media/SKILL.md) |
+| 省域新媒体综合工作入口 | [province-new-media](skills/province-new-media/SKILL.md) |
 | AI环境配置 | [ai-environment-setup](skills/ai-environment-setup/SKILL.md) |
 | 公众号写稿与排版 | [gzh-design](skills/gzh-design/SKILL.md) |
 | 团队通用日报 | [daily-report-universal](skills/daily-report-universal/SKILL.md) |

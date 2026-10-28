@@ -1,14 +1,14 @@
 {
-  "name": "新东方省域新媒体技能包",
+  "name": "省域新媒体技能包",
   "version": "2026.10.28",
   "python_minimum": "3.9",
   "skills": [
     {
-      "id": "xdf-province-new-media",
+      "id": "province-new-media",
       "title": "省域新媒体综合工作入口",
       "category": "00 项目入口",
       "scope": "team",
-      "path": "skills/xdf-province-new-media",
+      "path": "skills/province-new-media",
       "core": true,
       "requirements": "已有可读技能的agent；按任务使用当前真实工具与数据",
       "source": {
@@ -26,7 +26,7 @@
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "47d45ad2c48816464eb17e5c40b0a27b86f3b26a575ddfe8395f35ce327f4288",
+      "sha256": "77153ebeb119b660cc53f7ca04340106878cc95a0835c5c3140250f987ccfa3d",
       "external_tools": [
         "dingtalk-cli",
         "ego-browser"
