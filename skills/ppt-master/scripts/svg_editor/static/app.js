@@ -10,7 +10,7 @@
         en: {
             page_title: "PPT Master - Live Preview",
             panel_slides: "Slides",
-            panel_annotations: "Annotations",
+            panel_edit_annotate: "Edit / Annotate",
             placeholder_select_slide: "Select a slide on the left to begin",
             label_selected_element: "Selected element",
             empty_selected_element: "Click an element on the slide to select it",
@@ -22,6 +22,14 @@
             section_text_style: "Text",
             section_raw_attrs: "Raw attributes",
             label_edit_instruction: "Edit instruction",
+            pending_none: "No pending changes",
+            pending_summary: "{edits} direct edit(s), {annotations} annotation page(s) pending",
+            pending_pages: "Pages: {pages}",
+            quick_align: "Align / move",
+            quick_resize: "Resize",
+            quick_replace_image: "Replace image",
+            quick_copy: "Revise copy",
+            quick_relayout: "Relayout area",
             placeholder_annotation: "Describe how the AI should modify this element...",
             placeholder_annotation_multi: "Describe how to modify all {count} elements...",
             btn_add_annotation: "Add annotation",
@@ -53,12 +61,21 @@
             overlap_caption: "Overlapping here — pick one",
             err_empty_svg: "Slide loaded but the canvas is empty. The SVG may be malformed or missing a root <svg> element.",
             warn_icon_inline: "{count} icon(s) failed to render: {names}",
-            warn_svg_no_dims: "SVG is missing width/height attributes. Please ask the AI to strictly follow shared-standards.md §4 and include width & height in the SVG root element.",
+            warn_matrix_transform: "This geometry edit is stored as a transform matrix. Preview is exact; PPTX export depends on matrix-aware conversion.",
+            modal_matrix_transform_note: "\n\nNote: at least one staged geometry edit uses a transform matrix. Re-export with the current PPTX exporter so the matrix is applied.",
             slide_error_tooltip: "Failed to parse this slide: ",
             reload_banner: "This slide was updated on disk. Click to reload.",
-            modal_confirm_submit: "Apply staged attribute edits and annotations to disk?\n\nThe preview service will keep running. Click Exit preview when you want to stop it.",
-            modal_success_submit: "Changes saved to svg_output.\n\nReturn to the chat to re-export the PPTX or apply AI-needed annotations. The preview service is still running.",
-            modal_confirm_exit: "Exit preview and stop the local server?\n\nUnapplied edits and annotations will be discarded.",
+            modal_confirm_submit: "Apply staged direct edits and AI annotations to disk?\n\nThe preview service will keep running. Click Exit preview when you want to stop it.",
+            modal_success_submit: "Changes saved to svg_output.\n\nThe preview service is still running.",
+            modal_success_direct_only: "Changes saved to svg_output.\n\nDirect edits are now in the SVG source. Return to the chat and ask to re-export when you want a refreshed PPTX. The preview service is still running.",
+            modal_success_annotations_only: "Annotations saved to svg_output.\n\nReturn to the chat and ask to apply annotations when you want AI to interpret them. The preview service is still running.",
+            modal_success_mixed: "Direct edits and annotations saved to svg_output.\n\nReturn to the chat to apply AI-needed annotations, then re-export the PPTX when ready. The preview service is still running.",
+            modal_confirm_exit: "Exit preview and stop the local server?\n\nUnapplied edits and annotations are kept as a draft and restored the next time the preview opens.",
+            modal_nothing_applied: "The server had no pending changes, so nothing was written. It may have restarted since these changes were made; re-check the edits and annotations on each slide.",
+            warn_draft_unsaved: "Could not save the draft to disk. This change is staged in memory only and is lost if the server stops before Apply changes.",
+            notice_draft_restored: "Restored the unapplied draft for {count} slide(s): {pages}. Click Apply changes when ready.",
+            warn_draft_conflict: "{pages} changed on disk after the draft was saved, so that draft was not restored. It is kept in live_preview/{file}.",
+            warn_draft_unreadable: "The draft file could not be read. It is kept as live_preview/{file}.",
             modal_success_exit: "Preview stopped.\n\nYou can close this tab and return to the chat.",
             modal_stopping: "Stopping preview server...",
             lang_toggle_title: "Switch language",
@@ -69,21 +86,108 @@
             nav_counter: "{current} / {total}",
             nav_empty: "— / —"
         },
+        ja: {
+            page_title: "PPT Master - ライブプレビュー",
+            panel_slides: "スライド",
+            panel_edit_annotate: "編集 / コメント",
+            placeholder_select_slide: "左のスライドを選択してください",
+            label_selected_element: "選択中の要素",
+            empty_selected_element: "スライド上の要素をクリックすると選択できます",
+            btn_select_group: "親グループを選択",
+            label_batch_edit: "一括編集",
+            label_group_edit: "グループ編集",
+            section_geometry: "位置・サイズ",
+            section_style: "スタイル",
+            section_text_style: "テキスト",
+            section_raw_attrs: "SVG属性",
+            label_edit_instruction: "編集指示",
+            pending_none: "未適用の変更はありません",
+            pending_summary: "直接編集{edits}件、コメントを変更したスライド{annotations}件が未適用",
+            pending_pages: "対象スライド：{pages}",
+            quick_align: "整列 / 移動",
+            quick_resize: "サイズ変更",
+            quick_replace_image: "画像の差し替え",
+            quick_copy: "文言の修正",
+            quick_relayout: "領域のレイアウト変更",
+            placeholder_annotation: "この要素をAIにどう修正してほしいかを入力…",
+            placeholder_annotation_multi: "選択した{count}個の要素すべてをどう修正するかを入力…",
+            btn_add_annotation: "コメントを追加",
+            label_annotations_on_slide: "このスライドのコメント",
+            btn_submit_annotations: "変更を適用",
+            btn_exit_preview: "プレビューを終了",
+            modal_submit: "適用",
+            modal_cancel: "キャンセル",
+            empty_waiting_slides: "スライドの生成を待っています…",
+            empty_no_slides: "スライドが見つかりません",
+            placeholder_live_ready: "ライブプレビューの準備ができました。生成されたスライドがここに表示されます。",
+            placeholder_slide_writing: "スライドはまだ書き込み中です。次の更新を待っています…",
+            empty_annotations: "コメントはまだありません",
+            tooltip_remove_annotation: "コメントを削除",
+            multi_selected: "{count}個の要素を選択中",
+            multi_mixed: "混在",
+            err_load_slides: "スライド一覧の読み込みに失敗しました：",
+            err_load_slide: "スライドの読み込みに失敗しました：",
+            err_add_annotation: "コメントの追加に失敗しました：",
+            err_remove_annotation: "コメントの削除に失敗しました：",
+            err_save: "保存に失敗しました：",
+            err_edit: "編集に失敗しました：",
+            label_direct_edit: "オブジェクト属性（「変更を適用」までは保留）",
+            prop_multiline_hint: "複数行テキストです — 文字を編集するには1行（tspan）を選択してください",
+            edit_saved_hint: "変更は未適用です。「変更を適用」をクリックすると svg_output に書き込まれます。",
+            btn_undo: "元に戻す",
+            undo_done: "直前の未適用の編集を元に戻しました",
+            undo_empty: "元に戻せる編集はありません",
+            overlap_caption: "要素が重なっています — 1つ選択してください",
+            err_empty_svg: "スライドは読み込めましたがキャンバスが空です。SVGが不正か、ルート<svg>要素がない可能性があります。",
+            warn_icon_inline: "{count}個のアイコンを描画できませんでした：{names}",
+            warn_matrix_transform: "この位置・サイズの編集は transform matrix として保存されます。プレビューは正確ですが、PPTXへのエクスポートには matrix 対応のエクスポーターが必要です。",
+            modal_matrix_transform_note: "\n\n注意：未適用の位置・サイズの編集のうち、少なくとも1件が transform matrix を使用しています。matrix が反映されるよう、現行のPPTXエクスポーターで再エクスポートしてください。",
+            slide_error_tooltip: "このスライドの解析に失敗しました：",
+            reload_banner: "このスライドはディスク上で更新されました。クリックすると再読み込みします。",
+            modal_confirm_submit: "未適用の直接編集とAI向けコメントをディスクに書き込みますか？\n\nプレビューサーバーは動作を続けます。停止するには「プレビューを終了」をクリックしてください。",
+            modal_success_submit: "変更を svg_output に保存しました。\n\nプレビューサーバーは引き続き動作しています。",
+            modal_success_direct_only: "変更を svg_output に保存しました。\n\n直接編集はSVGソースに反映済みです。PPTXを更新したいときは、チャットに戻って再エクスポートを依頼してください。プレビューサーバーは引き続き動作しています。",
+            modal_success_annotations_only: "コメントを svg_output に保存しました。\n\nAIにコメントを解釈・反映させたいときは、チャットに戻ってコメントの適用を依頼してください。プレビューサーバーは引き続き動作しています。",
+            modal_success_mixed: "直接編集とコメントを svg_output に保存しました。\n\nチャットに戻ってAIの判断が必要なコメントの適用を先に依頼し、確認できたらPPTXを再エクスポートしてください。プレビューサーバーは引き続き動作しています。",
+            modal_confirm_exit: "プレビューを終了してローカルサーバーを停止しますか？\n\n未適用の編集とコメントは下書きとして保持され、次にプレビューを開いたときに復元されます。",
+            modal_nothing_applied: "サーバーに未適用の変更がなかったため、何も書き込まれませんでした。変更後にサーバーが再起動した可能性があります。各スライドの編集とコメントを確認してください。",
+            warn_draft_unsaved: "下書きをディスクに保存できませんでした。この変更はメモリ上にのみあり、「変更を適用」の前にサーバーが停止すると失われます。",
+            notice_draft_restored: "{count} 枚のスライドの未適用の下書きを復元しました：{pages}。準備ができたら「変更を適用」をクリックしてください。",
+            warn_draft_conflict: "{pages} は下書きの保存後にディスク上で変更されたため、その下書きは復元されませんでした。live_preview/{file} に保持されています。",
+            warn_draft_unreadable: "下書きファイルを読み込めませんでした。live_preview/{file} として保持されています。",
+            modal_success_exit: "プレビューを停止しました。\n\nこのタブを閉じてチャットに戻れます。",
+            modal_stopping: "プレビューサーバーを停止しています…",
+            lang_toggle_title: "言語を切り替え",
+            nav_first: "最初のスライド (Home)",
+            nav_prev: "前のスライド (←)",
+            nav_next: "次のスライド (→)",
+            nav_last: "最後のスライド (End)",
+            nav_counter: "{current} / {total}",
+            nav_empty: "— / —"
+        },
         zh: {
             page_title: "PPT Master - 实时预览",
             panel_slides: "幻灯片",
-            panel_annotations: "标注",
+            panel_edit_annotate: "编辑 / 标注",
             placeholder_select_slide: "在左侧选择一张幻灯片开始",
             label_selected_element: "已选元素",
             empty_selected_element: "点击幻灯片中的元素进行选择",
-            btn_select_group: "选择父级组",
+            btn_select_group: "选择父级组合",
             label_batch_edit: "批量编辑",
-            label_group_edit: "组编辑",
-            section_geometry: "几何",
+            label_group_edit: "组合编辑",
+            section_geometry: "位置与大小",
             section_style: "样式",
             section_text_style: "文本",
             section_raw_attrs: "原始属性",
             label_edit_instruction: "修改说明",
+            pending_none: "没有待应用修改",
+            pending_summary: "{edits} 条直接修改、{annotations} 个页面有 AI 标注待应用",
+            pending_pages: "页面：{pages}",
+            quick_align: "对齐 / 移动",
+            quick_resize: "调整大小",
+            quick_replace_image: "换图",
+            quick_copy: "改文案",
+            quick_relayout: "重排此区域",
             placeholder_annotation: "描述希望 AI 如何修改该元素……",
             placeholder_annotation_multi: "描述希望如何修改所选 {count} 个元素……",
             btn_add_annotation: "添加标注",
@@ -94,33 +198,42 @@
             modal_cancel: "取消",
             empty_waiting_slides: "正在等待生成幻灯片……",
             empty_no_slides: "未找到幻灯片",
-            placeholder_live_ready: "实时预览已就绪,生成的幻灯片会在这里出现。",
-            placeholder_slide_writing: "幻灯片仍在写入,等待下次刷新……",
+            placeholder_live_ready: "实时预览已就绪，生成的幻灯片会在这里出现。",
+            placeholder_slide_writing: "幻灯片仍在写入，等待下次刷新……",
             empty_annotations: "暂无标注",
             tooltip_remove_annotation: "删除标注",
             multi_selected: "已选 {count} 个元素",
             multi_mixed: "混合",
-            err_load_slides: "加载幻灯片失败:",
-            err_load_slide: "加载幻灯片失败:",
-            err_add_annotation: "添加标注失败:",
-            err_remove_annotation: "删除标注失败:",
-            err_save: "保存失败:",
-            err_edit: "编辑失败:",
-            label_direct_edit: "对象属性(点击应用修改后写入)",
-            prop_multiline_hint: "多行文本——选中单行(tspan)编辑文字",
+            err_load_slides: "加载幻灯片列表失败：",
+            err_load_slide: "加载幻灯片失败：",
+            err_add_annotation: "添加标注失败：",
+            err_remove_annotation: "删除标注失败：",
+            err_save: "保存失败：",
+            err_edit: "编辑失败：",
+            label_direct_edit: "对象属性（点击“应用修改”后写入）",
+            prop_multiline_hint: "多行文本——选中单行（tspan）后编辑文字",
             edit_saved_hint: "修改已暂存。点击“应用修改”后写入 svg_output。",
             btn_undo: "撤销",
             undo_done: "已撤销上一条暂存修改",
             undo_empty: "没有可撤销的暂存修改",
             overlap_caption: "此处重叠元素——点击选择",
             err_empty_svg: "幻灯片已加载但画布为空。SVG 可能损坏或缺少根 <svg> 元素。",
-            warn_icon_inline: "{count} 个图标渲染失败:{names}",
-            warn_svg_no_dims: "SVG 缺少 width/height 属性，预览可能异常。请让 AI 严格遵守 shared-standards.md §4 规范，在 SVG 根元素中补全 width 和 height。",
-            slide_error_tooltip: "该幻灯片解析失败:",
-            reload_banner: "当前页已在磁盘上更新,点此重新加载。",
-            modal_confirm_submit: "确认将暂存属性修改和标注写入磁盘?\n\n预览服务会继续运行。需要关闭时请点击退出预览。",
-            modal_success_submit: "修改已保存到 svg_output。\n\n请回到对话窗口重新导出 PPTX，或让 AI 应用需要判断的标注。预览服务仍在运行。",
-            modal_confirm_exit: "退出预览并停止本地服务?\n\n未应用的属性修改和标注将被丢弃。",
+            warn_icon_inline: "{count} 个图标渲染失败：{names}",
+            warn_matrix_transform: "本次位置/大小修改会以 transform matrix 保存。预览是准确的；PPTX 导出需要使用支持 matrix 的当前导出器。",
+            modal_matrix_transform_note: "\n\n提示：至少有一条暂存的位置/大小修改使用了 transform matrix。请用当前 PPTX 导出器重新导出，确保 matrix 被应用。",
+            slide_error_tooltip: "该幻灯片解析失败：",
+            reload_banner: "当前页已在磁盘上更新，点此重新加载。",
+            modal_confirm_submit: "确认将暂存的直接修改和 AI 标注写入磁盘？\n\n预览服务会继续运行。需要关闭时请点击“退出预览”。",
+            modal_success_submit: "修改已保存到 svg_output。\n\n预览服务仍在运行。",
+            modal_success_direct_only: "修改已保存到 svg_output。\n\n直接修改已经写入 SVG 源文件；需要刷新 PPTX 时，请回到对话窗口要求重新导出。预览服务仍在运行。",
+            modal_success_annotations_only: "标注已保存到 svg_output。\n\n需要 AI 理解并执行这些标注时，请回到对话窗口要求应用标注。预览服务仍在运行。",
+            modal_success_mixed: "直接修改和标注已保存到 svg_output。\n\n请回到对话窗口先应用需要 AI 判断的标注，确认后再重新导出 PPTX。预览服务仍在运行。",
+            modal_confirm_exit: "退出预览并停止本地服务？\n\n未应用的修改和标注会保留为草稿，下次打开预览时自动恢复。",
+            modal_nothing_applied: "服务器上没有待应用的修改，本次没有写入任何文件。服务可能在这些修改之后重启过，请逐页检查修改和标注。",
+            warn_draft_unsaved: "草稿未能写入磁盘。这次修改只暂存在内存里，点击“应用修改”前服务停止就会丢失。",
+            notice_draft_restored: "已恢复 {count} 页未应用的草稿：{pages}。确认后点击“应用修改”。",
+            warn_draft_conflict: "{pages} 在草稿保存后已在磁盘上变动，这部分草稿未恢复，已保留在 live_preview/{file}。",
+            warn_draft_unreadable: "草稿文件无法读取，已保留为 live_preview/{file}。",
             modal_success_exit: "预览已停止。\n\n可以关闭本标签页并回到对话窗口。",
             modal_stopping: "正在停止预览服务……",
             lang_toggle_title: "切换语言",
@@ -130,16 +243,102 @@
             nav_last: "末页 (End)",
             nav_counter: "{current} / {total}",
             nav_empty: "— / —"
+        },
+        "zh-TW": {
+            page_title: "PPT Master - 即時預覽",
+            panel_slides: "投影片",
+            panel_edit_annotate: "編輯 / 標註",
+            placeholder_select_slide: "在左側選擇一張投影片開始",
+            label_selected_element: "已選元素",
+            empty_selected_element: "點選投影片中的元素進行選擇",
+            btn_select_group: "選擇父群組",
+            label_batch_edit: "批次編輯",
+            label_group_edit: "群組編輯",
+            section_geometry: "幾何",
+            section_style: "樣式",
+            section_text_style: "文字",
+            section_raw_attrs: "原始屬性",
+            label_edit_instruction: "修改說明",
+            pending_none: "沒有待套用修改",
+            pending_summary: "{edits} 筆直接修改、{annotations} 個頁面有 AI 標註待套用",
+            pending_pages: "頁面：{pages}",
+            quick_align: "對齊/移動",
+            quick_resize: "調整大小",
+            quick_replace_image: "換圖",
+            quick_copy: "改文案",
+            quick_relayout: "重排此區域",
+            placeholder_annotation: "描述希望 AI 如何修改該元素……",
+            placeholder_annotation_multi: "描述希望如何修改所選 {count} 個元素……",
+            btn_add_annotation: "新增標註",
+            label_annotations_on_slide: "本頁標註",
+            btn_submit_annotations: "套用修改",
+            btn_exit_preview: "結束預覽",
+            modal_submit: "送出",
+            modal_cancel: "取消",
+            empty_waiting_slides: "正在等待生成投影片……",
+            empty_no_slides: "未找到投影片",
+            placeholder_live_ready: "即時預覽已就緒，生成的投影片會在這裡出現。",
+            placeholder_slide_writing: "投影片仍在寫入，等待下次重新整理……",
+            empty_annotations: "尚無標註",
+            tooltip_remove_annotation: "刪除標註",
+            multi_selected: "已選 {count} 個元素",
+            multi_mixed: "混合",
+            err_load_slides: "載入投影片失敗：",
+            err_load_slide: "載入投影片失敗：",
+            err_add_annotation: "新增標註失敗：",
+            err_remove_annotation: "刪除標註失敗：",
+            err_save: "儲存失敗：",
+            err_edit: "編輯失敗：",
+            label_direct_edit: "物件屬性（點選套用修改後寫入）",
+            prop_multiline_hint: "多行文字——選取單行（tspan）編輯文字",
+            edit_saved_hint: "修改已暫存。點選「套用修改」後寫入 svg_output。",
+            btn_undo: "復原",
+            undo_done: "已復原上一筆暫存修改",
+            undo_empty: "沒有可復原的暫存修改",
+            overlap_caption: "此處元素重疊——請點選其中一個",
+            err_empty_svg: "投影片已載入但畫布為空。SVG 可能損壞或缺少根 <svg> 元素。",
+            warn_icon_inline: "{count} 個圖示算繪失敗：{names}",
+            warn_matrix_transform: "本次幾何修改會以 transform matrix 儲存。預覽結果準確；PPTX 匯出則取決於轉換流程是否支援 matrix。",
+            modal_matrix_transform_note: "\n\n提示：至少有一筆暫存幾何修改使用了 transform matrix。請使用目前版本的 PPTX 匯出器重新匯出，以套用 matrix。",
+            slide_error_tooltip: "該投影片解析失敗：",
+            reload_banner: "這張投影片已在磁碟上更新，點此重新載入。",
+            modal_confirm_submit: "確認將暫存的直接修改和 AI 標註寫入磁碟？\n\n預覽服務會繼續執行。需要關閉時請點選結束預覽。",
+            modal_success_submit: "修改已儲存到 svg_output。\n\n預覽服務仍在執行。",
+            modal_success_direct_only: "修改已儲存到 svg_output。\n\n直接修改已經寫入 SVG 原始檔；需要更新 PPTX 時，請回到對話視窗要求重新匯出。預覽服務仍在執行。",
+            modal_success_annotations_only: "標註已儲存到 svg_output。\n\n需要 AI 理解並執行這些標註時，請回到對話視窗要求套用標註。預覽服務仍在執行。",
+            modal_success_mixed: "直接修改和標註已儲存到 svg_output。\n\n請回到對話視窗先套用需要 AI 判斷的標註，確認後再重新匯出 PPTX。預覽服務仍在執行。",
+            modal_confirm_exit: "結束預覽並停止本機服務？\n\n未套用的修改和標註會保留為草稿，下次開啟預覽時自動恢復。",
+            modal_nothing_applied: "伺服器上沒有待套用的修改，本次沒有寫入任何檔案。服務可能在這些修改之後重新啟動過，請逐頁檢查修改和標註。",
+            warn_draft_unsaved: "草稿未能寫入磁碟。這次修改只暫存在記憶體中，點選「套用修改」前服務停止就會遺失。",
+            notice_draft_restored: "已恢復 {count} 頁未套用的草稿：{pages}。確認後點選「套用修改」。",
+            warn_draft_conflict: "{pages} 在草稿儲存後已在磁碟上變動，這部分草稿未恢復，已保留在 live_preview/{file}。",
+            warn_draft_unreadable: "草稿檔案無法讀取，已保留為 live_preview/{file}。",
+            modal_success_exit: "預覽已停止。\n\n可以關閉本分頁並回到對話視窗。",
+            modal_stopping: "正在停止預覽服務……",
+            lang_toggle_title: "切換語言",
+            nav_first: "第一頁 (Home)",
+            nav_prev: "上一頁 (←)",
+            nav_next: "下一頁 (→)",
+            nav_last: "末頁 (End)",
+            nav_counter: "{current} / {total}",
+            nav_empty: "— / —"
         }
     };
 
     var LANG = (function () {
         try {
             var stored = window.localStorage.getItem("ppt_lang");
-            if (stored === "zh" || stored === "en") return stored;
+            if (stored === "zh" || stored === "en" || stored === "ja" ||
+                stored === "zh-TW") return stored;
         } catch (e) { /* ignore */ }
         var nav = (navigator.language || navigator.userLanguage || "en").toLowerCase();
-        return nav.indexOf("zh") === 0 ? "zh" : "en";
+        if (nav.indexOf("zh") === 0) {
+            if (/\bhans\b/.test(nav)) return "zh";
+            if (/\bhant\b/.test(nav) || /\b(tw|hk|mo)\b/.test(nav)) return "zh-TW";
+            return "zh";
+        }
+        if (nav.indexOf("ja") === 0) return "ja";
+        return "en";
     })();
 
     function t(key, params) {
@@ -156,7 +355,7 @@
     }
 
     function applyI18n() {
-        document.documentElement.setAttribute("lang", LANG === "zh" ? "zh-CN" : "en");
+        document.documentElement.setAttribute("lang", LANG === "zh" ? "zh-CN" : (LANG === "zh-TW" ? "zh-TW" : (LANG === "ja" ? "ja" : "en")));
         document.title = t("page_title");
         document.querySelectorAll("[data-i18n]").forEach(function (el) {
             el.textContent = t(el.getAttribute("data-i18n"));
@@ -170,20 +369,35 @@
         updateNavLabel();
     }
 
+    var LANG_NAMES = { zh: "中文", en: "English", ja: "日本語", "zh-TW": "繁體中文" };
+
+    function refreshLangUI(lang) {
+        // Custom dropdown (OS-independent): button shows the CURRENT language.
+        var cur = document.getElementById("lang-current");
+        if (cur) cur.textContent = LANG_NAMES[lang] || lang;
+        var btn = document.getElementById("btn-lang-toggle");
+        if (btn) btn.title = t("lang_toggle_title");
+        document.querySelectorAll("#lang-menu li").forEach(function (li) {
+            var selected = li.getAttribute("data-lang") === lang;
+            li.classList.toggle("selected", selected);
+            li.setAttribute("aria-selected", selected ? "true" : "false");
+        });
+    }
+
     function setLang(lang) {
-        if (lang !== "zh" && lang !== "en") return;
+        if (lang !== "zh" && lang !== "en" && lang !== "ja" && lang !== "zh-TW") return;
         LANG = lang;
         try { window.localStorage.setItem("ppt_lang", lang); } catch (e) { /* ignore */ }
         applyI18n();
-        var toggleBtn = document.getElementById("btn-lang-toggle");
-        if (toggleBtn) {
-            toggleBtn.textContent = lang === "zh" ? "EN" : "中";
-            toggleBtn.title = t("lang_toggle_title");
-        }
+        refreshLangUI(lang);
         // Re-render dynamic regions so they pick up the new language
+        var annotationDraft = annotationText.value;
         updateSelectionPanel();
+        annotationText.value = annotationDraft;
         updateAnnotationList();
         updateUndoButton();
+        updatePendingStatus();
+        initAnnotationQuickActions();
         loadSlides();
     }
 
@@ -193,6 +407,7 @@
     var svgContent        = document.getElementById("svg-content");
     var selectedElementEl = document.getElementById("selected-element");
     var annotationInput   = document.getElementById("annotation-input");
+    var annotationQuickActions = document.getElementById("annotation-quick-actions");
     var annotationText    = document.getElementById("annotation-text");
     var btnAddAnnotation  = document.getElementById("btn-add-annotation");
     var annotationsEl     = document.getElementById("annotations");
@@ -204,6 +419,7 @@
     var modalConfirm      = document.getElementById("modal-confirm");
     var modalCancel       = document.getElementById("modal-cancel");
     var elementPropsEl    = document.getElementById("element-props");
+    var pendingStatusEl   = document.getElementById("pending-status");
 
     var navFirstBtn       = document.getElementById("nav-first");
     var navPrevBtn        = document.getElementById("nav-prev");
@@ -214,6 +430,7 @@
 
     // ---- State ------------------------------------------------------
     var currentSlide      = null;   // filename, e.g. "slide_01.svg"
+    var waitingForSlide   = null;   // current slide is temporarily unreadable in live mode
     var slideNames        = [];     // ordered slide filenames for navigation
     var selectedElementIds = new Set(); // id attrs of selected SVG elements
     var slideAnnotations  = {};     // {element_id: annotation_text} for current slide
@@ -224,11 +441,102 @@
     var reloadBannerEl    = null;   // singleton banner element shown when currentSlide mtime drifts
     var editStackCount    = {};     // {name: staged edit count} — mirrors backend PENDING_EDITS
     var savedHintShown    = false;  // show the "staged edit" hint once per session
+    var matrixHintShown   = false;  // show transform-matrix export hint once per session
+    var matrixEditSlides  = {};     // {name: true} when a staged edit wrote transform=matrix(...)
     var annotationsDirty  = false;  // unsaved annotations added/removed this session
+    var annotationEditSlides = {};  // {name: true} when annotations changed this session
 
-    // Staged edits live in server memory until "Apply changes"; the server can
-    // still idle-timeout or be killed and drop them. Warn before the tab leaves
-    // so the user remembers to apply (browsers show their own generic prompt).
+    function pendingDirectEditCount() {
+        return Object.keys(editStackCount).reduce(function (total, name) {
+            return total + Math.max(0, editStackCount[name] || 0);
+        }, 0);
+    }
+
+    function pendingDirectEditSlides() {
+        return Object.keys(editStackCount).filter(function (name) {
+            return (editStackCount[name] || 0) > 0;
+        });
+    }
+
+    function pendingAnnotationSlides() {
+        return Object.keys(annotationEditSlides).filter(function (name) {
+            return !!annotationEditSlides[name];
+        });
+    }
+
+    function pendingAnnotationChangeCount() {
+        return pendingAnnotationSlides().length;
+    }
+
+    function pendingSlideNames() {
+        var seen = {};
+        pendingDirectEditSlides().concat(pendingAnnotationSlides()).forEach(function (name) {
+            seen[name] = true;
+        });
+        return Object.keys(seen).sort();
+    }
+
+    function updatePendingStatus() {
+        if (!pendingStatusEl) return;
+        var edits = pendingDirectEditCount();
+        var annotations = pendingAnnotationChangeCount();
+        if (edits === 0 && annotations === 0) {
+            pendingStatusEl.className = "pending-status empty";
+            pendingStatusEl.textContent = t("pending_none");
+            return;
+        }
+        var pages = pendingSlideNames();
+        pendingStatusEl.className = "pending-status active";
+        pendingStatusEl.innerHTML =
+            '<div>' + escapeHtml(t("pending_summary", {
+                edits: edits,
+                annotations: annotations,
+            })) + '</div>' +
+            (pages.length ? '<div class="pending-pages">' + escapeHtml(t("pending_pages", {
+                pages: pages.join(", "),
+            })) + '</div>' : '');
+    }
+
+    function markAnnotationChanged(slide) {
+        if (!slide) return;
+        annotationEditSlides[slide] = true;
+        annotationsDirty = true;
+        updatePendingStatus();
+    }
+
+    function initAnnotationQuickActions() {
+        if (!annotationQuickActions) return;
+        var actions = [
+            { key: "quick_align" },
+            { key: "quick_resize" },
+            { key: "quick_replace_image" },
+            { key: "quick_copy" },
+            { key: "quick_relayout" },
+        ];
+        annotationQuickActions.innerHTML = "";
+        actions.forEach(function (action) {
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "annotation-quick-chip";
+            btn.textContent = t(action.key);
+            btn.addEventListener("click", function () {
+                var label = t(action.key);
+                var prefix = (LANG === "zh" || LANG === "zh-TW" || LANG === "ja") ? label + "：" : label + ": ";
+                if (!annotationText.value.trim()) {
+                    annotationText.value = prefix;
+                } else if (annotationText.value.indexOf(prefix) === -1) {
+                    annotationText.value = prefix + annotationText.value;
+                }
+                annotationText.focus();
+                annotationText.selectionStart = annotationText.selectionEnd = annotationText.value.length;
+            });
+            annotationQuickActions.appendChild(btn);
+        });
+    }
+
+    // Staged edits stay unapplied until "Apply changes" (the server mirrors them
+    // to live_preview/draft.json). Warn before the tab leaves so the user
+    // remembers to apply (browsers show their own generic prompt).
     function hasUnsavedWork() {
         if (annotationsDirty) return true;
         return Object.keys(editStackCount).some(function (k) {
@@ -241,6 +549,28 @@
         e.returnValue = "";
         return "";
     });
+
+    function readSlideFromLocation() {
+        try {
+            var params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+            return params.get("slide");
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function rememberSlideInLocation(name) {
+        if (!name) return;
+        var params;
+        try {
+            params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        } catch (err) {
+            params = new URLSearchParams();
+        }
+        params.set("slide", name);
+        var url = window.location.pathname + window.location.search + "#" + params.toString();
+        window.history.replaceState(null, "", url);
+    }
 
     function currentSlideIndex() {
         if (!currentSlide) return -1;
@@ -278,6 +608,12 @@
         if (navLastBtn)  navLastBtn.disabled  = !hasCurrent || idx2 >= total - 1;
     }
 
+    // Keep data-i18n on the shown key so applyI18n() re-translates it instead of resetting it.
+    function setPlaceholder(key) {
+        svgPlaceholder.setAttribute("data-i18n", key);
+        svgPlaceholder.textContent = t(key);
+    }
+
     // ================================================================
     //  1.  loadSlides  -- GET /api/slides
     // ================================================================
@@ -298,20 +634,21 @@
                     slideListEl.appendChild(empty);
                     if (!currentSlide) {
                         svgPlaceholder.style.display = "block";
-                        svgPlaceholder.textContent = liveMode
-                            ? t("placeholder_live_ready")
-                            : t("empty_no_slides");
+                        setPlaceholder(liveMode ? "placeholder_live_ready" : "empty_no_slides");
                         svgContent.style.display = "none";
                     }
                     updateNavLabel();
+                    updatePendingStatus();
                     return;
                 }
 
                 var currentExists = false;
+                var currentReady = false;
                 var currentMtimeChanged = false;
                 slides.forEach(function (s) {
                     if (s.name === currentSlide) {
                         currentExists = true;
+                        currentReady = s.ok !== false;
                         // Compare against the mtime we recorded when we last rendered this slide.
                         var lastSeen = slideMtimes[s.name];
                         if (lastSeen !== undefined && s.mtime && s.mtime !== lastSeen) {
@@ -351,11 +688,20 @@
                 });
 
                 if (!currentSlide || !currentExists) {
-                    selectSlide(slides[0].name);
+                    var rememberedSlide = readSlideFromLocation();
+                    var targetSlide = rememberedSlide && slideNames.indexOf(rememberedSlide) !== -1
+                        ? rememberedSlide
+                        : slides[0].name;
+                    selectSlide(targetSlide);
+                } else if (waitingForSlide === currentSlide) {
+                    if (currentReady) {
+                        selectSlide(currentSlide);
+                    }
                 } else if (currentMtimeChanged) {
                     showReloadBanner(currentSlide);
                 }
                 updateNavLabel();
+                updatePendingStatus();
             })
             .catch(function (err) {
                 console.error("loadSlides:", err);
@@ -366,7 +712,18 @@
     // ================================================================
     //  2.  selectSlide  -- GET /api/slide/{name}
     // ================================================================
+    function waitForSlideRewrite(name) {
+        if (!liveMode || name !== currentSlide) return;
+        waitingForSlide = name;
+        svgPlaceholder.style.display = "block";
+        setPlaceholder("placeholder_slide_writing");
+        svgContent.style.display = "none";
+    }
+
     function selectSlide(name, el) {
+        if (!el) {
+            el = slideListEl.querySelector('.slide-item[data-name="' + cssAttr(name) + '"]');
+        }
         // Update active class in sidebar
         document.querySelectorAll(".slide-item").forEach(function (it) {
             it.classList.remove("active");
@@ -374,6 +731,8 @@
         if (el) el.classList.add("active");
 
         currentSlide = name;
+        waitingForSlide = null;
+        rememberSlideInLocation(name);
         selectedElementIds.clear();
         slideAnnotations = {};
         updateNavLabel();
@@ -385,42 +744,43 @@
         // Selecting a slide implicitly dismisses any stale "page updated" banner.
         hideReloadBanner();
 
-        // Remove any stale spec-violation banner from a previous load.
-        var oldSpecBanner = document.getElementById("spec-banner");
-        if (oldSpecBanner) oldSpecBanner.remove();
-
         fetch("/api/slide/" + encodeURIComponent(name))
             .then(function (res) { return res.json(); })
             .then(function (data) {
+                if (name !== currentSlide) return;
                 if (data.error) {
                     console.error("selectSlide:", data.error);
                     showError(t("err_load_slide") + data.error);
-                    if (liveMode) {
-                        currentSlide = null;
-                        svgPlaceholder.style.display = "block";
-                        svgPlaceholder.textContent = t("placeholder_slide_writing");
-                        svgContent.style.display = "none";
-                    }
+                    waitForSlideRewrite(name);
                     return;
                 }
-                // Render SVG
+                // Validate before showing the canvas; parse errors use the catch below.
+                var sanitizedSvg = sanitizeSvg(data.content);
                 svgPlaceholder.style.display = "none";
                 svgContent.style.display = "block";
-                svgContent.innerHTML = sanitizeSvg(data.content);
+                svgContent.innerHTML = sanitizedSvg;
 
                 // Empty-canvas guard: surface a clear error if the SVG parsed
                 // to nothing renderable (issue #115's silent-blank scenario).
                 var rootSvg = svgContent.querySelector("svg");
-                // Spec observability: missing width/height → red banner only
-                if (rootSvg && (!rootSvg.hasAttribute("width") || !rootSvg.hasAttribute("height"))) {
-                    var specBanner = document.createElement("div");
-                    specBanner.id = "spec-banner";
-                    specBanner.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);"
-                        + "background:#fee2e2;color:#b91c1c;border:2px solid #f87171;border-radius:8px;"
-                        + "padding:24px 36px;font-size:16px;font-weight:bold;text-align:center;z-index:9999;"
-                        + "width:420px;line-height:1.6;box-shadow:0 4px 12px rgba(0,0,0,0.15);";
-                    specBanner.textContent = t("warn_svg_no_dims");
-                    document.body.appendChild(specBanner);
+                // viewBox is the PPT Master canvas authority. Normalize the
+                // preview DOM from it so stale or missing root width/height
+                // cannot shrink the slide. View-layer only — the file on disk
+                // is never touched.
+                if (rootSvg) {
+                    var vb = (rootSvg.getAttribute("viewBox") || "").trim().split(/[\s,]+/);
+                    var vbWidth = Number(vb[2]);
+                    var vbHeight = Number(vb[3]);
+                    if (
+                        vb.length === 4 &&
+                        Number.isFinite(vbWidth) &&
+                        Number.isFinite(vbHeight) &&
+                        vbWidth > 0 &&
+                        vbHeight > 0
+                    ) {
+                        rootSvg.setAttribute("width", vb[2]);
+                        rootSvg.setAttribute("height", vb[3]);
+                    }
                 }
                 var hasContent = false;
                 if (rootSvg) {
@@ -436,7 +796,7 @@
                 if (!rootSvg || !hasContent) {
                     showError(t("err_empty_svg"));
                     svgPlaceholder.style.display = "block";
-                    svgPlaceholder.textContent = t("err_empty_svg");
+                    setPlaceholder("err_empty_svg");
                     svgContent.style.display = "none";
                     return;
                 }
@@ -468,10 +828,13 @@
                 refreshAnnotationVisuals();
                 updateAnnotationList();
                 updateUndoButton();
+                updatePendingStatus();
             })
             .catch(function (err) {
+                if (name !== currentSlide) return;
                 console.error("selectSlide:", err);
                 showError(t("err_load_slide") + err.message);
+                waitForSlideRewrite(name);
             });
     }
 
@@ -685,7 +1048,48 @@
         applyElementAttrs(el, sa);
     }
 
+    var INLINE_GEOMETRY_STYLE_PROPERTIES = {
+        rect: new Set(["x", "y", "width", "height", "rx", "ry"]),
+        circle: new Set(["cx", "cy", "r"]),
+        ellipse: new Set(["cx", "cy", "rx", "ry"]),
+        image: new Set(["x", "y", "width", "height"]),
+        svg: new Set(["x", "y", "width", "height"]),
+        use: new Set(["x", "y", "width", "height"])
+    };
+
+    function stripEditedInlineGeometry(el, attrs) {
+        var style = el.getAttribute("style");
+        var supported = INLINE_GEOMETRY_STYLE_PROPERTIES[localName(el)];
+        if (!style || !supported) return;
+        var edited = new Set(Object.keys(attrs || {}).map(function (key) {
+            return String(key).toLowerCase();
+        }).filter(function (key) { return supported.has(key); }));
+        if (edited.size === 0) return;
+
+        var retained = [];
+        var changed = false;
+        style.split(";").forEach(function (rawDeclaration) {
+            var declaration = rawDeclaration.trim();
+            if (!declaration) return;
+            var colon = declaration.indexOf(":");
+            if (colon < 0) {
+                retained.push(declaration);
+                return;
+            }
+            var name = declaration.slice(0, colon).trim().toLowerCase();
+            if (edited.has(name)) {
+                changed = true;
+                return;
+            }
+            retained.push(declaration);
+        });
+        if (!changed) return;
+        if (retained.length > 0) el.setAttribute("style", retained.join("; "));
+        else el.removeAttribute("style");
+    }
+
     function applyElementAttrs(el, attrs) {
+        stripEditedInlineGeometry(el, attrs);
         if (localName(el) === "g" && el.hasAttribute("data-icon") &&
                 attrs.x !== undefined && attrs.y !== undefined) {
             // The preview expands <use data-icon> into a <g>, but disk still owns
@@ -1253,7 +1657,7 @@
                 ids.forEach(function (eid) {
                     slideAnnotations[eid] = text;
                 });
-                annotationsDirty = true;
+                markAnnotationChanged(currentSlide);
                 refreshAnnotationVisuals();
                 updateAnnotationList();
                 annotationText.value = "";
@@ -1274,10 +1678,10 @@
         fetch("/api/slide/" + encodeURIComponent(currentSlide) + "/annotate/" + encodeURIComponent(elementId), {
             method: "DELETE"
         })
-            .then(function (res) { return res.json(); })
+            .then(jsonOrThrow)
             .then(function () {
                 delete slideAnnotations[elementId];
-                annotationsDirty = true;
+                markAnnotationChanged(currentSlide);
                 refreshAnnotationVisuals();
                 updateAnnotationList();
                 loadSlides();
@@ -1366,7 +1770,8 @@
     // ================================================================
     btnSave.addEventListener("click", function () {
         pendingModalAction = "submit";
-        modalMessage.textContent = t("modal_confirm_submit");
+        modalMessage.textContent = t("modal_confirm_submit") +
+            (hasPendingMatrixEdits() ? t("modal_matrix_transform_note") : "");
         modalConfirm.textContent = t("modal_submit");
         modalConfirm.style.display = "";
         modalCancel.style.display = "";
@@ -1402,6 +1807,8 @@
         }
 
         // Step 2: save annotations. Service lifetime is controlled only by Exit preview.
+        var hadDirectEdits = pendingDirectEditCount() > 0;
+        var hadAnnotationChanges = pendingAnnotationChangeCount() > 0;
         modalConfirm.style.display = "none";
         modalCancel.style.display = "none";
 
@@ -1414,11 +1821,27 @@
                 if (data.error) {
                     modalMessage.textContent = t("err_save") + data.error;
                 } else {
-                    modalMessage.textContent = t("modal_success_submit");
+                    var nothingApplied = (hadDirectEdits || hadAnnotationChanges) &&
+                        !(data.files_modified || []).length;
+                    if (nothingApplied) {
+                        modalMessage.textContent = t("modal_nothing_applied");
+                    } else if (hadDirectEdits && hadAnnotationChanges) {
+                        modalMessage.textContent = t("modal_success_mixed");
+                    } else if (hadDirectEdits) {
+                        modalMessage.textContent = t("modal_success_direct_only");
+                    } else if (hadAnnotationChanges) {
+                        modalMessage.textContent = t("modal_success_annotations_only");
+                    } else {
+                        modalMessage.textContent = t("modal_success_submit");
+                    }
                     editStackCount = {};
+                    matrixEditSlides = {};
+                    matrixHintShown = false;
                     savedHintShown = false;
                     annotationsDirty = false;
+                    annotationEditSlides = {};
                     updateUndoButton();
+                    updatePendingStatus();
                     var activeSlide = currentSlide;
                     loadSlides().then(function () {
                         if (activeSlide) {
@@ -1451,17 +1874,49 @@
     // ================================================================
     //  Utility
     // ================================================================
+    var SVG_NS = "http://www.w3.org/2000/svg";
+    var SVG_ALLOWED_ELEMENTS = new Set([
+        "svg", "g", "defs", "symbol", "use", "path", "rect", "circle", "ellipse",
+        "line", "polyline", "polygon", "text", "tspan", "textpath", "image",
+        "clippath", "mask", "pattern", "marker", "lineargradient", "radialgradient",
+        "stop", "filter", "feblend", "fecolormatrix", "fecomponenttransfer",
+        "fecomposite", "feconvolvematrix", "fediffuselighting", "fedisplacementmap",
+        "fedistantlight", "fedropshadow", "feflood", "fefunca", "fefuncb", "fefuncg",
+        "fefuncr", "fegaussianblur", "feimage", "femerge", "femergenode",
+        "femorphology", "feoffset", "fepointlight", "fespecularlighting",
+        "fespotlight", "fetile", "feturbulence", "style", "title", "desc", "metadata",
+        "a", "switch", "view", "animate", "animatecolor", "animatetransform",
+        "animatemotion", "set", "mpath"
+    ]);
+
     function sanitizeSvg(svgString) {
         var doc = new DOMParser().parseFromString(svgString, "image/svg+xml");
-        doc.querySelectorAll("script,foreignObject").forEach(function (el) { el.remove(); });
+        if (doc.getElementsByTagName("parsererror").length ||
+            !doc.documentElement || doc.documentElement.localName.toLowerCase() !== "svg" ||
+            doc.documentElement.namespaceURI !== SVG_NS) {
+            throw new Error(t("err_empty_svg"));
+        }
         doc.querySelectorAll("*").forEach(function (el) {
+            // XML preserves case; the innerHTML sink normalizes HTML/SVG names.
+            var tag = el.localName.toLowerCase();
+            if (!SVG_ALLOWED_ELEMENTS.has(tag) || el.namespaceURI !== SVG_NS) {
+                el.remove();
+                return;
+            }
             Array.from(el.attributes).forEach(function (attr) {
-                if (attr.name.indexOf("on") === 0) el.removeAttribute(attr.name);
+                var name = attr.name.toLowerCase();
+                var local = attr.localName.toLowerCase();
+                if (local.indexOf("on") === 0 || name.indexOf("on") === 0) {
+                    el.removeAttributeNode(attr);
+                    return;
+                }
                 // Strip dangerous URI protocols from href/xlink:href
-                if ((attr.name === "href" || attr.name === "xlink:href") &&
-                    (/^\s*javascript\s*:/i.test(attr.value) ||
-                     /^\s*data\s*:/i.test(attr.value))) {
-                    el.removeAttribute(attr.name);
+                var value = attr.value.replace(/[\t\r\n]/g, "").replace(/^[\x00-\x20]+/, "");
+                if (local === "href" &&
+                    (/^\s*javascript\s*:/i.test(value) ||
+                     /^\s*vbscript\s*:/i.test(value) ||
+                     /^\s*data\s*:/i.test(value))) {
+                    el.removeAttributeNode(attr);
                 }
             });
         });
@@ -1524,8 +1979,41 @@
             if (!res.ok || data.error) {
                 throw new Error(data.error || ("Request failed with status " + res.status));
             }
+            if (data.draft_saved === false) showWarning(t("warn_draft_unsaved"));
             return data;
         });
+    }
+
+    // Mirror the server's unapplied state (including a draft restored at
+    // startup) into the pending-state trackers, so Apply changes, the pending
+    // strip and the leave guard see it after a reload or server restart.
+    function applyDraftStatus(draft) {
+        if (!draft) return;
+        var pending = draft.pending || {};
+        Object.keys(pending).forEach(function (name) {
+            if (pending[name].annotations) {
+                annotationEditSlides[name] = true;
+                annotationsDirty = true;
+            }
+            editStackCount[name] = pending[name].edits || 0;
+        });
+        updatePendingStatus();
+        var startup = draft.startup;
+        if (!startup) return;
+        var names = Object.keys(startup.restored || {}).sort();
+        var messages = [];
+        if (names.length) {
+            messages.push(t("notice_draft_restored", { count: names.length, pages: names.join(", ") }));
+        }
+        if (startup.unreadable && startup.conflict_file) {
+            messages.push(t("warn_draft_unreadable", { file: startup.conflict_file }));
+        } else if ((startup.conflicts || []).length && startup.conflict_file) {
+            messages.push(t("warn_draft_conflict", {
+                pages: startup.conflicts.join(", "),
+                file: startup.conflict_file,
+            }));
+        }
+        if (messages.length) showWarning(messages.join(" "));
     }
 
     function loadConfig() {
@@ -1533,6 +2021,7 @@
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 liveMode = !!data.live;
+                applyDraftStatus(data.draft);
             })
             .catch(function () {
                 liveMode = false;
@@ -1561,7 +2050,9 @@
             .then(function (data) {
                 if (data.status === "empty") {
                     editStackCount[currentSlide] = 0;
+                    matrixEditSlides[currentSlide] = false;
                     updateUndoButton();
+                    updatePendingStatus();
                     showWarning(t("undo_empty"));
                     return;
                 }
@@ -1572,6 +2063,7 @@
                 // selectSlide refreshes editStackCount + the undo button.
                 var item = slideListEl.querySelector('.slide-item[data-name="' + cssAttr(currentSlide) + '"]');
                 selectSlide(currentSlide, item || undefined);
+                updatePendingStatus();
                 showWarning(t("undo_done"));
             })
             .catch(function (err) {
@@ -1583,6 +2075,24 @@
         if (savedHintShown) return;
         savedHintShown = true;
         showWarning(t("edit_saved_hint"));
+    }
+
+    function payloadHasMatrixTransform(payload) {
+        var transform = payload && payload.attrs && payload.attrs.transform;
+        return typeof transform === "string" && /^\s*matrix\s*\(/i.test(transform);
+    }
+
+    function hasPendingMatrixEdits() {
+        return Object.keys(matrixEditSlides).some(function (name) {
+            return !!matrixEditSlides[name];
+        });
+    }
+
+    function markMatrixTransformEdit(slide) {
+        matrixEditSlides[slide] = true;
+        if (matrixHintShown) return;
+        matrixHintShown = true;
+        showWarning(t("warn_matrix_transform"));
     }
 
     // ================================================================
@@ -1621,17 +2131,27 @@
         } catch (e) { /* no geometry */ }
         html += '</table>';
 
-        // L1: text content — only when the element owns no <tspan> children.
-        if (tag === "text" || tag === "tspan") {
+        var textStyleTargets = textStyleTargetsForSelection(el);
+
+        // L1: text content + computed text styles. When a textbox/group is
+        // selected, style controls target its descendant text leaves.
+        if (tag === "text" || tag === "tspan" || textStyleTargets.length > 0) {
             html += '<div class="prop-section">' + escapeHtml(t("section_text_style")) + '</div>';
             html += '<table class="prop-table">';
-            if (el.querySelector("tspan")) {
+            if ((tag === "text" || tag === "tspan") && el.querySelector("tspan")) {
                 html += '<tr><td class="prop-key">content</td><td class="prop-val prop-note">' +
                     escapeHtml(t("prop_multiline_hint")) + '</td></tr>';
-            } else {
+            } else if (tag === "text" || tag === "tspan") {
                 html += '<tr><td class="prop-key">content</td><td class="prop-val">' +
                     '<textarea class="prop-edit prop-edit-content" rows="2">' +
                     escapeHtml(el.textContent || "") + '</textarea></td></tr>';
+            }
+            if (textStyleTargets.length > 0) {
+                textStyleSpecs(textStyleTargets).forEach(function (spec) {
+                    html += '<tr><td class="prop-key">' + escapeHtml(spec.key) + '</td><td class="prop-val">';
+                    html += renderTextStyleControl(spec, textStyleTargets);
+                    html += '</td></tr>';
+                });
             }
             html += '</table>';
         }
@@ -1680,6 +2200,88 @@
         if (k === "id" || k === "class" || k === "href" || k === "xlink:href") return false;
         if (k.indexOf("on") === 0) return false;
         return /^[A-Za-z_][A-Za-z0-9_.:-]*$/.test(key);
+    }
+
+    function textStyleTargetsForSelection(el) {
+        if (!el) return [];
+        var tag = localName(el);
+        if (tag === "tspan") return el.id ? [el] : [];
+        if (tag === "text") return textStyleLeavesForText(el);
+
+        var targets = [];
+        el.querySelectorAll("text").forEach(function (textEl) {
+            targets = targets.concat(textStyleLeavesForText(textEl));
+        });
+        return uniqueElements(targets);
+    }
+
+    function textStyleLeavesForText(textEl) {
+        var tspans = Array.from(textEl.querySelectorAll("tspan")).filter(function (tspan) {
+            return !!tspan.id;
+        });
+        if (tspans.length > 0) return tspans;
+        return textEl.id ? [textEl] : [];
+    }
+
+    function uniqueElements(elements) {
+        var seen = new Set();
+        return elements.filter(function (el) {
+            if (!el || !el.id || seen.has(el.id)) return false;
+            seen.add(el.id);
+            return true;
+        });
+    }
+
+    function textStyleSpecs(targets) {
+        return [
+            { key: "fill", type: "color" },
+            { key: "font-size", type: "text" },
+            { key: "font-family", type: "text" },
+            { key: "font-weight", type: "select",
+              options: ["", "normal", "bold", "300", "400", "500", "600", "700", "800"] },
+            { key: "text-anchor", type: "select", options: ["", "start", "middle", "end"] }
+        ].map(function (spec) {
+            var value = commonAttrValue(targets, spec.key);
+            var copy = Object.assign({}, spec);
+            copy.value = value === null ? "" : value;
+            copy.mixed = value === null;
+            return copy;
+        });
+    }
+
+    function renderTextStyleControl(spec, targets) {
+        var targetIds = encodeURIComponent(JSON.stringify(targets.map(function (el) { return el.id; })));
+        var placeholder = spec.mixed ? t("multi_mixed") : "";
+        if (spec.type === "color") {
+            return '<input type="color" class="prop-edit prop-edit-text-style-color" data-key="' +
+                escapeHtml(spec.key) + '" data-target-ids="' + targetIds +
+                '" value="' + normalizeHexForPicker(spec.value) + '">' +
+                '<input type="text" class="prop-edit prop-edit-text-style" data-key="' +
+                escapeHtml(spec.key) + '" data-target-ids="' + targetIds +
+                '" placeholder="' + escapeHtml(placeholder) +
+                '" value="' + escapeHtml(spec.mixed ? "" : spec.value) + '">';
+        }
+        if (spec.type === "select") {
+            var html = '<select class="prop-edit prop-edit-text-style" data-key="' +
+                escapeHtml(spec.key) + '" data-target-ids="' + targetIds + '">';
+            var hasValue = spec.options.indexOf(spec.value) !== -1;
+            if (!spec.mixed && spec.value && !hasValue) {
+                html += '<option value="' + escapeHtml(spec.value) + '" selected>' +
+                    escapeHtml(spec.value) + '</option>';
+            }
+            spec.options.forEach(function (opt) {
+                var label = opt || placeholder || "";
+                var selected = !spec.mixed && spec.value === opt ? " selected" : "";
+                html += '<option value="' + escapeHtml(opt) + '"' + selected + '>' +
+                    escapeHtml(label) + '</option>';
+            });
+            html += '</select>';
+            return html;
+        }
+        return '<input type="text" class="prop-edit prop-edit-text-style" data-key="' +
+            escapeHtml(spec.key) + '" data-target-ids="' + targetIds +
+            '" placeholder="' + escapeHtml(placeholder) +
+            '" value="' + escapeHtml(spec.mixed ? "" : spec.value) + '">';
     }
 
     function isColorAttribute(key, value) {
@@ -1796,6 +2398,27 @@
             return "#" + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
         }
         return "#000000";
+    }
+
+    var SVG_UNIT_OPTIONAL_LENGTH_ATTRS = new Set([
+        "x", "y", "x1", "x2", "y1", "y2",
+        "cx", "cy", "r", "rx", "ry",
+        "dx", "dy", "width", "height",
+        "font-size", "stroke-width", "stroke-dashoffset",
+        "letter-spacing", "word-spacing"
+    ]);
+
+    function normalizeSvgLengthValue(key, value) {
+        var s = String(value || "");
+        if (!SVG_UNIT_OPTIONAL_LENGTH_ATTRS.has(String(key).toLowerCase())) return s;
+        s = s.trim();
+        var m = s.match(/^(-?\d+(?:\.\d+)?)px$/i);
+        return m ? m[1] : s;
+    }
+
+    function normalizeEditableAttrValue(key, value) {
+        var s = String(value || "").trim();
+        return normalizeSvgLengthValue(key, s);
     }
 
     function isSafeColor(val) {
@@ -2132,10 +2755,30 @@
             });
         });
 
+        panel.querySelectorAll(".prop-edit-text-style-color").forEach(function (picker) {
+            var key = picker.getAttribute("data-key");
+            var textInput = panel.querySelector('.prop-edit-text-style[data-key="' + key + '"]');
+            picker.addEventListener("input", function () {
+                if (textInput) textInput.value = picker.value;
+            });
+            picker.addEventListener("change", function () {
+                if (textInput) textInput.value = picker.value;
+                stageTextStyleAttr(key, picker.value, picker.getAttribute("data-target-ids"));
+            });
+        });
+        panel.querySelectorAll(".prop-edit-text-style").forEach(function (input) {
+            input.addEventListener("change", function () {
+                var key = input.getAttribute("data-key");
+                var value = normalizeEditableAttrValue(key, input.value);
+                if (!value) return;
+                stageTextStyleAttr(key, value, input.getAttribute("data-target-ids"));
+            });
+        });
+
         panel.querySelectorAll(".prop-edit-attr, .prop-edit-attr-area").forEach(function (input) {
             var key = input.getAttribute("data-key");
             input.addEventListener("change", function () {
-                stageAttr(el, eid, key, input.value.trim());
+                stageAttr(el, eid, key, normalizeEditableAttrValue(key, input.value));
             });
         });
 
@@ -2195,7 +2838,39 @@
         }
     }
 
+    function stageTextStyleAttr(key, value, encodedTargetIds) {
+        value = normalizeEditableAttrValue(key, value);
+        if ((key === "fill" || key === "stroke") && !isSafeColor(value)) {
+            showError(t("err_edit") + key);
+            return;
+        }
+        var ids;
+        try {
+            ids = JSON.parse(decodeURIComponent(encodedTargetIds || "%5B%5D"));
+        } catch (e) {
+            ids = [];
+        }
+        var targets = ids.map(function (id) {
+            return svgContent.querySelector("#" + CSS.escape(id));
+        }).filter(function (target) {
+            return target && attrOrComputedValue(target, key) !== value;
+        });
+        if (targets.length === 0) return;
+
+        var attrs = {};
+        attrs[key] = value;
+        var jobs = targets.map(function (target) {
+            return stageEditRequest(target.id, { attrs: attrs }).then(function () {
+                target.setAttribute(key, value);
+            });
+        });
+        Promise.all(jobs)
+            .then(function () { updateSelectionPanel(); })
+            .catch(function (err) { showError(t("err_edit") + err.message); });
+    }
+
     function stageAttr(el, eid, key, value) {
+        value = normalizeEditableAttrValue(key, value);
         if ((key === "fill" || key === "stroke") && !isSafeColor(value)) {
             showError(t("err_edit") + key);
             return;
@@ -2203,7 +2878,7 @@
         var attrs = {};
         attrs[key] = value;
         stageEditRequest(eid, { attrs: attrs })
-            .then(function () { el.setAttribute(key, value); })
+            .then(function () { applyElementAttrs(el, attrs); })
             .catch(function (err) { showError(t("err_edit") + err.message); });
     }
 
@@ -2238,6 +2913,10 @@
             if (data && data.undo_depth !== undefined) {
                 editStackCount[slide] = data.undo_depth;
                 if (slide === currentSlide) updateUndoButton();
+                updatePendingStatus();
+            }
+            if (payloadHasMatrixTransform(payload)) {
+                markMatrixTransformEdit(slide);
             }
             maybeShowSavedHint();
             return data;
@@ -2316,7 +2995,7 @@
 
     function attrOrComputedValue(el, key) {
         var value = el.getAttribute(key);
-        if (value !== null && value !== "") return value;
+        if (value !== null && value !== "") return normalizeSvgLengthValue(key, value);
         var style = window.getComputedStyle(el);
         var map = {
             "fill": "fill",
@@ -2327,7 +3006,7 @@
             "font-weight": "fontWeight",
             "text-anchor": "textAnchor"
         };
-        return (map[key] && style[map[key]]) || "";
+        return normalizeSvgLengthValue(key, (map[key] && style[map[key]]) || "");
     }
 
     function renderBatchControl(spec) {
@@ -2418,7 +3097,7 @@
         panel.querySelectorAll(".prop-edit-batch").forEach(function (input) {
             input.addEventListener("change", function () {
                 var key = input.getAttribute("data-key");
-                var value = input.value.trim();
+                var value = normalizeEditableAttrValue(key, input.value);
                 if (!value) return;
                 commitBatchAttr(key, value, moveEls);
             });
@@ -2426,6 +3105,7 @@
     }
 
     function commitBatchAttr(key, value, elements) {
+        value = normalizeEditableAttrValue(key, value);
         if ((key === "fill" || key === "stroke") && !isSafeColor(value)) {
             showError(t("err_edit") + key);
             return;
@@ -2434,7 +3114,7 @@
             var attrs = {};
             attrs[key] = value;
             return stageEditRequest(el.id, { attrs: attrs }).then(function () {
-                el.setAttribute(key, value);
+                applyElementAttrs(el, attrs);
             });
         });
         Promise.all(jobs)
@@ -2446,12 +3126,76 @@
     //  Boot
     // ================================================================
     applyI18n();
+    initAnnotationQuickActions();
+    updatePendingStatus();
     var langToggleBtn = document.getElementById("btn-lang-toggle");
-    if (langToggleBtn) {
-        langToggleBtn.textContent = LANG === "zh" ? "EN" : "中";
-        langToggleBtn.title = t("lang_toggle_title");
-        langToggleBtn.addEventListener("click", function () {
-            setLang(LANG === "zh" ? "en" : "zh");
+    var langMenu = document.getElementById("lang-menu");
+    if (langToggleBtn && langMenu) {
+        refreshLangUI(LANG);
+        var setMenuOpen = function (open) {
+            langMenu.hidden = !open;
+            langToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+            if (open) {
+                var sel = langMenu.querySelector("li.selected") || langMenu.querySelector("li[data-lang]");
+                if (sel) sel.focus();
+            }
+        };
+        var chooseLang = function (v) {
+            setMenuOpen(false);
+            langToggleBtn.focus();
+            if (v) setLang(v);
+        };
+        langToggleBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            setMenuOpen(langMenu.hidden);
+        });
+        langToggleBtn.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !langMenu.hidden) {
+                e.stopPropagation();
+                setMenuOpen(false);
+            } else if ((e.key === "ArrowDown" || e.key === "ArrowUp") && langMenu.hidden) {
+                e.preventDefault();
+                e.stopPropagation();
+                setMenuOpen(true);
+            }
+        });
+        langMenu.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var li = e.target && e.target.closest ? e.target.closest("li[data-lang]") : null;
+            if (li) chooseLang(li.getAttribute("data-lang"));
+            else setMenuOpen(false);
+        });
+        langMenu.addEventListener("keydown", function (e) {
+            e.stopPropagation();   // keep nudge / slide-nav shortcuts away while the menu is open
+            var items = Array.prototype.slice.call(langMenu.querySelectorAll("li[data-lang]"));
+            var idx = items.indexOf(document.activeElement);
+            if (e.key === "Escape") {
+                setMenuOpen(false);
+                langToggleBtn.focus();
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                (items[idx + 1] || items[0]).focus();
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                (items[idx - 1] || items[items.length - 1]).focus();
+            } else if (e.key === "Home") {
+                e.preventDefault();
+                items[0].focus();
+            } else if (e.key === "End") {
+                e.preventDefault();
+                items[items.length - 1].focus();
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                e.preventDefault();
+            } else if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (idx >= 0) chooseLang(items[idx].getAttribute("data-lang"));
+            }
+        });
+        langToggleBtn.parentElement.addEventListener("focusout", function (e) {
+            if (!langMenu.hidden && !langToggleBtn.parentElement.contains(e.relatedTarget)) setMenuOpen(false);
+        });
+        document.addEventListener("click", function () {
+            if (!langMenu.hidden) setMenuOpen(false);
         });
     }
 

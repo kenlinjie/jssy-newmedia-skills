@@ -17,6 +17,15 @@ the corresponding provider_<name>.py module and only imports from here.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
 
 if __name__ == "__main__":
     print(__doc__)
@@ -24,8 +33,7 @@ if __name__ == "__main__":
     raise SystemExit(0 if any(arg in {"-h", "--help", "help"} for arg in sys.argv[1:]) else 1)
 
 import re
-from dataclasses import dataclass, field
-from pathlib import Path
+from dataclasses import dataclass, field, replace
 from typing import Any, Optional
 
 
@@ -200,6 +208,8 @@ class ImageSearchRequest:
     min_height: int = 0
     filename: str = ""
     slide: str = ""
+    required_terms: tuple[str, ...] = ()
+    query_variants: tuple[str, ...] = ()
 
 
 @dataclass
@@ -216,6 +226,8 @@ class AssetCandidate:
     width: int = 0
     height: int = 0
     download_url: str = ""
+    preview_url: str = ""
+    discovery_query: str = ""
     author: str = ""
     raw: Any = field(default=None)
 
@@ -257,6 +269,8 @@ _SOFT_NOISE_WORDS = frozenset({
 })
 
 _TOKEN_STRIP_CHARS = ".,;:!?\"'()[]{}，。；：！？、"
+_MATCH_SEPARATOR_RE = re.compile(r"""[\s\-_./:;,'"()[\]{}]+""")
+_ASCII_MATCH_TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 
 def simplify_query(query: str, max_words: int = 4) -> str:
@@ -349,24 +363,105 @@ def _query_tokens(query: str) -> list[str]:
 
 def _candidate_text(candidate: AssetCandidate) -> str:
     """Concatenate the candidate's matchable metadata fields for scoring."""
-    return " ".join(filter(None, (candidate.title, candidate.author))).lower()
+    return " ".join(
+        filter(
+            None,
+            (
+                candidate.title,
+                candidate.author,
+                candidate.source_page_url,
+            ),
+        )
+    ).lower()
+
+
+def _candidate_match_tokens(candidate: AssetCandidate) -> set[str]:
+    """Return whole ASCII tokens from candidate metadata for relevance scoring."""
+    return set(_ASCII_MATCH_TOKEN_RE.findall(_candidate_text(candidate)))
+
+
+def _normalize_match_text(text: str) -> str:
+    """Normalize metadata / required terms for conservative substring matching."""
+    lowered = (text or "").lower()
+    return _MATCH_SEPARATOR_RE.sub(" ", lowered).strip()
+
+
+def _contains_term(term: str, text: str) -> bool:
+    """Match one normalized term: whole words for Latin, spacing-free for CJK.
+
+    "iran" must not pass on "tirana"; "liberation monument" still matches a
+    run-together "liberationmonument" slug, and CJK ignores inserted spaces.
+    """
+    compact_term = term.replace(" ", "")
+    if term.isascii():
+        forms = "|".join(re.escape(form) for form in {term, compact_term})
+        return re.search(rf"(?<![a-z0-9])(?:{forms})(?![a-z0-9])", text) is not None
+    return term in text or compact_term in text.replace(" ", "")
+
+
+def _term_group_alternatives(term_group: str) -> list[str]:
+    """Split one required term group into alternatives.
+
+    ``"Jiefangbei|Liberation Monument"`` means either alternative satisfies
+    that required group. Different list items are ANDed by
+    ``missing_required_terms``.
+    """
+    return [
+        _normalize_match_text(part)
+        for part in str(term_group or "").split("|")
+        if _normalize_match_text(part)
+    ]
+
+
+def missing_required_terms(
+    candidate: AssetCandidate,
+    required_terms: tuple[str, ...] | list[str] | None,
+) -> list[str]:
+    """Return required term groups not present in candidate metadata.
+
+    This is an entity-safety gate, not a fuzzy visual classifier. Use it for
+    exact subjects such as landmarks, people, companies, or products where a
+    visually nice but wrong image is worse than no image.
+    """
+    if not required_terms:
+        return []
+
+    text = _normalize_match_text(_candidate_text(candidate))
+    missing: list[str] = []
+    for group in required_terms:
+        alternatives = _term_group_alternatives(group)
+        if not alternatives:
+            continue
+        matched = any(_contains_term(alt, text) for alt in alternatives)
+        if not matched:
+            missing.append(str(group))
+    return missing
 
 
 def compute_relevance(candidate: AssetCandidate, query: str) -> float:
-    """Fraction of query tokens that appear in the candidate's metadata.
+    """Fraction of query tokens that match whole candidate metadata tokens.
 
     Range ``[0.0, 1.0]``. Returns ``1.0`` (neutral) when the query has no
     ASCII tokens to match — this lets non-English queries fall through
-    to license / size scoring without being unfairly rejected.
+    to license / size scoring without being unfairly rejected. Whole-token
+    matching prevents false positives such as ``office`` matching ``officer``.
     """
     tokens = _query_tokens(query)
     if not tokens:
         return 1.0
-    text = _candidate_text(candidate)
-    if not text:
+    candidate_tokens = _candidate_match_tokens(candidate)
+    if not candidate_tokens:
         return 0.0
-    hits = sum(1 for t in tokens if t in text)
+    hits = sum(1 for token in tokens if token in candidate_tokens)
     return hits / len(tokens)
+
+
+# Whole words only: a bare substring test penalized "business", "trail", and
+# "网站", and the text includes author names and source URLs.
+_INFRA_TERMS_RE = re.compile(
+    r"(?<![a-z])(?:stations?|subways?|metro|rail(?:way|road)?s?|transit"
+    r"|airports?|bus(?:es)?)(?![a-z])|地铁|车站|轨道"
+)
 
 
 def score_candidate(candidate: AssetCandidate, request: ImageSearchRequest) -> float:
@@ -378,22 +473,33 @@ def score_candidate(candidate: AssetCandidate, request: ImageSearchRequest) -> f
     """
     if not candidate.license_tier:
         return float("-inf")
+    if (
+        candidate.license_tier == LICENSE_TIER_ATTRIBUTION_REQUIRED
+        and not candidate.author.strip()
+    ):
+        return float("-inf")
+
+    required_misses = missing_required_terms(candidate, request.required_terms)
+    if required_misses:
+        return float("-inf")
 
     relevance = compute_relevance(candidate, request.query)
-    if relevance == 0.0:
+    if relevance == 0.0 and not request.required_terms:
         return float("-inf")
 
     score = relevance * 10000.0
+    title_text = _normalize_match_text(candidate.title)
+    for group in request.required_terms or ():
+        alternatives = _term_group_alternatives(group)
+        if any(_contains_term(alt, title_text) for alt in alternatives):
+            score += 1500.0
 
     # Penalize infrastructure/transit metadata if the user didn't explicitly ask for it.
     # This prevents high-res subway station photos from outranking actual tourist landmarks.
     text = _candidate_text(candidate)
     query_lower = request.query.lower()
-    infra_terms = ["station", "subway", "metro", "rail", "transit", "airport", "bus", "地铁", "站", "轨道"]
-    
-    if not any(t in query_lower for t in infra_terms):
-        if any(t in text for t in infra_terms):
-            score -= 5000.0
+    if not _INFRA_TERMS_RE.search(query_lower) and _INFRA_TERMS_RE.search(text):
+        score -= 5000.0
 
     candidate_orientation = normalize_orientation(candidate.width, candidate.height)
     requested = (request.orientation or "").strip().lower()
@@ -408,10 +514,50 @@ def score_candidate(candidate: AssetCandidate, request: ImageSearchRequest) -> f
     if request.min_height and candidate.height < request.min_height:
         score -= 500.0
 
-    # Larger images score higher, capped to avoid runaway dominance.
+    if candidate.license_tier == LICENSE_TIER_NO_ATTRIBUTION:
+        score += 250.0
+
+    # Larger images score higher, but only as a tie-breaker; entity accuracy
+    # and metadata relevance must dominate pixel count.
     pixel_score = max(candidate.width, 0) * max(candidate.height, 0) / 1000.0
-    score += min(pixel_score, 5000.0)
+    score += min(pixel_score, 1500.0)
     return score
+
+
+def score_review_candidate(
+    candidate: AssetCandidate,
+    request: ImageSearchRequest,
+) -> float:
+    """Score a wider visual-review pool without weakening automatic selection.
+
+    Metadata-verified candidates retain priority. A near match may enter the
+    thumbnail sheet only when at most one required identity group is missing
+    and the candidate still has meaningful relevance to the query that found
+    it. This never authorizes best-only download; ``score_candidate`` remains
+    the automatic-selection gate.
+    """
+    strict_score = score_candidate(candidate, request)
+    if strict_score != float("-inf"):
+        return strict_score + 20000.0
+    if not request.required_terms:
+        return strict_score
+
+    missing = missing_required_terms(candidate, request.required_terms)
+    if len(missing) != 1:
+        return float("-inf")
+
+    discovery_request = replace(
+        request,
+        query=candidate.discovery_query or request.query,
+        required_terms=(),
+    )
+    relevance = compute_relevance(candidate, discovery_request.query)
+    if relevance < 0.5:
+        return float("-inf")
+    relaxed_score = score_candidate(candidate, discovery_request)
+    if relaxed_score == float("-inf"):
+        return relaxed_score
+    return relaxed_score - 5000.0
 
 
 # ---------------------------------------------------------------------------

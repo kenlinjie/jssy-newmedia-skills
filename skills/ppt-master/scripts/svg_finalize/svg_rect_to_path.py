@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-PPT Master - SVG Rounded Rectangle to Path Tool
+PPT Master - Legacy SVG Rounded Rectangle Diagnostic
 
-Solves the issue of rounded corners being lost when using "Convert to Shape" in PowerPoint:
-Converts <rect> elements with rx/ry to equivalent <path> elements.
+Historical diagnostic that converts <rect> elements with rx/ry to equivalent
+<path> elements. It is not part of finalize_svg.py or the supported export
+workflow; PowerPoint's manual "Convert to Shape" behavior is not supported.
 
 Usage:
     python3 scripts/svg_finalize/svg_rect_to_path.py <SVG file or directory>
@@ -11,8 +12,8 @@ Usage:
     python3 scripts/svg_finalize/svg_rect_to_path.py <project_path> -s final -o svg_rounded
 
 Examples:
-    python3 scripts/svg_finalize/svg_rect_to_path.py examples/ppt169_demo
-    python3 scripts/svg_finalize/svg_rect_to_path.py examples/ppt169_demo/svg_output/01_cover.svg
+    python3 scripts/svg_finalize/svg_rect_to_path.py projects/ppt169_demo
+    python3 scripts/svg_finalize/svg_rect_to_path.py projects/ppt169_demo/svg_output/01_cover.svg
 
 Output:
     - Directory mode: outputs to svg_rounded/ subdirectory
@@ -25,6 +26,14 @@ import argparse
 from pathlib import Path
 from typing import Any, Tuple
 from xml.etree import ElementTree as ET
+
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
 
 
 def rect_to_rounded_path(
@@ -227,17 +236,17 @@ def find_svg_files(project_path: Path, source: str = 'output') -> tuple[list[Pat
 def main() -> None:
     """Run the CLI entry point."""
     parser = argparse.ArgumentParser(
-        description='PPT Master - SVG Rounded Rectangle to Path Tool',
+        description='PPT Master - Legacy SVG Rounded Rectangle Diagnostic',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-    %(prog)s examples/ppt169_demo
-    %(prog)s examples/ppt169_demo -s final
-    %(prog)s examples/ppt169_demo/svg_output/01_cover.svg
+    %(prog)s projects/ppt169_demo
+    %(prog)s projects/ppt169_demo -s final
+    %(prog)s projects/ppt169_demo/svg_output/01_cover.svg
 
 What it does:
     Converts <rect> elements with rx/ry to equivalent <path> elements.
-    Processed SVGs preserve rounded corners when using "Convert to Shape" in PowerPoint.
+    Legacy diagnostic only; the standard pipeline preserves SVG rounded rectangles.
 '''
     )
     
@@ -261,7 +270,7 @@ What it does:
     quiet = args.quiet
     
     if not quiet:
-        print("PPT Master - SVG Rounded Rectangle to Path Tool")
+        print("PPT Master - Legacy SVG Rounded Rectangle Diagnostic")
         print("=" * 50)
     
     total_converted = 0

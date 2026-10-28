@@ -6,7 +6,8 @@ Layered paper-craft — scissor-cut shapes stacked in tactile layers, soft shado
 
 ## 1. Shape & decoration
 
-- Shape language: forms defined by crisp, slightly-irregular cut edges (no outlines); simplified, stylized shapes that read as cut paper rather than illustration.
+- Shape language: forms defined by crisp, slightly-irregular cut edges (no outlines); simplified, stylized shapes that read as cut paper rather than illustration. A silhouette intended to read as hand-cut uses an irregular `<polygon>` / `<path>` instead of a pristine digital box. Functional native contours and deliberately machine-cut layers remain eligible inside the same paper system.
+- Composition geometry: stacked wave sheets building the page bottom-up; a die-cut window revealing the layer beneath; one large cut disc (sun / moon) anchoring the composition; tabbed sheet edges ordering steps; a foreground frame layer with the content on the sheet behind it.
 - Decoration: layering itself is the device — each element is a "sheet" stacked over the one beneath; small cut-out accents on the top layer.
 - Whitespace: cozy, composed — the backing sheet shows through as breathing room.
 
@@ -14,7 +15,7 @@ Layered paper-craft — scissor-cut shapes stacked in tactile layers, soft shado
 
 - Clean friendly sans; warm, not severe. Titles can sit on a cut-paper banner shape.
 
-> Families are chosen at confirmation `g`; this style asks for a warm, rounded, approachable sans *character*.
+> Families are chosen at confirmation `g`; this style asks for a warm, rounded, approachable sans *character*. This governs editable native text; decorative-lettering eligibility remains a separate carrier decision.
 
 ## 3. Using the deck's colors
 
@@ -25,8 +26,12 @@ Layered paper-craft — scissor-cut shapes stacked in tactile layers, soft shado
 
 ## 4. Texture / elevation
 
-- Real layered depth — a soft 8-12% drop shadow under each cut layer is core here (the one style where layered shadow is the point, not a violation). Matte paper grain on each sheet. (Shadow rules: [`shared-standards.md §6`](../shared-standards.md).)
+- Real layered depth — a soft, low-opacity drop shadow under cut layers is core here (the style where layered shadow is the point, not a violation). Matte paper grain on each sheet.
 
 ## 5. Paired image-rendering
 
 `paper-cut` — layered cut-paper imagery sharing the tactile, hand-made depth.
+
+## 6. Illustration propensity
+
+**core** — when illustration is selected, layered cut-paper elements may lead the style, and transparent slices match it natively. Role, scale, reuse, and placement stay Strategist judgment; an explicit user request wins either way, and `image_usage: none` writes no illustration rows.

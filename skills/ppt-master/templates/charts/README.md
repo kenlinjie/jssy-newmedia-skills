@@ -1,17 +1,63 @@
-# SVG Visualization Template Library
+# Chart Visualization Templates
 
-This directory contains the standardized SVG visualization templates used by PPT Master — charts, infographics, process diagrams, relationship diagrams, and strategic frameworks. The directory name `charts/` is kept for backward compatibility; the library scope is broader than charts.
+This directory contains 33 canonical value-driven references. A chart belongs here
+when source values, categories, time, weights, or durations determine visual
+mark position, length, area, angle, font size, or connection width.
 
-## Source of truth
+Qualitative page topology is built as a page-specific Structure by Executor.
+Cell-grid semantics belong in [`tables/`](../tables/). Reusable PowerPoint
+Master/Layout, page-type, slot, and placeholder contracts belong in
+[`layouts/`](../layouts/).
 
-[`charts_index.json`](./charts_index.json) is the single source of truth for the library: total count + one selection-rule `summary` per template (format: `"Pick for X. Skip if Y (use other_key)."`). Both human readers and AI roles read it in full — there is no category/keyword sub-index. Selection is done by semantic match against the summary list in one pass.
+## Planning vocabulary and source of truth
 
-To browse the library, open `charts_index.json` and scan the `charts` block top-to-bottom; each entry's `summary` answers "when do I pick this, when do I skip" directly.
+[`charts_index.json`](./charts_index.json) is the sole chart registry. Its
+`charts` object maps each canonical key to one selection-rule `summary` in the
+form `Pick for ... Skip if ...`. The key matches `<key>.svg`; `meta.total`
+matches the canonical SVG roster.
 
-## Style rules
+[`chart-vocabulary.md`](./chart-vocabulary.md) is the complete planning
+projection. It lists all 33 exact `chart/<key>` references by information
+relationship and states only what each encoding represents. It contains no
+chart-authoring instructions and does not prescribe selection.
 
-See [`CHART_STYLE_GUIDE.md`](./CHART_STYLE_GUIDE.md) for color palette, typography, and SVG authoring conventions all templates must follow.
+Default Strategist and Quick read the vocabulary together with the Table
+registry before planning, choose through their own judgment, then use
+[`visualization_recall.py`](../../scripts/visualization_recall.py) `validate`
+to resolve selected canonical references. Its `recall` mode remains an
+optional diagnostic helper over the machine registry, not the runtime
+capability gate. Default writes `chart/<key>` to `page_visualizations`; Quick
+keeps the selected reference in active context. Executor then reads only the
+selected SVG and execution references. [`chart_recall.py`](../../scripts/chart_recall.py)
+and bare keys remain legacy compatibility only.
 
-## Usage
+## Authoring contract
 
-Before generating a chart page, open the corresponding `<key>.svg` file to read its structure and layout. Files are named after the `key` field in `charts_index.json` (e.g. `bar_chart.svg`, `quadrant_bubble_scatter.svg`). Templates are named by visual structure, not by business-model name — keywords like SWOT, BCG, PEST, OKR, Porter's Five Forces, Value Chain are matched via each template's `summary` field.
+[`VISUALIZATION_TEMPLATE_AUTHORING.md`](../VISUALIZATION_TEMPLATE_AUTHORING.md)
+owns the shared standalone-SVG, neutral-preview, root-boundary, Shape-first,
+family, and catalog rules. Chart-specific requirements are:
+
+- Preserve the exact value-to-mark mapping, labels, units, categories, series,
+  ordering, and source notes required by the information.
+- Keep calculator-supported `chart-plot-area` markers accurate.
+- Default output remains independently editable DrawingML shapes.
+- Add native Chart replacement metadata only for a supported independent data
+  object. The visible fallback and metadata describe the same data.
+- Do not classify a named quadrant, process, hierarchy, or relationship diagram
+  as a chart unless values actually determine its marks.
+
+`matrix_2x2` is a chart: each item's x/y coordinates encode two values and its
+radius encodes a third metric. A fixed 2×2 set of titled text regions is a
+page-specific Structure. A schedule whose dates or durations determine task-bar
+position and length is `chart/gantt_chart`; a qualitative stage/lane plan is a
+Structure built from those relationships.
+
+## Runtime boundary
+
+One selected SVG is a flexible reference for one mapped page. Design Spec §IX
+or the Quick active-context decision plus source data owns final semantics.
+Project palette, typography, chrome, grouping, capacity, and geometry remain
+adaptable. Selecting a chart reference does not itself select native output;
+§IX/Quick names independent objects separately and decides
+`<object-key>=yes|no`, while explicit `--native-charts-and-tables` export is a
+second opt-in.

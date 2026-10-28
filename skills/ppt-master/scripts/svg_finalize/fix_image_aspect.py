@@ -3,11 +3,12 @@
 SVG Image Aspect Ratio Fix Tool
 
 Fixes the dimensions of <image> elements in SVG to match the original image aspect ratio.
-This prevents images from being stretched when PowerPoint converts SVG to editable shapes.
+This prevents images from being stretched by PowerPoint SVG rendering paths that do not
+honor preserveAspectRatio consistently.
 
 Principle:
-    When PowerPoint converts SVG to editable shapes, it ignores the preserveAspectRatio attribute
-    and directly stretches the image to fill the area specified by width/height.
+    Some PowerPoint SVG rendering paths ignore the preserveAspectRatio attribute and directly
+    stretch the image to fill the area specified by width/height.
 
     This tool reads the actual image aspect ratio and recalculates the x, y, width, height of
     <image> elements so that images are centered and maintain their original aspect ratio.
@@ -31,9 +32,17 @@ import argparse
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
+
 # Try to import PIL for getting image dimensions
 try:
-    from PIL import Image
+    from PIL import Image, ImageOps
     HAS_PIL = True
 except ImportError:
     HAS_PIL = False
@@ -45,7 +54,7 @@ def get_image_dimensions_pil(image_path: str) -> tuple[int | None, int | None]:
     """Get image dimensions using PIL."""
     try:
         with Image.open(image_path) as img:
-            return img.width, img.height
+            return ImageOps.exif_transpose(img).size
     except Exception as e:
         print(f"  [WARN] Cannot read image with PIL: {e}")
         return None, None
@@ -112,7 +121,7 @@ def get_image_dimensions_from_base64(data_uri: str) -> tuple[int | None, int | N
         
         if HAS_PIL:
             with Image.open(io.BytesIO(img_bytes)) as img:
-                return img.width, img.height
+                return ImageOps.exif_transpose(img).size
         else:
             # Use basic method
             if img_bytes[:8] == b'\x89PNG\r\n\x1a\n':
@@ -323,7 +332,7 @@ def fix_image_aspect_in_svg(svg_path: str, dry_run: bool = False, verbose: bool 
 def main() -> None:
     """Run the CLI entry point."""
     parser = argparse.ArgumentParser(
-        description='Fix image aspect ratios in SVG to prevent stretching when PowerPoint converts to shapes',
+        description='Normalize SVG image boxes for PowerPoint SVG rendering diagnostics',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:

@@ -10,6 +10,15 @@ API docs: https://pixabay.com/api/docs/
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
 
 if __name__ == "__main__":
     print(__doc__)
@@ -77,6 +86,11 @@ def parse_results(payload: dict) -> list[AssetCandidate]:
                 width=int(item.get("imageWidth") or 0),
                 height=int(item.get("imageHeight") or 0),
                 download_url=download_url,
+                preview_url=(
+                    item.get("webformatURL")
+                    or item.get("previewURL")
+                    or ""
+                ).strip(),
                 author=(item.get("user") or "").strip(),
                 raw=item,
             )

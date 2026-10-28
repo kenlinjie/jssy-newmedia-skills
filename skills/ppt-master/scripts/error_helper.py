@@ -8,6 +8,10 @@ Provides user-friendly error messages and specific fix suggestions.
 import argparse
 from typing import Dict, List, Optional
 
+from console_encoding import configure_utf8_stdio
+
+configure_utf8_stdio()
+
 
 class ErrorHelper:
     """Error message helper."""
@@ -18,8 +22,8 @@ class ErrorHelper:
             'message': 'Missing README.md file',
             'solutions': [
                 'Create a README.md file with project description, usage instructions, etc.',
-                'Reference template: examples/google_annual_report_ppt169_20251116/README.md',
-                'Or use command: cp examples/google_annual_report_ppt169_20251116/README.md <your_project>/'
+                'Document the project goal, source material, canvas, generated artifacts, and export path',
+                'Keep project-specific instructions local instead of copying a repository example'
             ],
             'severity': 'error'
         },
@@ -64,17 +68,19 @@ class ErrorHelper:
             'message': 'Project directory missing date suffix',
             'solutions': [
                 'Rename the project directory to add a date suffix: _YYYYMMDD',
-                'Format: {project_name}_{format}_{YYYYMMDD}',
-                'Example: my_project_ppt169_20251116',
-                'Command: mv old_name new_name_ppt169_20251116'
+                'Format: {project_name}_{YYYYMMDD}',
+                'An explicit registered format may use: {project_name}_{format}_{YYYYMMDD}',
+                'Example: my_project_20251116 or my_project_ppt169_20251116',
+                'Command: mv old_name new_name_20251116'
             ],
             'severity': 'warning'
         },
         'viewbox_mismatch': {
-            'message': 'SVG viewBox does not match canvas format',
+            'message': 'SVG viewBox differs from the recorded canvas format',
             'solutions': [
                 'Check the viewBox attribute of SVG files',
-                'Ensure it matches the project canvas format',
+                'Treat the root viewBox as the actual canvas size',
+                'If the project metadata is stale, export will use the SVG viewBox',
                 'PPT 16:9 should be: viewBox="0 0 1280 720"',
                 'PPT 4:3 should be: viewBox="0 0 1024 768"',
                 'Reference: references/canvas-formats.md'
@@ -96,8 +102,8 @@ class ErrorHelper:
             'solutions': [
                 'Add the viewBox attribute to the SVG root element',
                 'Format: <svg viewBox="0 0 1280 720" ...>',
-                'Ensure width, height are consistent with viewBox',
-                'This is a mandatory requirement for SVG generation'
+                'Root width/height are optional compatibility attributes',
+                'The root viewBox is mandatory for SVG generation'
             ],
             'severity': 'error'
         },
@@ -107,7 +113,7 @@ class ErrorHelper:
                 'Remove <foreignObject> elements',
                 'Use <text> + <tspan> for manual line wrapping',
                 'This is a project technical specification requirement',
-                'Reference: references/shared-standards.md'
+                'Reference: references/shared-standards-core.md'
             ],
             'severity': 'error'
         },
@@ -116,7 +122,7 @@ class ErrorHelper:
             'solutions': [
                 'Remove clip-path from shapes / groups / text',
                 'Draw the target geometry directly with the matching native element: <circle> / <ellipse> / <rect rx="..."> / <polygon> / <path>. A rect clipped to a circle is just a <circle>.',
-                'clip-path on <image> is conditionally allowed — see references/shared-standards.md §1.2'
+                'clip-path on <image> is conditionally allowed — see references/shared-standards-core.md §1.2'
             ],
             'severity': 'error'
         },
@@ -125,7 +131,7 @@ class ErrorHelper:
             'solutions': [
                 'Define the referenced <clipPath id="..."> inside <defs>',
                 'The clipPath must contain exactly one shape child (circle / ellipse / rect with rx,ry / path / polygon)',
-                'Reference: references/shared-standards.md §1.2'
+                'Reference: references/shared-standards-core.md §1.2'
             ],
             'severity': 'error'
         },
@@ -157,11 +163,11 @@ class ErrorHelper:
             'severity': 'error'
         },
         'id_attribute_detected': {
-            'message': 'Forbidden id attribute detected',
+            'message': 'Forbidden CSS selector usage with id detected',
             'solutions': [
-                'Remove all id attributes',
-                'Use inline styles instead',
-                'Avoid relying on selectors for positioning or style reuse'
+                'Keep IDs for local references or documented semantic/animation groups',
+                'Remove <style> rules and CSS selectors',
+                'Use inline presentation attributes instead'
             ],
             'severity': 'error'
         },
@@ -175,51 +181,15 @@ class ErrorHelper:
             ],
             'severity': 'error'
         },
-        'symbol_use_detected': {
-            'message': 'Forbidden <symbol> + <use> complex usage detected',
-            'solutions': [
-                'Expand <symbol> into actual SVG code',
-                'Avoid <symbol> + <use> reuse structures',
-                'Embed SVG paths directly when icons are needed'
-            ],
-            'severity': 'error'
-        },
         # Note: <marker> and marker-end are NO LONGER forbidden — they are
-        # conditionally allowed (see references/shared-standards.md §1.1).
+        # conditionally allowed (see references/shared-standards-core.md §1.1).
         # The converter maps qualifying markers to native DrawingML arrow heads.
         'marker_orphan_ref': {
             'message': 'marker-start/marker-end references a marker id, but no <marker> element is defined',
             'solutions': [
                 'Define the <marker> inside <defs>',
                 'Or remove the marker-start/marker-end attribute',
-                'See shared-standards.md §1.1 for marker constraints',
-            ],
-            'severity': 'error'
-        },
-        'rgba_detected': {
-            'message': 'Forbidden rgba() color detected',
-            'solutions': [
-                'Replace rgba() with hex + opacity notation',
-                'Example: fill="#FFFFFF" fill-opacity="0.1"',
-                'Use stroke-opacity for strokes'
-            ],
-            'severity': 'error'
-        },
-        'group_opacity_detected': {
-            'message': 'Forbidden <g opacity> detected',
-            'solutions': [
-                'Remove group-level opacity',
-                'Set opacity individually on each child element',
-                'Use fill-opacity / stroke-opacity for control'
-            ],
-            'severity': 'error'
-        },
-        'image_opacity_detected': {
-            'message': 'Forbidden <image opacity> detected',
-            'solutions': [
-                'Remove image opacity attribute',
-                'Add a <rect> overlay to control transparency',
-                'Ensure overlay color matches the background'
+                'See shared-standards-core.md §1.1 for marker constraints',
             ],
             'severity': 'error'
         },
@@ -262,7 +232,7 @@ class ErrorHelper:
             'message': 'Forbidden web font (@font-face) detected',
             'solutions': [
                 'Remove @font-face declarations',
-                'End every font-family stack with a PPT-safe pre-installed family',
+                'Use font-family stacks that export target-installed/approved PPT-safe typefaces',
                 'Example: font-family: "Microsoft YaHei", Arial, sans-serif'
             ],
             'severity': 'error'
@@ -286,10 +256,11 @@ class ErrorHelper:
             'severity': 'error'
         },
         'invalid_font': {
-            'message': 'Font stack does not end on a PPT-safe family',
+            'message': 'Font stack exports non-PPT-safe typefaces to PPTX',
             'solutions': [
-                'End the stack with a cross-platform pre-installed family',
-                'CJK: "Microsoft YaHei", sans-serif  |  SimSun, serif',
+                'Use stacks whose exported Latin / EA faces are installed or approved on the delivery target',
+                'Do not choose PPTX faces from the authoring host font inventory',
+                'CJK: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif  |  SimSun, "Noto Serif CJK SC", serif',
                 'Latin: Arial, sans-serif  |  "Times New Roman", serif',
                 'Mono: Consolas, "Courier New", monospace',
                 'See strategist.md §g for the full PPT-safe discipline'

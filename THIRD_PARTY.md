@@ -7,10 +7,14 @@
 | `ai-environment-setup` | https://github.com/kenlinjie/ai-environment-setup ，保留 MIT LICENSE |
 | `gzh-design` | 上游家族：https://github.com/X-hub-spec/gzh-design-skill ，保留 AGPL-3.0-or-later LICENSE 与主题组件 |
 | `douyin-benchmark` | https://github.com/kenlinjie/douyin-benchmark ，保留 MIT LICENSE |
-| `guizang-ppt-skill` | https://github.com/op7418/guizang-ppt-skill ，保留原 LICENSE |
 | `remotion-talking-head` | https://github.com/kenlinjie/remotion-talking-head ，未随附独立 LICENSE |
-| `watch` | 技能内说明帧抽取核心来自 bradautomates/claude-video ，保留现有 MIT LICENSE |
+| `ppt-master` | https://github.com/hugohe3/ppt-master ，完整收录官方 6.7.3 技能目录，保留 MIT LICENSE、署名、赞助归属文件与完整性门禁 |
+| `watch` | https://github.com/bradautomates/claude-video ，合入 0.3.2 帧提取修复，保留 MIT LICENSE 与本地中文转写分支 |
+| `agent-reach` | https://github.com/Panniantong/Agent-Reach ，合入 1.6.0 统一 CLI 和能力参考，保留 MIT LICENSE 与本项目工具偏好 |
+| `obsidian-markdown`、`obsidian-bases`、`obsidian-cli`、`json-canvas`、`defuddle` | https://github.com/kepano/obsidian-skills ，各技能随附上游 MIT LICENSE |
 | `daily-report-universal` | 通用日报技能分发包，仅保留通用流程与空白模板 |
+
+`write`、`local-sota-transcription` 与通用日报按本机通用源或已有分发包核对，尚无可确认的独立公开上游地址；不将“本机没有新增内容”称作“全网最新版”。
 
 文件哈希、依赖、适配和许可证位置见 `catalog.json`。路径通用化、共享配置隔离和隐私清理只作用于本项目副本。运行时、模型和服务在使用时按实际环境配置。
 

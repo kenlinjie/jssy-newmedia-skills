@@ -1,6 +1,6 @@
 {
   "name": "新东方省域新媒体技能包",
-  "version": "2026.10.27",
+  "version": "2026.10.28",
   "python_minimum": "3.9",
   "skills": [
     {
@@ -13,7 +13,9 @@
       "requirements": "已有可读技能的agent；按任务使用当前真实工具与数据",
       "source": {
         "kind": "created-in-project",
-        "reference": "2026-10-27 省域整合请求"
+        "reference": "2026-10-27 省域整合请求",
+        "last_checked": "2026-10-28",
+        "check_result": "maintained-in-project"
       },
       "adaptations": [
         "钉钉能力仅引用国内可访问的CLI官方站，使用官方当前技能，不随附产品技能副本"
@@ -24,7 +26,7 @@
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "1bdd9a28f7cc3a267c45c6942e91bddfd7045954fcb9e37cff820b6c8a1cdfd5",
+      "sha256": "47d45ad2c48816464eb17e5c40b0a27b86f3b26a575ddfe8395f35ce327f4288",
       "external_tools": [
         "dingtalk-cli",
         "ego-browser"
@@ -41,7 +43,11 @@
       "source": {
         "kind": "bundled-skill",
         "reference": "ai-environment-setup",
-        "repository": "https://github.com/kenlinjie/ai-environment-setup"
+        "repository": "https://github.com/kenlinjie/ai-environment-setup",
+        "last_checked": "2026-10-28",
+        "upstream_revision": "83a36c6bb9df287664275c348c177af638d521a9",
+        "upstream_path": ".",
+        "check_result": "reviewed-adapted"
       },
       "adaptations": [
         "钉钉能力仅引用国内可访问的CLI官方站，使用官方当前技能，不随附产品技能副本"
@@ -67,13 +73,18 @@
       "source": {
         "kind": "bundled-skill",
         "reference": "gzh-design",
-        "upstream_family": "https://github.com/X-hub-spec/gzh-design-skill"
+        "upstream_family": "https://github.com/X-hub-spec/gzh-design-skill",
+        "last_checked": "2026-10-28",
+        "upstream_revision": "012b7dabdfb76ebe0d4ad2aa295d823d697c3a88",
+        "upstream_path": ".",
+        "check_result": "updated-selectively"
       },
       "adaptations": [
-        "保留本机完整主题库与写作排版流程；补回已核实上游AGPL许可"
+        "保留本机完整主题库与写作排版流程；补回已核实上游AGPL许可",
+        "合入上游曜金专业风、黑金刊主题及预览；保留写作、头图、主题选择与单HTML交付流程"
       ],
-      "file_count": 21,
-      "sha256": "7d979e47b35ad94c2515831f1c4a96d553a43c291da45a28043277cf7acdcd45",
+      "file_count": 25,
+      "sha256": "75bcc9fb1517b739dec1870cf257dc0be19ebe684c2647eeb1e63937378be44d",
       "license_files": [
         "LICENSE"
       ]
@@ -88,7 +99,9 @@
       "requirements": "本人历史日报与真实工作素材；钉钉读取用 dws",
       "source": {
         "kind": "bundled-skill",
-        "reference": "日报-skill-daily-report-universal-2026-10-19.zip"
+        "reference": "日报-skill-daily-report-universal-2026-10-19.zip",
+        "last_checked": "2026-10-28",
+        "check_result": "local-source-reviewed-no-new-content"
       },
       "adaptations": [
         "个人画像改用空白example模板；安装时生成local-config.md",
@@ -113,7 +126,11 @@
       "source": {
         "kind": "bundled-skill",
         "reference": "douyin-benchmark",
-        "repository": "https://github.com/kenlinjie/douyin-benchmark"
+        "repository": "https://github.com/kenlinjie/douyin-benchmark",
+        "last_checked": "2026-10-28",
+        "upstream_revision": "39fe2333b3810fce09c74eeeb370b6e7e167efee",
+        "upstream_path": ".",
+        "check_result": "unchanged"
       },
       "adaptations": [],
       "file_count": 19,
@@ -135,7 +152,9 @@
       "requirements": "ego Lite 与 ego-browser；本人或获授权的直播后台；老师指定目标表；钉钉写表另需 dws",
       "source": {
         "kind": "created-in-project",
-        "reference": "2026-10-27 直播后台填表与老师引导请求"
+        "reference": "2026-10-27 直播后台填表与老师引导请求",
+        "last_checked": "2026-10-28",
+        "check_result": "maintained-in-project"
       },
       "adaptations": [
         "实查登录账号；按老师提供表头填写确定值；不确定先不写，填后主动用大白话问清方向；场次查重与写后读回；个人状态在项目外"
@@ -162,30 +181,15 @@
       "requirements": "用户原稿或明确的写作事实",
       "source": {
         "kind": "bundled-skill",
-        "reference": "write"
+        "reference": "write",
+        "last_checked": "2026-10-28",
+        "check_result": "local-source-reviewed-no-new-content"
       },
       "adaptations": [
         "把非标准顶层when_to_use与dispatch_intent保留到metadata，兼容标准技能frontmatter"
       ],
       "file_count": 12,
       "sha256": "f10ae71d942dca9f89bc4760c7153cf225fe1998aef3d9549896725bdc909f9e",
-      "license_files": []
-    },
-    {
-      "id": "voice-loop",
-      "title": "文风与口播长期学习",
-      "category": "02 内容生产",
-      "scope": "team",
-      "path": "skills/voice-loop",
-      "core": false,
-      "requirements": "授权语料；每人单独本地 profile，不包含人物数据",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "voice-loop"
-      },
-      "adaptations": [],
-      "file_count": 15,
-      "sha256": "71928cce94f96279f255d3e69566ca6cf800eba591ce64a9827057681bed3498",
       "license_files": []
     },
     {
@@ -198,18 +202,28 @@
       "requirements": "Python、ffmpeg、ffprobe；无字幕时需要本地转写运行时",
       "source": {
         "kind": "bundled-skill",
-        "reference": "watch"
+        "reference": "watch",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/bradautomates/claude-video",
+        "upstream_revision": "03ceb42f7fa2c4439aca01752118044baabffb8f",
+        "upstream_path": "skills/watch",
+        "check_result": "updated-selectively"
       },
       "adaptations": [
-        "本地ASR辅助脚本从同一技能安装目录寻找转写技能"
+        "本地ASR辅助脚本从同一技能安装目录寻找转写技能",
+        "合入上游 0.3.2 帧提取与跨平台运行时修复，保留本地中文Qwen转写、逐词对齐与字幕优先流程"
       ],
-      "file_count": 13,
-      "sha256": "129b7e99202d143ee50ad772e153a616fec55543a021b45d449af5bc6c601b6f",
+      "file_count": 14,
+      "sha256": "91e4fd57a083ae402fae20c95fcdab58c3a1d7c381f8ab1e1e100322a3a9e36e",
       "license_files": [
         "LICENSE"
       ],
       "depends_on": [
         "local-sota-transcription"
+      ],
+      "required_files": [
+        "scripts/runtime.py",
+        "scripts/local_asr.py"
       ]
     },
     {
@@ -222,7 +236,9 @@
       "requirements": "仅 Apple Silicon Mac；uv、本地模型与语言资源按需配置",
       "source": {
         "kind": "bundled-skill",
-        "reference": "local-sota-transcription"
+        "reference": "local-sota-transcription",
+        "last_checked": "2026-10-28",
+        "check_result": "local-source-reviewed-no-new-content"
       },
       "adaptations": [
         "将开发者绝对主目录改为当前用户HOME；uv从PATH定位；技能路径用SKILL_DIR"
@@ -242,52 +258,15 @@
       "source": {
         "kind": "bundled-skill",
         "reference": "remotion-talking-head",
-        "repository": "https://github.com/kenlinjie/remotion-talking-head"
+        "repository": "https://github.com/kenlinjie/remotion-talking-head",
+        "last_checked": "2026-10-28",
+        "upstream_revision": "753aa5af5137659074bf7a67f492cae29ca82d26",
+        "upstream_path": ".",
+        "check_result": "unchanged"
       },
       "adaptations": [],
       "file_count": 9,
       "sha256": "fc9b32e9272cea339cd91df3da028796ce8292615bd56eaeaa48e17c25ea2a7a",
-      "license_files": []
-    },
-    {
-      "id": "guizang-ppt-skill",
-      "title": "网页演示与培训分享",
-      "category": "05 培训与汇报",
-      "scope": "team",
-      "path": "skills/guizang-ppt-skill",
-      "core": false,
-      "requirements": "HTML演示；脚本验收需要 Node.js；页面动效可离线降级",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "guizang-ppt-skill",
-        "repository": "https://github.com/op7418/guizang-ppt-skill"
-      },
-      "adaptations": [
-        "将示例路径、手机号或邮箱统一为非个人示例"
-      ],
-      "file_count": 41,
-      "sha256": "21e38bc93de0fe64c445fbd91b807cd7efb8e6d94c3ed97e402f248317644bce",
-      "license_files": [
-        "LICENSE"
-      ]
-    },
-    {
-      "id": "open-kimi-ppt",
-      "title": "可编辑PPT与PPTD项目",
-      "category": "05 培训与汇报",
-      "scope": "team",
-      "path": "skills/open-kimi-ppt",
-      "core": false,
-      "requirements": "Python、Node.js 18+、Chromium；导出需访问 Kimi 官方资源",
-      "source": {
-        "kind": "bundled-skill",
-        "reference": "open-kimi-ppt"
-      },
-      "adaptations": [
-        "入口命令使用当前技能目录SKILL_DIR，不依赖原机器安装路径"
-      ],
-      "file_count": 80,
-      "sha256": "f293ee3d38b16339269a9e7f5ba2571eea5feaf25698d3aa5558a3dd83fabbd4",
       "license_files": []
     },
     {
@@ -300,16 +279,33 @@
       "requirements": "Python虚拟环境与 requirements.txt；可选配图另需对应能力",
       "source": {
         "kind": "bundled-skill",
-        "reference": "ppt-master"
+        "reference": "ppt-master",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/hugohe3/ppt-master",
+        "upstream_revision": "f3660bfcd20bc07c29260b7e330261a01a2b5a6d",
+        "upstream_path": "skills/ppt-master",
+        "check_result": "updated",
+        "version": "6.7.3"
       },
       "adaptations": [
-        "入口命令使用当前技能目录SKILL_DIR，不依赖原机器安装路径",
-        "补入上游模板架构文档并改为技能内相对引用，独立安装仍能读取",
-        "移除私人设备说明，运行环境按使用者现场检查"
+        "更新为官方完整 6.7.3 技能目录；保留 MIT 许可、署名、赞助归属文件与完整性门禁",
+        "路径按官方 SKILL_DIR 规则定位；软件运行时与私人工作目录由使用者配置",
+        "规范三份上游测试文件的末尾空行，未改动测试逻辑"
       ],
-      "file_count": 12141,
-      "sha256": "864c38eb1a6df34f9e3de11f598ca7ddf0e52cd997da6bbb581bde776646c8b7",
-      "license_files": []
+      "file_count": 13047,
+      "sha256": "a8d698328f6855aa13f66a28d773ae069dda6ae474cbc19194f592b620ad87ed",
+      "license_files": [
+        "LICENSE"
+      ],
+      "required_files": [
+        "LICENSE",
+        "SPONSORS.md",
+        "SPONSORS_CN.md",
+        "scripts/attribution_guard.py",
+        "scripts/console_encoding.py",
+        "workflows/routing.md",
+        "workflows/generate-pptx.md"
+      ]
     },
     {
       "id": "agent-reach",
@@ -321,12 +317,23 @@
       "requirements": "优先当前可用的连接器；外部CLI与账号按需核验",
       "source": {
         "kind": "bundled-skill",
-        "reference": "agent-reach"
+        "reference": "agent-reach",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/Panniantong/Agent-Reach",
+        "upstream_revision": "14c213405669414492bda0f8d52cc6531d062c45",
+        "upstream_path": "agent_reach/skill",
+        "check_result": "updated-selectively",
+        "version": "1.6.0"
       },
-      "adaptations": [],
-      "file_count": 9,
-      "sha256": "98b3e060395f9ed3860eac6eb42b7bb73d96e6493eccd96d84a39f40e029e3e0",
-      "license_files": []
+      "adaptations": [
+        "合入当前统一 CLI 与上游能力边界；保留连接器、ego Lite 优先和只读约束",
+        "专用后端旧参考按需使用，不自动迁移登录或升级软件"
+      ],
+      "file_count": 12,
+      "sha256": "fc652c4d7cca0477d1196e3cb6c63a5703905c8c43b0ef30087b9ffe59449b61",
+      "license_files": [
+        "LICENSE"
+      ]
     },
     {
       "id": "defuddle",
@@ -338,12 +345,19 @@
       "requirements": "Defuddle CLI；需要时再安装，不代表已有登录态",
       "source": {
         "kind": "bundled-skill",
-        "reference": "defuddle"
+        "reference": "defuddle",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/kepano/obsidian-skills",
+        "upstream_revision": "3ccff5338ea700537839b21900aa5358a0402c98",
+        "upstream_path": "skills/defuddle",
+        "check_result": "updated"
       },
       "adaptations": [],
-      "file_count": 1,
-      "sha256": "35b98b1114bdc8f0c1829cf00b8064f579c95e998089d121b84d6071acf9b2f5",
-      "license_files": []
+      "file_count": 2,
+      "sha256": "5dceb811a708d55f78083be97c02b27288db7c98bcb8b9fc9c95fa23b60d154a",
+      "license_files": [
+        "LICENSE"
+      ]
     },
     {
       "id": "obsidian-cli",
@@ -355,12 +369,19 @@
       "requirements": "Obsidian与CLI；用户主动打开目标知识库后使用",
       "source": {
         "kind": "bundled-skill",
-        "reference": "obsidian-cli"
+        "reference": "obsidian-cli",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/kepano/obsidian-skills",
+        "upstream_revision": "3ccff5338ea700537839b21900aa5358a0402c98",
+        "upstream_path": "skills/obsidian-cli",
+        "check_result": "unchanged-license-added"
       },
       "adaptations": [],
-      "file_count": 1,
-      "sha256": "e872fdf8931880ba097f5206de667272e2b33763e35cc7e44751ea99dcd3f6ba",
-      "license_files": []
+      "file_count": 2,
+      "sha256": "26d71cb32cfbfd37a41bada01503cc6694115cae8089dd4c0a56fb663ebef891",
+      "license_files": [
+        "LICENSE"
+      ]
     },
     {
       "id": "obsidian-markdown",
@@ -372,12 +393,19 @@
       "requirements": "用户指定知识库；无外部账号依赖",
       "source": {
         "kind": "bundled-skill",
-        "reference": "obsidian-markdown"
+        "reference": "obsidian-markdown",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/kepano/obsidian-skills",
+        "upstream_revision": "3ccff5338ea700537839b21900aa5358a0402c98",
+        "upstream_path": "skills/obsidian-markdown",
+        "check_result": "updated"
       },
       "adaptations": [],
-      "file_count": 4,
-      "sha256": "7ccccf454d251ca36557afdf042e14d89f980a4a3a1c37e1064b2a1157a0a642",
-      "license_files": []
+      "file_count": 5,
+      "sha256": "10cb0e8330cdc4860287760fec3f866e5934773e3a1e62df8cb08ea83efe4b50",
+      "license_files": [
+        "LICENSE"
+      ]
     },
     {
       "id": "obsidian-bases",
@@ -389,12 +417,19 @@
       "requirements": "Obsidian Bases；指定笔记与字段",
       "source": {
         "kind": "bundled-skill",
-        "reference": "obsidian-bases"
+        "reference": "obsidian-bases",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/kepano/obsidian-skills",
+        "upstream_revision": "3ccff5338ea700537839b21900aa5358a0402c98",
+        "upstream_path": "skills/obsidian-bases",
+        "check_result": "updated"
       },
       "adaptations": [],
-      "file_count": 2,
-      "sha256": "4af5e1d24d62f93864e33b02f4fef7501b59ac2a746c879992355dd7278278b2",
-      "license_files": []
+      "file_count": 3,
+      "sha256": "9a9ec466fde4daed1484f80bc0701e58aa30b28f91bf84ccb140d2a8c2c5afe0",
+      "license_files": [
+        "LICENSE"
+      ]
     },
     {
       "id": "json-canvas",
@@ -406,12 +441,19 @@
       "requirements": "Obsidian或兼容JSON Canvas的工具",
       "source": {
         "kind": "bundled-skill",
-        "reference": "json-canvas"
+        "reference": "json-canvas",
+        "last_checked": "2026-10-28",
+        "repository": "https://github.com/kepano/obsidian-skills",
+        "upstream_revision": "3ccff5338ea700537839b21900aa5358a0402c98",
+        "upstream_path": "skills/json-canvas",
+        "check_result": "unchanged-license-added"
       },
       "adaptations": [],
-      "file_count": 2,
-      "sha256": "0bb96479383f4237e8e249a4f476488c9f8f18539fcb09535f128ad1b6ef29bf",
-      "license_files": []
+      "file_count": 3,
+      "sha256": "eb6d61891441f748737c9331bcb41b3b16cd41d3251d6830ab839153154e70e2",
+      "license_files": [
+        "LICENSE"
+      ]
     }
   ],
   "external_tools": [

@@ -24,8 +24,16 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from urllib.parse import unquote
 
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
+
 try:
-    from PIL import Image
+    from PIL import Image, ImageOps
 except ImportError:
     print("Error: PIL (Pillow) is required. Run: pip install Pillow")
     exit(1)
@@ -78,8 +86,8 @@ def get_crop_anchor(align: str) -> tuple[float, float]:
 
 def crop_image_to_size(
     img: Image.Image,
-    target_width: int,
-    target_height: int,
+    target_width: float,
+    target_height: float,
     x_anchor: float = 0.5,
     y_anchor: float = 0.5,
 ) -> Image.Image:
@@ -100,6 +108,10 @@ def crop_image_to_size(
         Cropped PIL Image object (preserving original resolution)
     """
     img_width, img_height = img.size
+    if img_width <= 0 or img_height <= 0:
+        raise ValueError('source image dimensions must be positive')
+    if target_width <= 0 or target_height <= 0:
+        raise ValueError('target image dimensions must be positive')
     
     # Calculate target aspect ratio
     target_ratio = target_width / target_height
@@ -109,11 +121,11 @@ def crop_image_to_size(
     if img_ratio > target_ratio:
         # Original image is wider; crop left and right sides
         crop_height = img_height
-        crop_width = int(img_height * target_ratio)
+        crop_width = max(1, min(img_width, int(round(img_height * target_ratio))))
     else:
         # Original image is taller; crop top and bottom sides
         crop_width = img_width
-        crop_height = int(img_width / target_ratio)
+        crop_height = max(1, min(img_height, int(round(img_width / target_ratio))))
     
     # Calculate crop position based on anchor point
     extra_width = img_width - crop_width
@@ -231,7 +243,8 @@ def process_svg_images(
         
         try:
             # Open and process image
-            img = Image.open(img_path)
+            with Image.open(img_path) as source:
+                img = ImageOps.exif_transpose(source)
             output_is_png = img_path.suffix.lower() == '.png'
 
             # Preserve alpha for PNG assets such as translucent overlays.

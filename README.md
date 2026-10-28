@@ -1,6 +1,6 @@
 # 新东方省域新媒体技能包
 
-本项目包含 **20 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。
+本项目包含 **17 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。PPT 统一使用 `ppt-master`。
 
 ## 固定下载入口
 
@@ -29,12 +29,9 @@
 | 公开抖音账号对标 | [douyin-benchmark](skills/douyin-benchmark/SKILL.md) |
 | 直播后台数据填表 | [live-backend-to-sheet](skills/live-backend-to-sheet/SKILL.md) |
 | 文案修改与去AI腔 | [write](skills/write/SKILL.md) |
-| 文风与口播长期学习 | [voice-loop](skills/voice-loop/SKILL.md) |
 | 看视频与按时间点复盘 | [watch](skills/watch/SKILL.md) |
 | 本地中文音视频转写 | [local-sota-transcription](skills/local-sota-transcription/SKILL.md) |
 | 口播视频剪辑与包装 | [remotion-talking-head](skills/remotion-talking-head/SKILL.md) |
-| 网页演示与培训分享 | [guizang-ppt-skill](skills/guizang-ppt-skill/SKILL.md) |
-| 可编辑PPT与PPTD项目 | [open-kimi-ppt](skills/open-kimi-ppt/SKILL.md) |
 | SVG转可编辑PPT | [ppt-master](skills/ppt-master/SKILL.md) |
 | 联网检索与平台资料读取 | [agent-reach](skills/agent-reach/SKILL.md) |
 | 网页正文转Markdown | [defuddle](skills/defuddle/SKILL.md) |
@@ -57,7 +54,7 @@ python3 scripts/skillpack.py install --target workbuddy --profile core --apply
 python3 scripts/skillpack.py package
 ```
 
-`core` 是 8 个常用技能，`team` 是全部 20 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
+`core` 是 8 个常用技能，`team` 是全部 17 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
 
 日常下载直接使用上面的固定入口，无需等待单独的安装包。需要自行分发时可运行打包命令，生成的文件保存在本地 `dist/`，不会自动上传。
 
@@ -82,5 +79,7 @@ python3 scripts/skillpack.py package
 ## 来源与维护
 
 公开来源、许可文件、依赖和整合适配见 [catalog.json](catalog.json) 与 [许可说明](THIRD_PARTY.md)。保留各技能必要的公开署名和许可。更新技能后复核正文和资源，再更新哈希并运行检查。
+
+2026-10-28 的来源核对、更新内容与保留的定制流程见 [来源更新记录](docs/来源更新记录.md)。PPT 仅保留 `ppt-master`，已更新至官方 6.7.3；未确认公开上游的技能单独标明核对范围。
 
 项目同步到 [GitHub 仓库](https://github.com/kenlinjie/xdf-province-new-media-skills)，只维护通用技能、公开参考和空白模板。后续更新先执行检查，再提交并推送 `main` 分支。

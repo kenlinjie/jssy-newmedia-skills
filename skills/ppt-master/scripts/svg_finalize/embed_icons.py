@@ -4,15 +4,12 @@ SVG Icon Embedding Tool
 
 Replaces icon placeholders in SVG files with actual icon code.
 
-Placeholder syntax (new SVGs must include a library prefix):
+Placeholder syntax (every SVG must include the exact project-local namespace):
     <use data-icon="chunk-filled/rocket" x="100" y="200" width="48" height="48" fill="#0076A8"/>
     <use data-icon="tabler-filled/home" x="100" y="200" width="48" height="48" fill="#0076A8"/>
     <use data-icon="tabler-outline/home" x="100" y="200" width="48" height="48" fill="#0076A8"/>
     <use data-icon="tabler-outline/home" x="100" y="200" width="48" height="48" fill="#0076A8" stroke-width="3"/>
-
-Legacy compatibility accepted by the resolver:
-    <use data-icon="rocket" .../> -> chunk-filled/rocket
-    <use data-icon="chunk/rocket" .../> -> chunk-filled/rocket
+    <use data-icon="imported/layered_slide_06_ill01"/>
 
 Optional `stroke-width` (stroke-style libraries only — e.g. tabler-outline):
     Default 2 (matches the source). Pass 1.5 for thin, 3 for bold.
@@ -23,44 +20,88 @@ After replacement:
       <path d="..."/>
     </g>
 
-Icon libraries (subdirectories of templates/icons/):
-    chunk-filled/      - 640+ fill icons, 16x16 viewBox  (use prefix: chunk-filled/name; legacy 'chunk/' also accepted)
+Project icon namespaces (subdirectories of <project>/icons/):
+    chunk-filled/      - 640+ fill icons, 16x16 viewBox
     tabler-filled/     - 1000+ fill icons, 24x24 viewBox (use prefix: tabler-filled/name)
     tabler-outline/    - 5000+ stroke icons, 24x24 viewBox (use prefix: tabler-outline/name)
     phosphor-duotone/  - 1200+ duotone icons, 256x256 viewBox (single color + 0.2-opacity backplate)
     simple-icons/      - 3400+ brand logos, 24x24 viewBox (brand-inset library — used alongside the chosen primary library, NOT as a standalone library for generic icons)
+    imported/          - extracted vector illustrations with data-icon-style="preserve-color"; preserve source colors and natural viewBox aspect ratio
+
+Bundled icons must first be copied into the project with icon_sync.py. This
+tool never reads templates/icons directly and never accepts a bare icon name.
 
 Usage:
     python3 scripts/svg_finalize/embed_icons.py <svg_file> [svg_file2] ...
     python3 scripts/svg_finalize/embed_icons.py svg_output/*.svg
 
 Options:
-    --icons-dir <path>    Icon directory path (default: templates/icons/)
     --dry-run             Only show what would be replaced, without modifying files
     --verbose             Show detailed information
 """
 
+from __future__ import annotations
+
+import argparse
+import html
 import os
 import re
 import sys
-import argparse
 from pathlib import Path
-from xml.etree import ElementTree as ET
+from urllib.parse import urlsplit, urlunsplit
 
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
 
-# Default icon directory
-DEFAULT_ICONS_DIR = Path(__file__).parent.parent.parent / 'templates' / 'icons'
+from console_encoding import configure_utf8_stdio  # noqa: E402
+from resource_paths import icon_dir_for_svg  # noqa: E402
+from svg_to_pptx.drawingml.utils import parse_project_geometry_length  # noqa: E402
+
+configure_utf8_stdio()
+
 
 # Icon base size per library
 ICON_BASE_SIZES = {
     'chunk-filled': 16,
-    'chunk': 16,          # backward compat alias → chunk-filled/
     'tabler-filled': 24,
     'tabler-outline': 24,
     'phosphor-duotone': 256,
     'simple-icons': 24,
+    'imported': 24,
 }
+_ICON_IDENTIFIER_RE = re.compile(
+    r'(?P<library>[a-z0-9][a-z0-9-]*)/(?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)'
+)
+_ICON_COLOR_RE = re.compile(
+    r'#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})'
+    r'|[a-z]+|(?:rgba?|hsla?)\([0-9\s.,%]+\)',
+    re.IGNORECASE | re.ASCII,
+)
+_NUMBER_PATTERN = r'[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?'
+_TRANSFORM_FUNCTION_PATTERN = (
+    rf'(?:matrix|translate|scale|rotate|skewX|skewY)\(\s*{_NUMBER_PATTERN}'
+    rf'(?:(?:\s*,\s*|\s+){_NUMBER_PATTERN})*\s*\)'
+)
+_ICON_TRANSFORM_RE = re.compile(
+    rf'{_TRANSFORM_FUNCTION_PATTERN}(?:\s*,?\s*{_TRANSFORM_FUNCTION_PATTERN})*',
+    re.ASCII,
+)
+_ICON_STROKE_WIDTH_RE = re.compile(rf'{_NUMBER_PATTERN}(?:px|em|%)?')
 DEFAULT_ICON_BASE_SIZE = 24
+BaseGeometry = float | tuple[float, float, float, float]
+
+
+def _xml_attr(value: object) -> str:
+    """Escape a value for insertion into a quoted SVG attribute."""
+    return html.escape(str(value), quote=True)
+
+
+def _validate_icon_attr(value: str, attr: str, pattern: re.Pattern[str]) -> str:
+    """Reject unsafe icon attributes while preserving legal source spelling."""
+    if pattern.fullmatch(value.strip()) is None:
+        raise ValueError(f'Invalid icon {attr}: {value!r}; use a plain SVG {attr} value')
+    return value
 
 
 def _get_viewbox_size(content: str) -> float:
@@ -71,12 +112,70 @@ def _get_viewbox_size(content: str) -> float:
     return 0
 
 
+def _get_viewbox_geometry(content: str) -> tuple[float, float, float, float] | None:
+    """Extract full viewBox geometry as (min_x, min_y, width, height)."""
+    match = re.search(r'viewBox=["\']([^"\']+)["\']', content)
+    if not match:
+        return None
+    parts = re.split(r'[\s,]+', match.group(1).strip())
+    if len(parts) < 4:
+        return None
+    try:
+        min_x, min_y, width, height = [float(part) for part in parts[:4]]
+    except ValueError:
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    return min_x, min_y, width, height
+
+
+def _format_number(value: object) -> str:
+    """Format SVG numeric values compactly without losing meaningful precision."""
+    if isinstance(value, float):
+        return f'{value:g}'
+    return str(value)
+
+
+def _base_geometry(base_size: BaseGeometry) -> tuple[float, float, float, float]:
+    """Normalize scalar icon size and full viewBox geometry."""
+    if isinstance(base_size, tuple):
+        return base_size
+    return 0.0, 0.0, float(base_size), float(base_size)
+
+
+# Either quote style: a single-quoted marker silently fell back to a recolored
+# monochrome icon, dropping the asset's text, colors, and group transforms.
+_PRESERVE_COLOR_RE = re.compile(r'data-icon-style\s*=\s*["\']preserve-color["\']')
+
+
+def _is_preserve_color_asset(content: str) -> bool:
+    """Project illustrations are vector assets, not recolorable monochrome icons.
+
+    The `data-icon-style="preserve-color"` marker is stamped by
+    extract_svg_assets.py and is the single source of truth — hand-authored
+    multi-color assets must carry it to keep their colors and aspect ratio.
+    """
+    return _PRESERVE_COLOR_RE.search(content) is not None
+
+
 def _detect_icon_style(content: str) -> str:
     """Detect whether an icon is fill-based or stroke-based."""
-    # stroke="currentColor" with fill="none" → stroke style
-    if 'stroke="currentColor"' in content and 'fill="none"' in content:
+    # stroke="currentColor" with fill="none" → stroke style (either quote)
+    if (
+        re.search(r'stroke\s*=\s*["\']currentColor["\']', content)
+        and re.search(r'fill\s*=\s*["\']none["\']', content)
+    ):
         return 'stroke'
     return 'fill'
+
+
+def _extract_svg_body(content: str) -> list[str]:
+    """Return the root SVG body for preserve-color assets without editing attrs."""
+    match = re.search(r'<svg\b[^>]*>(.*)</svg>\s*$', content, re.DOTALL)
+    if not match:
+        return []
+    body = match.group(1).strip()
+    return [body] if body else []
 
 
 def _extract_shape_elements(content: str, color: str) -> list[str]:
@@ -103,55 +202,150 @@ def _extract_shape_elements(content: str, color: str) -> list[str]:
     return elements
 
 
+def _split_icon_identifier(icon_name: str) -> tuple[str, str]:
+    """Parse one complete canonical ``library/name`` identifier."""
+    match = _ICON_IDENTIFIER_RE.fullmatch(icon_name)
+    if match is None:
+        raise ValueError(
+            "data-icon must be a complete project-local library/name identifier: "
+            f"{icon_name!r}"
+        )
+    return match.group('library'), match.group('name')
+
+
+def _resolve_in_dir(icon_name: str, icons_dir: Path) -> tuple[Path, float]:
+    """Resolve one canonical identifier against exactly one icon root."""
+    library, name = _split_icon_identifier(icon_name)
+    return (
+        icons_dir / library / f'{name}.svg',
+        ICON_BASE_SIZES.get(library, DEFAULT_ICON_BASE_SIZE),
+    )
+
+
+def _casefold_icon_name_in_dir(icon_name: str, icons_dir: Path) -> str | None:
+    """Return the exact on-disk identifier when only casing differs."""
+    if not icons_dir.is_dir():
+        return None
+
+    try:
+        requested_lib, expected_name = _split_icon_identifier(icon_name)
+    except ValueError:
+        return None
+    search_dirs = [icons_dir / requested_lib]
+
+    expected_filename = f'{expected_name}.svg'.casefold()
+    for search_dir in search_dirs:
+        if not search_dir.is_dir():
+            continue
+        matches = sorted(
+            path for path in search_dir.iterdir()
+            if path.is_file()
+            and path.suffix.casefold() == '.svg'
+            and path.name.casefold() == expected_filename
+        )
+        if len(matches) != 1:
+            continue
+        relative = matches[0].relative_to(icons_dir).with_suffix('')
+        return relative.as_posix()
+    return None
+
+
+def suggest_icon_name(
+    icon_name: str,
+    icons_dir: Path,
+) -> str | None:
+    """Suggest exact casing inside the declared project-local namespace."""
+    return _casefold_icon_name_in_dir(icon_name, icons_dir)
+
+
 def resolve_icon_path(icon_name: str, icons_dir: Path) -> tuple[Path, float]:
-    """
-    Resolve icon name to file path and base size.
-
-    Supports:
-      - "chunk-filled/home"     → icons_dir/chunk-filled/home.svg
-      - "chunk/home"            → icons_dir/chunk-filled/home.svg (backward compat alias)
-      - "tabler-filled/home"    → icons_dir/tabler-filled/home.svg
-      - "tabler-outline/home"   → icons_dir/tabler-outline/home.svg
-      - "home" (no prefix)      → falls back to icons_dir/chunk-filled/home.svg (legacy compat only)
-
-    Returns (path, base_size). base_size=0 means not found.
-    """
-    # Backward compat: 'chunk/name' → 'chunk-filled/name'
-    _LIB_ALIASES = {'chunk': 'chunk-filled'}
-
-    if '/' in icon_name:
-        lib, name = icon_name.split('/', 1)
-        lib = _LIB_ALIASES.get(lib, lib)  # resolve aliases
-        icon_path = icons_dir / lib / f'{name}.svg'
-        base_size = ICON_BASE_SIZES.get(lib, 24)
-    else:
-        # Backward compatibility: un-prefixed names fall back to legacy chunk-filled/ library
-        icon_path = icons_dir / 'chunk-filled' / f'{icon_name}.svg'
-        base_size = 16
-        if not icon_path.exists():
-            icon_path = icons_dir / f'{icon_name}.svg'  # legacy flat layout
-            base_size = 16
-
+    """Resolve one complete identifier only under the supplied icon root."""
+    icon_path, base_size = _resolve_in_dir(icon_name, icons_dir)
+    resolved_root = icons_dir.resolve()
+    try:
+        icon_path.resolve().relative_to(resolved_root)
+    except ValueError as exc:
+        raise ValueError(
+            f"data-icon escapes the project-local icon root: {icon_name!r}"
+        ) from exc
     return icon_path, base_size
 
 
-def extract_paths_from_icon(icon_path: Path, target_color: str = '#000000') -> tuple[list[str], str, float]:
+def _rebase_preserve_asset_hrefs(
+    content: str,
+    source_dir: Path,
+    target_dir: Path,
+) -> str:
+    """Rebase relative hrefs when a preserve-color asset is inlined."""
+    pattern = re.compile(
+        r'(\b(?:xlink:)?href\s*=\s*)(["\'])(.*?)\2',
+        re.IGNORECASE | re.DOTALL,
+    )
+
+    def replace(match: re.Match[str]) -> str:
+        value = match.group(3)
+        if value.startswith(("#", "/")):
+            return match.group(0)
+        parsed = urlsplit(value)
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            return match.group(0)
+        source_target = (source_dir / parsed.path).resolve()
+        try:
+            relative = Path(os.path.relpath(source_target, target_dir)).as_posix()
+        except ValueError:
+            return match.group(0)
+        rewritten = urlunsplit(("", "", relative, parsed.query, parsed.fragment))
+        return f'{match.group(1)}{match.group(2)}{rewritten}{match.group(2)}'
+
+    return pattern.sub(replace, content)
+
+
+def extract_paths_from_icon(
+    icon_path: Path,
+    target_color: str = '#000000',
+    *,
+    target_dir: Path | None = None,
+) -> tuple[list[str], str, BaseGeometry]:
     """
     Extract drawable elements from an icon SVG file.
 
     Returns:
         (elements, style, base_size)
-        style: 'fill' or 'stroke'
-        base_size: detected from viewBox
+        style: 'fill', 'stroke', or 'preserve'
+        base_size: square icon size, or full viewBox geometry for preserve assets
     """
     if not icon_path.exists():
         return [], 'fill', 16
 
     content = icon_path.read_text(encoding='utf-8')
+    if _is_preserve_color_asset(content):
+        geometry = _get_viewbox_geometry(content) or (0.0, 0.0, DEFAULT_ICON_BASE_SIZE, DEFAULT_ICON_BASE_SIZE)
+        elements = _extract_svg_body(content)
+        if target_dir is not None:
+            elements = [
+                _rebase_preserve_asset_hrefs(
+                    element,
+                    icon_path.parent,
+                    target_dir,
+                )
+                for element in elements
+            ]
+        return elements, 'preserve', geometry
+
     style = _detect_icon_style(content)
     base_size = _get_viewbox_size(content) or 16
     elements = _extract_shape_elements(content, target_color)
     return elements, style, base_size
+
+
+def _attr_value(tag_text: str, attr: str) -> str | None:
+    """Return an attribute value from a raw tag, accepting either quote style."""
+    match = re.search(
+        rf'(?<!\S){re.escape(attr)}\s*=\s*(["\'])(.*?)\1',
+        tag_text,
+        re.DOTALL,
+    )
+    return match.group(2) if match else None
 
 
 def parse_use_element(use_match: str) -> dict[str, str | float]:
@@ -165,50 +359,67 @@ def parse_use_element(use_match: str) -> dict[str, str | float]:
         Attribute dictionary
     """
     attrs: dict[str, str | float] = {}
-    
+
     # Extract data-icon
-    icon_match = re.search(r'data-icon="([^"]+)"', use_match)
-    if icon_match:
-        attrs['icon'] = icon_match.group(1)
-    
+    icon_value = _attr_value(use_match, 'data-icon')
+    if icon_value:
+        attrs['icon'] = icon_value
+
     # Extract numeric attributes
     for attr in ['x', 'y', 'width', 'height']:
-        match = re.search(rf'{attr}="([^"]+)"', use_match)
-        if match:
-            attrs[attr] = float(match.group(1))
-    
+        value = _attr_value(use_match, attr)
+        if value is not None:
+            attrs[attr] = parse_project_geometry_length(value, attr)
+
     # Extract fill color
-    fill_match = re.search(r'fill="([^"]+)"', use_match)
-    if fill_match:
-        attrs['fill'] = fill_match.group(1)
+    fill_value = _attr_value(use_match, 'fill')
+    if fill_value is not None:
+        attrs['fill'] = _validate_icon_attr(fill_value, 'fill', _ICON_COLOR_RE)
 
     # Stroke-style icons may be authored with natural SVG semantics:
     # fill="none" stroke="#HEX". Keep accepting fill as the canonical color
     # carrier, but preserve stroke so outline icons do not collapse to none.
-    stroke_match = re.search(r'stroke="([^"]+)"', use_match)
-    if stroke_match:
-        attrs['stroke'] = stroke_match.group(1)
+    stroke_value = _attr_value(use_match, 'stroke')
+    if stroke_value is not None:
+        attrs['stroke'] = _validate_icon_attr(stroke_value, 'stroke', _ICON_COLOR_RE)
 
     # Live preview direct edits may write an absolute transform matrix back to
     # the placeholder. Preserve it so the expanded icon matches the edited
     # browser geometry instead of falling back to the original x/y placement.
-    transform_match = re.search(r'transform="([^"]+)"', use_match)
-    if transform_match:
-        attrs['transform'] = transform_match.group(1)
+    transform_value = _attr_value(use_match, 'transform')
+    if transform_value is not None:
+        attrs['transform'] = _validate_icon_attr(transform_value, 'transform', _ICON_TRANSFORM_RE)
 
     # Extract optional stroke-width override (stroke-style icons only).
     # Tabler-outline ships at stroke-width=2; passing 1.5 reads thin, 3 reads bold.
-    stroke_width_match = re.search(r'stroke-width="([^"]+)"', use_match)
-    if stroke_width_match:
-        attrs['stroke-width'] = stroke_width_match.group(1)
+    stroke_width_value = _attr_value(use_match, 'stroke-width')
+    if stroke_width_value is not None:
+        attrs['stroke-width'] = _validate_icon_attr(stroke_width_value, 'stroke-width', _ICON_STROKE_WIDTH_RE)
+
+    # These belong to the authored object, rather than the icon's local
+    # geometry. Keep them on the replacement group, including visibility.
+    for match in re.finditer(
+        r'''(?<!\S)(id|class|style|opacity|display|visibility|fill-opacity|stroke-opacity|'''
+        r'''clip-path|filter|data-pptx-[\w.-]+|data-edit-[\w.-]+)\s*=\s*(["'])(.*?)\2''',
+        use_match,
+        re.DOTALL,
+    ):
+        attrs[match.group(1)] = html.unescape(match.group(3))
 
     return attrs
 
 
 def resolve_icon_color(attrs: dict[str, str | float], style: str) -> str:
     """Resolve the caller-provided color for fill or stroke icon libraries."""
+    if style == 'preserve':
+        return 'preserve'
+
     fill = str(attrs.get('fill', '')).strip()
     stroke = str(attrs.get('stroke', '')).strip()
+    if fill:
+        _validate_icon_attr(fill, 'fill', _ICON_COLOR_RE)
+    if stroke:
+        _validate_icon_attr(stroke, 'stroke', _ICON_COLOR_RE)
 
     if style == 'stroke':
         if fill and fill != 'none':
@@ -224,58 +435,84 @@ def resolve_icon_color(attrs: dict[str, str | float], style: str) -> str:
     return '#000000'
 
 
-def generate_icon_group(attrs: dict[str, str | float], elements: list[str], style: str, base_size: float) -> str:
+def generate_icon_group(attrs: dict[str, str | float], elements: list[str], style: str, base_size: BaseGeometry) -> str:
     """
     Generate the icon's <g> element.
 
     Args:
         attrs:     Attributes of the use element
         elements:  List of drawable SVG elements
-        style:     'fill' or 'stroke'
-        base_size: Icon's natural size (viewBox width)
+        style:     'fill', 'stroke', or 'preserve'
+        base_size: Icon's natural size, or full viewBox geometry for preserve assets
 
     Returns:
         Complete <g> element string
     """
+    min_x, min_y, base_width, base_height = _base_geometry(base_size)
     x = attrs.get('x', 0)
     y = attrs.get('y', 0)
-    width = attrs.get('width', base_size)
-    height = attrs.get('height', base_size)
+    width = attrs.get('width', base_width)
+    height = attrs.get('height', base_height)
     color = resolve_icon_color(attrs, style)
     icon_name = attrs.get('icon', 'unknown')
 
-    scale_x = width / base_size
-    scale_y = height / base_size
+    scale_x = float(width) / base_width
+    scale_y = float(height) / base_height
 
     if attrs.get('transform'):
         # This transform is authoritative: the editor computes it from the
         # expanded <g>, so composing it with x/y would apply placement twice.
         transform = str(attrs['transform'])
     elif abs(scale_x - 1) < 1e-6 and abs(scale_y - 1) < 1e-6:
-        transform = f'translate({x}, {y})'
+        transform = f'translate({_format_number(x)}, {_format_number(y)})'
     elif abs(scale_x - scale_y) < 1e-6:
-        transform = f'translate({x}, {y}) scale({scale_x})'
+        transform = f'translate({_format_number(x)}, {_format_number(y)}) scale({_format_number(scale_x)})'
     else:
-        transform = f'translate({x}, {y}) scale({scale_x}, {scale_y})'
+        transform = (
+            f'translate({_format_number(x)}, {_format_number(y)}) '
+            f'scale({_format_number(scale_x)}, {_format_number(scale_y)})'
+        )
 
     elements_str = '\n    '.join(elements)
+    context_attrs = ''.join(
+        f' {key}="{_xml_attr(value)}"'
+        for key, value in attrs.items()
+        if key in {
+            'id', 'class', 'style', 'opacity', 'display', 'visibility',
+            'fill-opacity', 'stroke-opacity', 'clip-path', 'filter',
+        } or key.startswith(('data-pptx-', 'data-edit-'))
+    )
+
+    if style == 'preserve':
+        if min_x or min_y:
+            inner_transform = f'translate({_format_number(-min_x)}, {_format_number(-min_y)})'
+            elements_str = f'<g transform="{_xml_attr(inner_transform)}">\n    {elements_str}\n    </g>'
+        return f'''<!-- icon: {_xml_attr(icon_name)} -->
+  <g transform="{_xml_attr(transform)}"{context_attrs}>
+    {elements_str}
+  </g>'''
 
     if style == 'stroke':
         # Default to 2 — matches the source stroke-width baked into tabler-outline
         # (and any other stroke library) so omitting the attribute reproduces
         # pre-change visual output.
         stroke_width = attrs.get('stroke-width', '2')
-        color_attrs = f'fill="none" stroke="{color}" stroke-width="{stroke_width}"'
+        color_attrs = f'fill="none" stroke="{_xml_attr(color)}" stroke-width="{_xml_attr(stroke_width)}"'
     else:
-        color_attrs = f'fill="{color}"'
+        color_attrs = f'fill="{_xml_attr(color)}"'
 
-    return f'''<!-- icon: {icon_name} -->
-  <g transform="{transform}" {color_attrs}>
+    return f'''<!-- icon: {_xml_attr(icon_name)} -->
+  <g transform="{_xml_attr(transform)}" {color_attrs}{context_attrs}>
     {elements_str}
   </g>'''
 
 
-def process_svg_file(svg_path: Path, icons_dir: Path, dry_run: bool = False, verbose: bool = False) -> int:
+def process_svg_file(
+    svg_path: Path,
+    icons_dir: Path,
+    dry_run: bool = False,
+    verbose: bool = False,
+) -> int:
     """
     Process a single SVG file, replacing all icon placeholders.
 
@@ -289,14 +526,14 @@ def process_svg_file(svg_path: Path, icons_dir: Path, dry_run: bool = False, ver
         Number of icons replaced
     """
     if not svg_path.exists():
-        print(f"[ERROR] File not found: {svg_path}")
-        return 0
+        raise FileNotFoundError(f"SVG file not found: {svg_path}")
     
     content = svg_path.read_text(encoding='utf-8')
     
-    # Match <use data-icon="xxx" ... /> elements
-    use_pattern = r'<use\s+[^>]*data-icon="[^"]*"[^>]*/>'
-    matches = list(re.finditer(use_pattern, content))
+    # Match self-closing <use data-icon="..."/> placeholders. Attribute
+    # parsing below accepts both single and double quotes.
+    use_pattern = r'<use\b(?=[^>]*\bdata-icon\s*=)[^>]*/>'
+    matches = list(re.finditer(use_pattern, content, re.IGNORECASE | re.DOTALL))
     
     if not matches:
         if verbose:
@@ -313,15 +550,34 @@ def process_svg_file(svg_path: Path, icons_dir: Path, dry_run: bool = False, ver
         
         icon_name = attrs.get('icon')
         if not icon_name:
-            continue
+            raise ValueError(
+                f'{svg_path.name}: icon placeholder has an empty data-icon value'
+            )
 
-        icon_path, _ = resolve_icon_path(str(icon_name), icons_dir)
-        elements, style, base_size = extract_paths_from_icon(icon_path)
+        try:
+            icon_path, _ = resolve_icon_path(str(icon_name), icons_dir)
+        except ValueError as exc:
+            raise ValueError(f'{svg_path.name}: {exc}') from exc
+        if not icon_path.exists():
+            suggestion = suggest_icon_name(str(icon_name), icons_dir)
+            hint = (
+                f"; identifiers are case-sensitive; use '{suggestion}'"
+                if suggestion else ""
+            )
+            raise FileNotFoundError(
+                f'{svg_path.name}: project-local icon not found: '
+                f'{icon_name}{hint}'
+            )
+
+        elements, style, base_size = extract_paths_from_icon(
+            icon_path,
+            target_dir=svg_path.parent,
+        )
         color = resolve_icon_color(attrs, style)
-        
         if not elements:
-            print(f"[WARN] Icon not found: {icon_name} (in {svg_path.name})")
-            continue
+            raise ValueError(
+                f'{svg_path.name}: icon has no embeddable shapes: {icon_name}'
+            )
         
         replacement = generate_icon_group(attrs, elements, style, base_size)
         
@@ -341,7 +597,7 @@ def process_svg_file(svg_path: Path, icons_dir: Path, dry_run: bool = False, ver
     return replaced_count
 
 
-def main() -> None:
+def main() -> int:
     """Run the CLI entry point."""
     parser = argparse.ArgumentParser(
         description='Replace icon placeholders in SVG files with actual icon code',
@@ -351,13 +607,10 @@ Examples:
   python3 scripts/svg_finalize/embed_icons.py svg_output/01_cover.svg
   python3 scripts/svg_finalize/embed_icons.py svg_output/*.svg
   python3 scripts/svg_finalize/embed_icons.py --dry-run svg_output/*.svg
-  python3 scripts/svg_finalize/embed_icons.py --icons-dir my_icons/ output.svg
         '''
     )
     
     parser.add_argument('files', nargs='+', help='SVG files to process')
-    parser.add_argument('--icons-dir', type=Path, default=DEFAULT_ICONS_DIR,
-                        help=f'Icon directory path (default: {DEFAULT_ICONS_DIR})')
     parser.add_argument('--dry-run', action='store_true',
                         help='Only show what would be replaced, without modifying files')
     parser.add_argument('--verbose', '-v', action='store_true',
@@ -365,12 +618,6 @@ Examples:
     
     args = parser.parse_args()
     
-    # Validate icon directory
-    if not args.icons_dir.exists():
-        print(f"[ERROR] Icon directory not found: {args.icons_dir}")
-        sys.exit(1)
-
-    print(f"[DIR] Icon directory: {args.icons_dir}")
     if args.dry_run:
         print("[PREVIEW] Preview mode (no files will be modified)")
     print()
@@ -378,18 +625,28 @@ Examples:
     total_replaced = 0
     total_files = 0
     
-    for file_pattern in args.files:
-        svg_path = Path(file_pattern)
-        if svg_path.exists():
-            count = process_svg_file(svg_path, args.icons_dir, args.dry_run, args.verbose)
+    try:
+        for file_pattern in args.files:
+            svg_path = Path(file_pattern)
+            icons_dir = icon_dir_for_svg(svg_path)
+            count = process_svg_file(
+                svg_path,
+                icons_dir,
+                args.dry_run,
+                args.verbose,
+            )
             total_replaced += count
             if count > 0:
                 total_files += 1
+    except (OSError, ValueError) as exc:
+        print(f'[ERROR] {exc}', file=sys.stderr)
+        return 1
     
     print()
     print(f"[Summary] Total: {total_files} file(s), {total_replaced} icon(s)" +
           (" (preview)" if args.dry_run else " replaced"))
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

@@ -1,80 +1,53 @@
 # Layout Templates
 
-**Layout = structure-only template.** Captures canvas, page structure, page types, and SVG roster — but **no identity segment** (color / typography / logo / voice / icon style). Layered identity comes from `templates/brands/` or is decided per-deck in Strategist's Eight Confirmations. For full-identity replicas of specific PPTs, see [`templates/decks/`](../decks/) instead.
+**Layout = a structure-only reusable template bundle**: canvas, Master/Layout structure, page types, slot geometry, semantic text roles, alignment/wrapping/capacity behavior, and the SVG roster — no brand color, typeface/weight identity, final type scale, logo, voice, or icon style (those come from a Brand/Deck or the confirmation stage). A layout may describe the content shapes and delivery conditions its geometry supports but never owns a communication objective, audience outcome, narrative sequence, boilerplate, or example content downstream must preserve — a structurally useful "board update" page stays a Layout; a board-update sequence with required decision, risk, and action roles is a Deck. Neutral colors, safe fonts, and provisional sizes in prototypes are preview values, not identity or a locked scale; Strategist inspects the prototypes and content, decides how much structure to reuse, and writes the exporter plan automatically. The shared kind and workspace model lives in the parent [`README.md`](../README.md).
 
-Single source of truth for what layouts exist: [`layouts_index.json`](./layouts_index.json) (`layout_id → { summary, canvas_format, page_count, page_types }`). This README explains the kind; it does **not** enumerate layouts.
+| Axis | Layout behavior |
+|---|---|
+| Template kind | `layout`: structure only |
+| Internal creation strategy | AI-derived `standard` / `fidelity` for a new system or `mirror` for validated source materialization; tool provenance, not a user choice — Layout mirror additionally requires a brand-neutral, application-neutral source (otherwise author through `standard` / `fidelity` or create a Deck; removing rules is never mirror) |
+| Application planning | Strategist decides literal, structural, or style-only use and any strict/adaptive value |
+| PPTX structure | The workspace is `structured`; the plan decides whether pages compile its structure or use it as visual reference |
 
-Full data model: [`docs/zh/templates-architecture.md`](../../../../docs/zh/templates-architecture.md).
+[`layouts_index.json`](./layouts_index.json) (`layout_id → { summary, canvas_format, page_count, page_types }`) is the discovery source of truth; this README defines the kind and enumerates no layouts.
 
----
+## Selection and identity boundary
 
-## Trigger rule
+Selection and installation follow [`routing.md`](../../workflows/routing.md) §7 and [`apply-template-workspace`](../../workflows/stages/apply-template-workspace.md).
 
-Layout selection is **opt-in by explicit path**. The main workflow defaults to free design. A layout is only used when the user gives an explicit directory path in their initial message (e.g. `skills/ppt-master/templates/layouts/academic_defense/`). Bare names do not trigger. See [`SKILL.md`](../../SKILL.md) Step 3.
+## `design_spec.md` contract
 
-`layouts_index.json` is a **discovery aid**, not a trigger — it lets the AI answer "what layouts exist?" by listing ids and paths. Listing alone never advances the pipeline.
-
----
-
-## design_spec.md schema
-
-Layouts write **structure-only segments**. Identity sections (Color Scheme / Typography / Logo / Voice / Icon Style) are forbidden — those belong to brands and decks. Minimum schema:
+Portable structural metadata plus rules unique to this layout; no Template Overview, application contract, or identity section — the frontmatter `summary` carries selection context.
 
 ```markdown
 ---
 layout_id: <slug>
 kind: layout
-summary: <one-line use cases>
+category: general | scenario | government | special
+summary: <one-line structural use case>
 canvas_format: ppt169
-page_count: 5
+canvas_width: 1280
+canvas_height: 720
+canvas_viewbox: "0 0 1280 720"
+replication_mode: standard | fidelity | mirror
+native_structure_mode: structured
+page_count: <N>
 page_types: [cover, toc, chapter, content, ending]
 ---
 
-# [Template Name] - Design Specification
+# [Layout Name] — Design Specification
 
-## I. Template Overview         # Use cases / Design intent
-## II. Canvas Specification     # Format / Dimensions / viewBox / Margins
-## III. Page Structure          # Layout grid / Decorative DNA / Navigation
-## IV. Page Types               # Per-page role descriptions
-## V. SVG Page Roster           # File list + per-file purpose
+## IV. Signature Design Elements
+## V. Page Roster
+## VII. Placeholder Overrides      # omit when none
 ```
 
-Layouts may include additional supporting sections (Layout Patterns, Spacing Guidelines, SVG Technical Constraints, Placeholder Specification, Usage Notes). Do **not** include Color Scheme or Typography sections — those are identity-segment fields owned by `templates/brands/` and `templates/decks/`.
+`replication_mode` records how the workspace was produced. `Signature Design Elements` describes only reusable structure (grids, zones, image behavior, density rhythm, text roles, alignment/wrapping/capacity, slot conventions) and introduces no palette, typeface identity, type scale, objective, or narrative sequence; `Page Roster` lists every SVG with Layout key, picker name, content shape, and slot behavior.
 
----
+## Structured SVG and slot contract
 
-## Standard file set per layout directory
+Every SVG is a complete Slide preview under the contract of [`pptx-structure-interface.md`](../../references/pptx-structure-interface.md) §2; a typed `picture` slot promises no inserted picture, and a typed `chart` / `table` slot is filled by its native-replacement marker, so a deck that uses one exports only with `--native-charts-and-tables` — the generated Slide supplies the content. Use canonical `{{PLACEHOLDER}}` names ([`template-designer.md`](../../references/template-designer.md#4-placeholder-reference-canonical-convention-overridable-per-template)) with a `placeholders:` frontmatter map for overrides. `standard` / `fidelity` author new SVGs and structure; `mirror` preserves source identities, parentage, assignments, placeholder facts, and supported visuals without synthesis; legacy contracts are never upgraded in place, and a flat directory shape alone is not a legacy signal.
 
-| Filename | Required | Purpose |
-|----------|----------|---------|
-| `design_spec.md` | Yes | Layout schema spec (frontmatter + structure sections) |
-| `01_cover.svg` | Yes | Cover page |
-| `02_toc.svg` | Optional | Table of contents |
-| `02_chapter.svg` | Yes | Chapter page |
-| `03_content.svg` | Yes | Content page |
-| `04_ending.svg` | Yes | Ending page |
+## Workspace and creation
 
-All SVGs use `viewBox="0 0 1280 720"` for ppt169.
-
----
-
-## Placeholder convention
-
-Templates use `{{PLACEHOLDER}}` to mark replaceable content. New layouts should use the canonical placeholder set documented in [`references/template-designer.md`](../../references/template-designer.md#4-placeholder-reference-canonical-convention-overridable-per-template). Templates with intentionally different vocabulary declare a `placeholders:` block in `design_spec.md` frontmatter to silence advisory warnings.
-
----
-
-## Creating a new layout
-
-1. Run [`workflows/create-template.md`](../../workflows/create-template.md) (default produces a deck; explicit "structure only / no identity" option produces a layout)
-2. Resulting directory lands under `templates/layouts/<id>/`
-3. Validate: `python3 skills/ppt-master/scripts/svg_quality_checker.py templates/layouts/<id> --template-mode --format ppt169`
-4. Register: `python3 skills/ppt-master/scripts/register_template.py <id> --kind layout`
-
-The register step updates [`layouts_index.json`](./layouts_index.json) — the single source of truth for layout discovery.
-
----
-
-## SVG technical constraints
-
-See [`shared-standards.md`](../../references/shared-standards.md) for the authoritative ban list (PPT incompatibilities, raw-character rules, clipPath conditional allowance, etc.). Layouts must comply.
+`templates/` (spec + prototypes), optional `images/` (`../images/<name>`), optional `icons/imported/`, and `exports/<layout_id>_template_preview.pptx` as review evidence. Library scope writes `skills/ppt-master/templates/layouts/<layout_id>/` and updates the index; project scope uses an initialized `projects/<name>/` root without registration. Enter [`create-template.md`](../../workflows/create-template.md) (dispatching to [`create-layout.md`](../../workflows/create-template/create-layout.md)), validate with `svg_quality_checker.py --template-mode`, run `template_preview_pptx.py` on request and always for multiple Masters, and in library scope register with `register_template.py <id> --kind layout`. General SVG/PPT rules stay in [`shared-standards-core.md`](../../references/shared-standards-core.md) and [`pptx-structure-interface.md`](../../references/pptx-structure-interface.md); see [`styles/`](../styles/) to combine method and direction with this structure.

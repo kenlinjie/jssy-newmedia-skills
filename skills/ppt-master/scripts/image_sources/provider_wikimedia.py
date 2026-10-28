@@ -13,6 +13,15 @@ API docs: https://www.mediawiki.org/wiki/API:Search
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
 
 if __name__ == "__main__":
     print(__doc__)
@@ -120,6 +129,7 @@ def parse_results(payload: dict) -> list[AssetCandidate]:
                 width=int(info.get("width") or 0),
                 height=int(info.get("height") or 0),
                 download_url=download_url,
+                preview_url=(info.get("thumburl") or "").strip(),
                 author=_ext_value(extmetadata, "Artist"),
                 raw=page,
             )
@@ -171,6 +181,7 @@ def search(
             "gsrlimit": search_limit,
             "prop": "imageinfo",
             "iiprop": "url|size|extmetadata|mime",
+            "iiurlwidth": 1024,
             "iiextmetadatafilter": (
                 "LicenseShortName|License|LicenseUrl|Artist"
             ),

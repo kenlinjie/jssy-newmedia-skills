@@ -7,6 +7,7 @@ Photo-led editorial — large full-bleed photography dominates the page, text po
 ## 1. Shape & decoration
 
 - Shape language: large full-bleed / edge-to-edge image fields are the page's spine; text sits in restrained columns, caption blocks, kickers, or overlay headlines. Minimal chrome — the photograph carries the page.
+- Composition geometry: an L-shaped text zone carved out of the full bleed; a headline straddling the photo edge; a diptych / triptych panel split; one floating caption card breaking the image boundary — moves that serve the photograph, never bury it.
 - Decoration: thin rules, section numbering, small figure notes; nothing competes with the image.
 - Whitespace: generous around text; the photo fills, the type breathes beside it. Asymmetric magazine composition.
 
@@ -16,7 +17,7 @@ Photo-led editorial — large full-bleed photography dominates the page, text po
 
 - Editorial serif / CJK title × clean sans body; magazine-column cadence; small precise captions and figure notes. Words are concise — they point, they don't fill.
 
-> Families are chosen at confirmation `g`; this style asks for an editorial serif-title × clean-sans-body *character*.
+> Families are chosen at confirmation `g`; this style asks for an editorial serif-title × clean-sans-body *character*. This governs editable native text; decorative-lettering eligibility remains a separate carrier decision.
 
 ## 3. Using the deck's colors
 
@@ -32,3 +33,7 @@ Photo-led editorial — large full-bleed photography dominates the page, text po
 ## 5. Paired image-rendering
 
 `corporate-photo` — real editorial photography as the hero imagery the layout is built around.
+
+## 6. Illustration propensity
+
+**sparse** — photography leads. Use illustration selectively when it frames, connects, or extends the photographic composition without displacing factual or visual authority; form and scale follow the page job. An explicit user request wins either way, and `image_usage: none` writes no illustration rows.

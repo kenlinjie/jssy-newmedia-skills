@@ -1,429 +1,364 @@
-# Executor Common Guidelines
+# Executor Flat and Shared Core
 
-> Narrative skeleton and visual aesthetic come from this deck's locked files under [`modes/`](./modes/_index.md) and [`visual-styles/`](./visual-styles/_index.md). Technical constraints are in shared-standards.md.
+Always-loaded Executor authority for flat SVG page authoring, shared by Default and Quick. Executor builds the finished pages on the plan's structure: it receives the blueprint (§2), owns every decision judged on the canvas — carrier mix, geometry, composition, hierarchy, treatment — and draws from the expression vocabulary in the Page Expression Core. Items marked `Default only` bind to the persisted Design Spec / `spec_lock.md`. Quick applies the same craft to the transient anchors from [`quick-generate.md`](../workflows/profiles/quick-generate.md) §2; its own pacing, single final checker, and export replace the Default gates and §6.
 
----
+**Conditional branch routing**: evaluate every trigger once over the whole roster before P01 (Default: §IX; Quick: the frozen transient roster). Read the triggered modules then, in one batch, so that reading stays out of the page loop. A page that reaches a capability the sweep did not foresee reads its module at that moment, before that page's first SVG line.
 
-## 1. Template Adherence Rules
-
-### 1.0 Pre-generation Batch Read
-
-**Hard rule**: Before the first SVG page, batch-read every template SVG this deck will reference. Read once up front, never re-read during generation.
-
-| Source list | Read path |
+| Trigger | Load |
 |---|---|
-| Chosen template's `design_spec.md` (read frontmatter to detect `replication_mode`) | `templates/design_spec.md` |
-| Every distinct `<basename>` in `spec_lock.md page_layouts` | `templates/<basename>.svg` |
-| Every distinct chart name in `spec_lock.md page_charts` | `templates/charts/<chart_name>.svg` |
-| Chart types in `design_spec.md §VII` not covered above | `templates/charts/<chart_name>.svg` |
+| `pptx_structure.mode: structured` | [`executor-structured.md`](./executor-structured.md) |
+| Any selected Chart/Table `family/key` reference, or a legacy `page_charts` row that resolves to a live Chart/Table SVG | [`executor-visualization.md`](./executor-visualization.md), then the resolver-returned Chart/Table branch |
+| Any value-driven geometry, including a chart-family reference, mini chart, sparkline, inset, or small multiple | [`executor-chart.md`](./executor-chart.md) |
+| Any semantic cell grid, including a table-family reference | [`executor-table.md`](./executor-table.md) |
+| A page uses a preset pattern fill, or an independent Chart/Table object is resolved as `<object-key>=yes` | [`native-data-interface.md`](./native-data-interface.md) before emitting the pattern or replacement metadata |
+| The per-page topology decision is `yes` for the first time | [`executor-structure.md`](./executor-structure.md) + [`topology-assembly.md`](./topology-assembly.md) |
+| A page's contour reaches beyond rectangle, rounded rectangle, circle, ellipse, and line — an inflected carrier (snipped or one-sided rounded rectangle, plaque, bevel, polygon, pie / arc / donut, frame, corner, folded corner, trapezoid, parallelogram) as much as a relationship symbol (block arrow, chevron, callout, flowchart node, banner, star, bracket, connector) — or needs a Boolean / freeform decision | [`native-shape-authoring.md`](./native-shape-authoring.md), read completely (the preset vocabulary is already resident) |
+| A page's visual job reaches beyond the everyday block below — faux glass, constructed styles (hand-drawn, ink, riso, pixel, halftone, paper-cut, facets, gradient ribbon), gradient stroke, text picture/texture fill, gauge / sunburst / explicit arc geometry, freeform curves, transforms beyond rotate, or an unsupported effect needing a native-safe alternative | [`svg-effects.md`](./svg-effects.md) |
+| Any image | [`executor-image.md`](./executor-image.md) + [`image-layout-spec.md`](./image-layout-spec.md) + [`image-layout-patterns.md`](./image-layout-patterns.md) + [`svg-image-embedding.md`](./svg-image-embedding.md) |
+| Structural notation — a fraction, radical, n-ary operator, matrix, or delimiter pair (flat arithmetic, percentages, and `O(n log n)`-style tokens stay ordinary text) | [`native-formula.md`](./native-formula.md) |
+| Any external or same-deck click hyperlink | [`native-hyperlinks.md`](./native-hyperlinks.md) |
+| Any placed image is `Status: Sourced` or its filename has an `image_sources.json` record | [`executor-web-image.md`](./executor-web-image.md), after `executor-image.md` |
+| Effective Speaker Notes outcome is enabled after all SVG pages pass | [`executor-notes.md`](./executor-notes.md) |
 
-**Default — read each template once; re-read only on the mid-deck exception below**:
-- Layout SVG already loaded in this batch
-- Chart SVG already loaded in this batch
+**Branch evaluation reads the information model**: evaluate branches from each object's actual information model, not only from a Chart/Table reference. A catalog family selects construction guidance, never native readiness. Page-local qualitative geometry never implies `pptx_structure.mode: structured`.
 
-`spec_lock.md` is the only file re-read per page (§2.1).
+**Mode and visual-style files**: the narrative skeleton and aesthetic come from the confirmed mode / visual-style values (Default: the lock; Quick: the active context). A value naming a catalog preset reads that one file. A `custom` with `*_references` reads only those files (one basis under its behavior, or several by their stated contributions). A `custom` without references reads no catalog file and follows its behavior prose alone. The planning indexes are never reopened. [`shared-standards-core.md`](./shared-standards-core.md) supplies the technical boundary and the fallback visual-quality and leading defaults.
 
-**Exception**: user mid-deck adds pages or swaps templates introducing a basename/chart absent from the original batch → read the new file once, continue.
+**Hard rule — Shape-first page authority**: every visible object of the exported slide exists in the final page SVG or is explicitly referenced by it. Templates and `spec_lock.md` guide construction and never supply content at export. Optional native Chart/Table metadata belongs to an independently selected object and never replaces the visible fallback ([`native-data-interface.md`](./native-data-interface.md)). A native formula marker keeps a matching SVG preview that export alone replaces ([`native-formula.md`](./native-formula.md)).
 
-> Note: batched prefix reads stay in the cached prompt prefix; per-page `spec_lock.md` re-reads append below and benefit from that cache. Scattered on-demand reads of layout/chart SVGs would invalidate downstream cache and sit in the compression-vulnerable mid-context region.
+**Hard rule — flat PowerPoint structure**: free-design, brand-only, Style-only, and `template_reuse_scope: style` projects use `pptx_structure.mode: flat`: no root Master/Layout identity, `data-pptx-layer`, or `data-pptx-placeholder`; every object Slide-local; the root declares exactly one `data-pptx-page-role` (`cover` / `toc` / `section` / `content` / `ending`). Add `data-pptx-role` only to page-frame objects whose package, page-number, or animation behavior no specialized marker expresses, with a stable unique `id` ([`semantic-svg.md`](./semantic-svg.md)).
 
-Resolve the per-page template SVG via `spec_lock.md page_layouts` (authoritative). The legacy page-type table below is a **last-resort fallback** for legacy decks where `page_layouts` is missing.
+**Style workspace under flat structure**: a Style supplies direction, rhythm, and expression defaults without prototypes. Its identity-adjacent defaults yield to the final Brand/Deck identity and the lock. Beside Layout/Deck it changes only method.
 
-**Resolution order (per page):**
-
-1. **Mirror-mode template** (template's `design_spec.md` frontmatter has `replication_mode: mirror`) → see §1.1 below. The page is consumed as a **visual reference**, not as a placeholder shell.
-2. `spec_lock.md page_layouts` has `P<NN>: <basename>` for this page → inherit the structure of `templates/<basename>.svg` (already in context from §1.0).
-3. `page_layouts` exists but **no entry** for this page → **free design**, no template inheritance.
-4. `page_layouts` section absent (legacy deck) **and** `templates/` directory exists → fall back to the page-type table below, matching by SVG filename keyword (cover/chapter/content/ending/toc). Read the matched file at first use if §1.0 batch did not cover it.
-5. No template at all → free design.
-
-> Note: `page_layouts` disambiguates the multiple content variants modern templates ship (e.g., `graduation_defense` has 8); the legacy table cannot.
-
-**Templates supply structure, not skin (non-mirror)**: a chart or layout template's gradients, drop-shadows, and palette are placeholder. Inherit its geometry, label / legend placement, and series-encoding logic; re-skin every fill / stroke to the deck's `visual_style` + `spec_lock.colors` — flat styles strip the gradients and shadows, gradient / glass styles repaint their own. Forbidden — shipping a template's default `<linearGradient>` / `cardShadow` / Tailwind fills unchanged. Mirror templates are the exception: §1.1 preserves their visuals verbatim.
-
-### 1.1 Mirror-mode templates — reference-style consumption
-
-When the project's chosen template is a `mirror` template (`design_spec.md` frontmatter declares `replication_mode: mirror`), Executor switches to a **reference-style** consumption path that bypasses placeholder substitution:
-
-1. **Per-page reference selection** — Strategist selects one mirror page per project page via `spec_lock.md page_layouts` (e.g., `P04: 015_content`). The basename is the mirror filename without extension; Strategist made this choice by reading `design_spec.md §V Page Roster` descriptions, not by guessing.
-2. **Copy, don't fill** — open the referenced mirror SVG (already in context from §1.0). **Copy it as the starting point for the project page**, then edit text elements in place to express the project's content for `P<NN>`. Preserve every non-text element verbatim: backgrounds, decorative shapes, sprite-cropped images, charts, icon usage, color values, font families, geometry, sprite `<svg viewBox>` wrappers, and **which image** each `<image>` points at.
-3. **What you may edit** — the visible text content of `<text>` / `<tspan>` elements that express slide-specific content (title, body, captions, KPI labels, dates, page numbers). Replace the source deck's example text with the project's text for this page from `design_spec.md §IX` and `notes/<NN>_*.md`.
-4. **What you must not touch** — element positions, sizes, fonts, colors, fills, strokes, gradients, **which image each `<image>` points at**, `<g>` grouping, sprite-sheet `<svg viewBox>` wrappers, decorative `<rect>` / `<path>` / `<circle>` / `<polygon>` shapes, `<use data-icon="...">` markers, embedded chart data structures. Mirror's value is preserving the source deck's visual identity — any geometric / decorative drift defeats the purpose. **The `href` path is not the image**: normalizing a bare `href="cover_bg.png"` to `href="../images/<name>"` (when Step 3 relocated the asset to `images/`) points at the *same* image and changes nothing visual — that is an allowed path fix, not a fidelity edit. Leaving the bare href as-is is also fine; the exporter and live preview resolve bare hrefs against `images/` either way.
-5. **Content fit** — the mirror page was chosen by Strategist because its layout matches the content slot. If the project's content for `P<NN>` legitimately needs more / fewer items than the mirror page provides (e.g. mirror shows 3 KPI cards, project has 4 metrics), keep the mirror page's visual rhythm and either drop one metric to fit or split across two pages — do **not** restructure the mirror page's grid. If neither works, surface a `warning: P<NN> content does not fit mirror reference <basename>; suggest different reference page` and proceed with the closest-fit edit.
-6. **No `{{}}` substitution** — mirror SVGs do not contain placeholder markers. Do not search for `{{TITLE}}` / `{{CONTENT_AREA}}` etc.; do not invent placeholders. The whole mirror contract is "verbatim source + in-place text edit".
-7. **Output filename** — follow the standard project SVG naming convention (`<NN>_<page_name>.svg` where `<NN>` matches the project page index, not the mirror source index). The mirror filename is the *reference*, not the *output*.
-
-**Detecting mirror mode**: read the chosen template's `design_spec.md` frontmatter once during §1.0 batch read. If `replication_mode: mirror`, every page that hits `page_layouts` follows §1.1 above; pages without a `page_layouts` entry still fall through to free design (resolution rule 3 above).
-
-**Mirror + chart pages**: chart structures inside a mirror SVG are already drawn (axis, series, labels). Treat them as visual references — replace the data labels and series text content to match the project's chart spec, but do not redraw the chart from a `templates/charts/<name>.svg` baseline. A mirror template's `page_charts` entries are normally absent for this reason.
-
-**Legacy fallback table** (used only when `page_layouts` is absent):
-
-| Page Type | Corresponding Template | Adherence Rules |
-|-----------|----------------------|-----------------|
-| Cover | `01_cover.svg` | Inherit background, decorative elements, layout structure; replace placeholder content |
-| Chapter | `02_chapter.svg` | Inherit numbering style, title position, decorative elements |
-| Content | `03_content.svg` | Inherit header/footer styles; **content area may be freely laid out** |
-| Ending | `04_ending.svg` | Inherit background, thank-you message position, contact info layout |
-| TOC | `02_toc.svg` | **Optional**: Inherit TOC title, list styles |
-
-### Page-Template Mapping Declaration (Required Output)
-
-Before generating each page, output which template is used:
-
-```
-📝 **Template mapping**: `templates/03a_content_image_text.svg` (or "None (free design)")
-🎯 **Adherence rules / layout strategy**: [specific description]
-```
-
-- **Content pages**: template defines only header/footer; content area is free
-- **No template**: generate entirely per the Design Spec
+**Hard rule — supported PPTX route**: `svg_output/` through the project converter is the only generated-PPTX path. `svg_final/` is an optional preview, and PowerPoint's manual Convert-to-Shape is not an authoring target ([`shared-standards-core.md`](./shared-standards-core.md) §4.2). Speaker notes, animations, transitions, narration, and native-PPTX workflows keep their own artifacts.
 
 ---
 
-## 2. Design Parameter Confirmation (Mandatory Step)
+## Page Expression Core
 
-Before the first SVG page, output a confirmation listing: canvas dimensions, body font size, color scheme (primary/secondary/accent HEX), font plan. Prevents spec/execution drift.
+Read this before §1: the expression vocabulary every page draws from — what exists, recalled here so it is available at the moment a page is composed. The contracts below bound how it is written, not whether it is available; the full manuals load on their routing triggers.
 
-### 2.1 Per-page spec_lock re-read (Mandatory)
+**Capability — typographic feature elements**: beyond the structural roles fixed by `typography` anchors, a page may carry a lead-in sentence, an inline emphasis run, a pull quote, a kicker, a hero number, or a takeaway line — each its own feature element with its own size and treatment. A recurring one becomes a named role.
 
-> Long decks drift off the declared palette/icons mid-deck due to context compression. `spec_lock.md` is the canonical execution reference — re-read it per page to bypass model memory.
+**Capability — inline emphasis is one editable frame**: a `<text>` paragraph may nest non-positional `<tspan>` runs with their own `fill`, `font-weight`, or `font-size`. Export emits one DrawingML run per styled segment inside the same editable frame. Positioned line-break `<tspan>` children may themselves contain inline runs.
 
-**Hard rule**: Before generating **each** SVG page, `read_file <project_path>/spec_lock.md`. Use only values from this file, not from memory. If context was auto-compacted, also `read_file <project_path>/design_spec.md` for the current page's §IX brief.
+```xml
+<text x="72" y="300" font-size="24" fill="#2E3230">腐朽但仍可加固接续的<tspan fill="#9E2B25" font-weight="bold">千年木梁，不做整体更换</tspan>；风化的古墙，只做防风化微创处理。</text>
+```
 
-**Per-block expression**: render each `design_spec.md §IX Content` block in its written texture — a full-sentence block as wrapped prose, a fragment/label block as bullets/keywords. **Never split a full-sentence block into a bullet list** — splitting loses the information that the block was continuous reasoning, not a set of parallel points; not because a bullet lays out easier, and not because an inherited template slot is shaped as a list. If a block carries no clear texture, infer the mode from its wording and the page layout.
+**Capability — native contour families**: beyond rectangle, rounded rectangle, circle, ellipse, and line, the complete Office vocabulary is drawable and stays editable in PowerPoint: carrier and field contours that hold content or cut the page (snipped and one-sided rounded rectangles, plaque and bevel, triangles, hexagons and other polygons, trapezoids and parallelograms, pies, arcs, and donuts, frames, corners, stripes, and folded corners), block arrows and chevrons for direction and steps, flowchart symbols for process and decision, callouts, brackets and braces, stars and banners, bent and curved connectors, and equation shapes. Each comes through `preset_shape_svg.py`; Merge Shapes results come through `shape_boolean_svg.py`. [`preset-shape-vocabulary.md`](./preset-shape-vocabulary.md) is the full list; §3.0 owns selection and encoding.
 
-- **Prose render recipe**: one `<text>` per paragraph; wrap lines with sibling `<tspan>` that reset `x` to the block's left edge and advance `dy` by the font size × a line-height factor. **Default — line-height by density (may override per content fit)**: ~1.4–1.5× for dense / small-body blocks (CLReq comfortable minimum), 1.6–2.0× for large-type, sparse, or `breathing` blocks. Fit about width ÷ font-size CJK glyphs per line (Latin fits roughly twice that); the last line runs short. Use the body ramp size, not a new one.
-- **Template precedence**: when an inherited template slot is a bullet list but the §IX block is prose, the prose wins — widen or reflow the container to hold the paragraph, or drop that card; do not pour the sentence back into the list slot.
-- **Mode precedence**: the locked mode shapes voice / register, not §IX's authored titles or page order. When a `§IX` title is a user-authored topic label, keep it — do not upgrade it to an assertion just because the mode (e.g. `pyramid`) favors them; mode title-tendencies apply only to AI-drafted titles.
+**Reference — everyday device menu (not a constraint, not a quota)**: the pieces most slides are built from.
 
-> Note: block-level phrasing, applied *within* the page's `page_rhythm` density (below), not against it.
+| Device | Typical job | Realization |
+|---|---|---|
+| Gradient block or band | Cover / chapter field, title backing, zone separation | `<linearGradient>` / `<radialGradient>` in 2–3 stops of the deck hue |
+| Rounded card | One content module among peers, a feature or option block | `<rect rx>` in `secondary_bg`; a shadow only when it floats over a photo or colored panel |
+| Icon with label | Feature markers, list prefixes, step or category cues | `<use data-icon>` at 32–48 px in an accent or primary role |
+| Numbered circle or badge | Ordered steps, ranked items, chapter marks | `<circle>` + centered number; oversized numeral for a chapter |
+| Color swatch | A color, material, or sample that the content names | `<circle>` / `<rect>` filled with the subject's own value, labeled with its name and HEX |
+| KPI card | Metric name + hero number + trend or comparison | Card + number at the hero size + small annotation; icon optional |
+| Takeaway box | One-sentence conclusion under a title | Tinted band (`fill-opacity` 0.06–0.10) with the sentence in lead size |
+| Divider or rule | Separate sections, columns, header from body | Hairline `<line>` in `divider`, or a 2 px accent bar |
+| Full-bleed image + scrim | Cover, chapter divider, mood page | Image `slice` + directional gradient scrim + floating title |
+| Framed or shaped picture | Portrait, product, place, evidence photo | Circle / rounded clip on `<image>`, hairline frame, caption |
+| Quote block | Pull quote, testimonial, source sentence | Oversized quotation mark or accent rule + text at lead size + attribution |
+| Timeline or step strip | Ordered events or stages | Baseline `<line>` with ticks/nodes, or chevron presets, labels above/below |
+| Process or decision diagram | Flow, branch, input → output, cycle | Flowchart / block-arrow / chevron presets as nodes and direction, `<line>` or connector presets between them, labels native |
+| Callout or annotation | A remark attached to an object or region | Callout preset, bracket, or leader line + short native text |
+| Display text with gradient or glow | Hero number, cover word, or chapter numeral that should read luminous or material | Text `fill="url(#…)"` or `filter="url(#titleGlow)"` on that one element; body copy never ([`svg-effects.md`](./svg-effects.md) §6.7 / §6.4) |
+| Accent gradient rule or band | Title underline, section marker, KPI baseline carrying the deck hue with direction | 2–4 px `<rect>` / `<line>` filled by a 2-stop primary → accent gradient |
+| Elevated primary object | The one card, image, or CTA that sits above the page | `softShadow` at resting opacity on that object; peers stay flat |
+| Duotone or brand-wash image | A photo that must join the deck palette instead of fighting it | Wash gradient over the picture, or a prepared duotone derivative ([`svg-effects.md`](./svg-effects.md) §6.5 / §6.12) |
 
-**If `spec_lock.md` is missing**: emit `warning: spec_lock.md missing — generating without execution lock` once, then proceed using `design_spec.md` values. Expected only for legacy projects; new projects MUST have it (see [strategist.md](strategist.md) §6 step 4).
+**Reference — layout structures (starting points; proportion follows information weight)**: 16:9 values for 1280×720 — safe area 1200×640 with 40 px margins; title band ≈ 100 px, content field ≈ 500 px, footer ≈ 40 px. 4:3 values for 1024×768 — safe area 944×688 with 40 px margins; title band ≈ 90 px, content field ≈ 540 px, footer ≈ 40 px; the field is 256 px narrower than 16:9, so a text column beside an image needs ≥ 520 px or the page stacks top/bottom. A4 portrait values for 1240×1754 (`a4`, print) — 80 px margins, a running masthead band ≈ 100 px, body field 1080×1490, footer band ≈ 60 px; regions stack, an evidence margin of ≈ 330 px beside a ≥ 700 px argument column reads as a document, and a chart takes the full measure.
 
-**Forbidden — values outside the lock**:
+| Content relationship | Useful starting structure | Starting geometry |
+|---|---|---|
+| One focal claim | Centered single column, negative space, or full-bleed field + floating text | Column 800–1000 px wide; a negative-space page leaves 40–60% empty |
+| Equal comparison | Symmetric split or a true matrix / four quadrants | 1:1 with a 40–60 px gap; quadrants ≈ 560×250 with 20–30 px gaps |
+| Dominant evidence + takeaway | Asymmetric split with one dominant field | 3:7 / 2:8, heavy side 840–1024 px |
+| Parallel sequence | Three columns, process line, chevron strip, or Z-pattern / waterfall | Three columns with 30–40 px gaps |
+| Core + surrounding forces | Center-radiating or hub-spoke | Hub 200–300 px with 4–6 satellites |
+| Wide visual + explanation | Top-bottom split, or figure-text overlap for a hero moment | Visual ≥ 55% of the field |
+| Page-field organization | One large surface, outline, aperture, or off-canvas contour organizes the zones instead of a card per unit | Field spans two or more zones |
 
-- Colors (fill / stroke / stop-color) MUST come from `colors`
-- Icons MUST come from `icons.inventory`; library MUST equal `icons.library`
-- Font family from `typography`: use role override (`title_family` / `body_family` / `emphasis_family` / `code_family`) if declared, else fall back to `font_family`
-- Font sizes follow a **ramp anchored on `typography.body`**, not a closed menu. Use the declared slots when they fit. Intermediate sizes (e.g., 40px hero number, 13px annotation) are allowed if the ratio to `body` falls within the role's band (see `design_spec.md §IV ramp table`). Sizes outside every band require extending the lock first.
-- Images MUST reference files listed under `images`; no invented filenames
-- Formula PNGs are images with `Acquire Via: formula` / `Status: Rendered`; place them only from the listed file path and never recreate the formula as text.
+Repeating symmetric card grids without a page job is the failure mode these structures exist to avoid. Compare a page-field, outline carrier, nested field, or continuity construction before stacked cards or uniform equal columns ([`native-shape-authoring.md`](./native-shape-authoring.md) §2.1 composition lenses — page field, outline carrier, nested fields, continuity, depth and contrast, deck language).
 
-If a page needs a value not in `spec_lock.md`, surface it — do not silently invent one.
+**Reference — page-level recipes (back to front; omit every layer without a job)**. Full stacks and stops: [`svg-effects.md`](./svg-effects.md) §6.13.
 
-**Per-page layout rhythm — `page_rhythm` section**:
+| Page | Layers back to front |
+|---|---|
+| Cover | hero field → optional scrim/wash → purposeful opening/contour → native title |
+| Divider | image band or quiet field → restrained wash → recurring geometry → number/title |
+| Text-led explanation | quiet field → recurring material/contour → native hierarchy → local emphasis |
+| Process / system | context field → native relation lines → nodes/labels → optional state/direction focus |
+| Evidence / metric | context field → local contrast → native leaders/labels/metric → optional focus/elevation |
+| Comparison | matched planes → shared wash/divider → matched labels → one difference marker |
+| Closing | receded field → echoed contour/gradient → native action → raised accent |
+| Cross-page motif | reuse contour, gradient direction, line language, texture, or light logic; vary scale, crop, position by page job |
 
-Before drawing each page, look up its entry in `page_rhythm` (key format `P<NN>` matching the page index in §IX of `design_spec.md`) and apply the corresponding layout discipline:
+**Reference — image composition families (any image page)**: `P1` single visual (side, band, inset, hero), `P2` image as canvas with native overlay, `P3` multi-visual (grid, collage, sequence, compare); modifiers `M1` reveal / crop / registration, `M2` tone / focus / contrast (scrim, wash, vignette, spotlight), `M3` framing / placement / depth; prepared-asset `A` treatments and cross-page `C` continuity. Catalog and situation router: [`image-layout-patterns.md`](./image-layout-patterns.md); integration decision: [`executor-image.md`](./executor-image.md).
+
+**Reference — visual job router (recall; the full table is [`svg-effects.md`](./svg-effects.md) §6.1)**:
+
+| Visual job | Candidate device |
+|---|---|
+| Missing direction, continuous value, or center focus | gradient or channel alpha |
+| Unclear elevation or boundary | one-light shadow, restrained glow, or hairline |
+| Copy and image not integrating | scrim, fade, wash, vignette, spotlight, or faux glass |
+| Unclear relationship state | dash for draft/optional, marker for direction, gradient stroke for flow, frame/contour for boundary |
+| A load-bearing figure lost in a scan | inline emphasis run |
+| Display text needing silhouette or material | outline, gradient, picture/texture fill, tracking, glow |
+| A style asking for hand, print, pixel, facets, layers, or ribbon | the matching constructed recipe |
+| An unmatched silhouette, radial hierarchy, or gauge | freeform, explicit arc/sector, or calculated arrowhead |
+
+**Reference — everyday effects and aesthetic defaults (self-contained; the full contract and rarer techniques are [`svg-effects.md`](./svg-effects.md))**:
+
+- **Color proportion**: 60-30-10 as the starting proportion (dominant field ≈ 60%, support ≈ 30%, accent ≈ 10%); body text contrast ≥ 4.5:1; hue count follows encoding and natural assets.
+- **Color use**: cover and chapter pages may use the theme color as a large field; same-hue gradients add depth; the accent color goes on the key number or word to create focus, not everywhere. Cool tones read technical, warm tones energetic, dark fields grave. Trends use green up / red down / gray flat with the deck's polarity roles.
+- **Rhythm and weight**: follow a data-heavy page with a breathing page. Balance visual weight — dark or large elements are heavy, light or small ones light — across left/right and top/bottom. A chapter may share one carrier system while chapters vary, provided each repetition has a page job. A content page may add a one-sentence takeaway band under the title and a muted source note at the page bottom (title voice belongs to the locked mode).
+- **Depth through restraint**: depth comes from rhythm (flat vs lifted, dense vs spacious), not shadows everywhere. Shadow 2–3 genuinely floating objects per page at most (card over a photo or colored panel, the primary CTA, an overlay); keep peer-grid cards, dividers, and body containers flat. Reach for weight, spacing, accent bars, and tints before shadow. Pick one weight tool per container (shadow, border, gradient fill, or strong tint — never stacked).
+- **Shadow values**: one light source per page (`dx="0"`, `dy="4"`–`"8"`). The shadow is felt, not seen — resting `flood-opacity` 0.06–0.10, raised at most 0.20 (above that is the Office 2007 look). On dark fields use a light hairline or a restrained glow instead of black shadow.
+- **Image overlays**: a directional scrim darkest beside the text (`0.88 → 0.30 → 0`), a bottom fade under a lower title (`0 → 0.72`), a radial vignette for atmosphere (`0 → 0.58`), or a brand wash (`0.80 → 0.10`). Never a uniform flat opacity over the whole image or a solid black plate.
+- **Lines**: `stroke-dasharray` `4,4` separator, `2,2` placeholder outline, `8,4` timeline or flow connector, `8,4,2,4` dimension line; `marker-end` for connector arrowheads; divider hairlines at 0.2–0.3 alpha.
+- **Inline emphasis**: lift numerical results, before/after contrasts, and one or two load-bearing nouns per sentence as bold runs in the primary color. Never connectives, common verbs, every noun, decorative adjectives, or structural text (footer, axis, legend, page number). Reserve green/red for real polarity.
+
+```xml
+<defs>
+  <filter id="softShadow" x="-15%" y="-20%" width="130%" height="150%">
+    <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.10"/>
+  </filter>
+  <filter id="titleGlow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="b"/>
+    <feFlood flood-color="#1A73E8" flood-opacity="0.45" result="c"/>
+    <feComposite in="c" in2="b" operator="in" result="g"/>
+    <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="field" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#1A73E8"/><stop offset="100%" stop-color="#0D47A1"/>
+  </linearGradient>
+  <linearGradient id="scrim" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#1A1A2E" stop-opacity="0.85"/>
+    <stop offset="55%" stop-color="#1A1A2E" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#1A1A2E" stop-opacity="0"/>
+  </linearGradient>
+</defs>
+<rect x="60" y="60" width="400" height="240" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>   <!-- card floating over a photo/panel -->
+<image href="../images/cover.jpg" x="0" y="0" width="1280" height="720" preserveAspectRatio="xMidYMid slice"/>
+<rect x="0" y="0" width="1280" height="720" fill="url(#scrim)"/>   <!-- text sits on the dark side -->
+```
+
+---
+
+## 1. Effect Capability Discovery
+
+**Reference — effects beyond the everyday block**: the everyday block above covers most pages. Once [`svg-effects.md`](./svg-effects.md) is loaded on its routing-table trigger, its §6.1 Visual Job Router recalls candidates and §6.13 offers coordinated page recipes. Active cross-page continuous action additionally loads [`animations.md`](./animations.md) §3.1 before authoring both endpoints.
+
+**Hard rule — discovery does not expand compatibility**: follow `svg-effects.md` syntax and fallbacks. Source/backdrop blur, blend mode, `<mask>` / per-pixel masking, dense texture, and skew stay baked or alternative-only.
+
+**Default — author motion endpoints while pages are still being written (may override when the deck has no continuous action)**: effects, transitions, and Morph pair keys are post-processing, but the two visible endpoint states are not. A sequence that should read as one action is authored now as consecutive pages, each continuing endpoint in a compatible direct-root group; geometry may differ, and `animations.json` binds them later.
+
+| Motion endpoints | Rule |
+|---|---|
+| Activation | Effects and transitions need an explicit motion instruction, an enabled Custom Animations outcome, or an existing `animations.json`; a §IX Motion suggestion activates none, yet its Morph candidates are authored as compatible direct-root groups with recorded partner ids |
+| Missing state | A deck exported without both states cannot gain the motion by a flag |
+| Extra page | Adding a page is a §IX roster change and returns to Strategist |
+| Endpoint id | Fix the first endpoint's direct-root `<g id>` when that page is drawn and record the intended partner id with `workflow_log.py` (never in `notes/total.md`, which is read verbatim by TTS); the next page reuses it, so no endpoint is renamed after both pages exist (a rename reruns the gate) |
+
+---
+
+## 2. Blueprint Intake
+
+Executor receives the plan and builds on it: Default reads the retained `design_spec.md` and `spec_lock.md`; Quick holds the same decisions as transient §2 anchors. The plan owns what must be true about every page — content, `Relationships`, roster, rhythm, resources, identity; Executor owns how it looks. Pipeline mechanics of the Default run — context validity and rereads, roster invariance, the five-page lock re-read, recovery from a missing artifact, the pre-P01 parameter confirmation, and the gate cadence — are [`generate-pptx.md`](../workflows/generate-pptx.md) Step 6.
+
+### 2.1 Execution context and binding
+
+> Quick has no Design Spec or lock: apply the binding, Reference, content-vs-expression, and anchor rules here, and the §2.2 chain, to its transient §2 anchors.
+
+**Hard rule — binding selection vs realization**:
+
+| Binds (plan-selected) | Realization (Executor-owned) |
+|---|---|
+| Content and `Relationships`; roster and `page_rhythm`; resource paths; structured-template routing keys; core fonts; palette and spacing anchors; icon-library/stroke anchors; crop boundaries; any field labeled `(binding)` | The carrier mix, geometry, composition, and which prepared icon serves a page, plus the sparse local garnish allowed below |
+
+Missing or unresolved material stops execution and returns upstream. Never search, generate, download, sync, invent, or substitute it.
+
+**Reference — planning sketches are adjusted freely**: §V and the §IX `Composition` line, cover/closing composition, capability recommendations, §III motif direction, Chart/Table `family/key` references, §VIII image-layout patterns, and Motion suggestions are starting sketches. Adjust or replace each for the page's purpose, with no upstream repair or stated reason; they carry no binding semantics. A `(binding)` field is followed literally. Executor owns final carrier choice, page-scale composition, information-preserving visualization, geometry, spacing, coordinates, native construction, and effects.
+
+**Hard rule — content vs expression**: §IX owns each page's semantic content — complete preferred wording and block texture at `complete` depth, a short block list at `brief`. Its wording is not verbatim unless marked literal.
+
+| Executor may | Executor never |
+|---|---|
+| Paraphrase, condense repetition, regroup or reorder within the page, and switch among prose, bullets, keywords, labels, or visual annotation when fit or readability benefits | Add a claim, move content across pages, or drop information to fit a layout |
+| Use named lock roles literally where they apply, apply an optional `Template Application`, and choose page-local values from the Design Spec, style, content, and composition | Force every object into a lock row |
+| Read sources to resolve listed `Fact IDs` or verify required claims, quotes, names, or data | Read sources to add content |
+
+The result stays information-equivalent: the `Core message`, `Audience move`, and every claim, fact, value, proper name, qualifier, relationship, evidence, and literal requirement survive. Quotation marks and first person only for wording the source itself gives as a quote; reported speech stays reported. Return an unfit or underspecified block for Design Spec repair.
+
+**Hard rule — one paragraph, one text frame**: one `<text>` per prose paragraph with positioned `<tspan>` line breaks, never sibling `<text>` elements ([`shared-standards-core.md`](./shared-standards-core.md) §4.2). Start from its leading ranges, then adjust for typeface, reading distance, explicit requirements, and locked style.
+
+**Execution anchors and contextual values**:
+
+- **Icons**: any SVG prepared under `<project_path>/icons/` is usable. `icons.library` records the primary bundled style; `icons.inventory` indexes the synced pool without assigning icons to pages or limiting other project-local assets; `simple-icons` entries are real brand marks, not a library. Illustrated icons are transparent slices under `images/` and follow [`executor-image.md`](./executor-image.md) — never moved into `icons/`, added to the inventory, or rendered through `<use data-icon>`.
+- **Colors**: core roles keep their meaning. Derive tints, shades, alpha, gradients, and effects; preserve natural asset colors; use sparse page-local accents that never become a competing or recurring palette.
+- **Spacing**: §V anchors (page margin, block gap, column gutter, corner radius, body leading) are deck-wide identity. Depart only for a page job, never to make content fit.
+- **Families**: resolve by role — exact `<role>_family`, then `title_family` / `body_family`, then legacy `font_family`; never flatten a declared override. A role with no `<role>_family` of its own uses `body_family`; `title`, `subtitle`, and chapter-numeral roles use `title_family`. A sparse export-safe accent family may style short non-structural display or ornament only; recurrence needs upstream selection.
+- **Sizes**: map every structural text item to a declared `typography` role and write its anchor or a value within `±2` px, as unitless px with at most two decimals. Peers on one page stay consistent, and bounded adjustment creates no new role. Never inherit a template placeholder size. `lead` / `subtitle` carry the page's primary claim; `footnote` / `annotation` carry footnotes, page numbers, and credits.
+- **Sparse display-size exception**: a short non-structural Hero/Display element may use one undeclared size at most twice across the deck without a lock row. The third occurrence makes it recurring: stop, return to Strategist to name the role in the Design Spec and lock, then read back and validate before reuse. Never for titles, body, subtitles, annotations, footnotes, captions, data labels, or card copy, and never imitated with nearby sizes.
+- **Outside-band recovery**: structural text reflows geometry and uses the declared band; a sparse display occurrence keeps its value while its deck-wide count stays ≤2. Never flatten a justified distinction or add a role to silence the checker. Mirror pages keep exact source typography.
+- **Prepared decorative lettering**: place the approved AI/slice file as an image and keep the editable title/subtitle in separate native frames. Never rebuild it from glyph copies or WordArt, and never invent a missing asset when the plan kept the wording native.
+- **Images and math**: images reference only files listed under `images`. Math loads [`native-formula.md`](./native-formula.md): simple notation stays text, one-line structural prose goes inline only when its native height fits the reserved row, matrices and multiline or vertically expanding math go block; exact LaTeX plus preview, never an image.
+
+Return upstream before a derived or accent identity becomes recurring or structural. Garnish, `±2` px adjustments, and two sparse display occurrences need no lock row, and the lock is never expanded to silence a comparison.
+
+### 2.2 Per-page decision chain
+
+Run these steps in order for every page, in active context, before the page's first coordinate. Each step is decided once; no artifact, no extra pass, no rereading a module while the context is valid. Composition (Step 7) is one decision: the style's geometry, the motif, and — on an image page — the image composition are resolved together, before any geometry is drawn.
+
+**Step 1 — communication trace**: read `communication.objective`, `communication.core_message`, and the page's §IX `Core message` + `Audience move` before composing. The page must advance the objective and make that move. A page that cannot state its move is an outline defect: surface `warning: P<NN> has no communication move` rather than decorating around it, and never invent a purpose at execution time. Structural pages advance the contract by establishing relevance, tension, or the decision frame, or by completing the final commitment.
+
+**Step 2 — reading-mode check**: apply `communication.consumption_mode` with the §IX block texture and `page_rhythm`:
+
+| Mode | The page carries |
+|---|---|
+| `text` | The visible page stands alone: complete prose, explicit labels / captions / sources, tables, necessary detail |
+| `balanced` | The primary claim and its evidence; enabled notes add interpretation and transitions |
+| `presentation` | One claim and one dominant visual legible at projection distance, concise copy; enabled notes carry the explanation |
+
+With notes disabled, never omit required content on the assumption that notes carry it. Never drop or invent facts to force a mode. When the authored texture materially conflicts with the lock, render the least-destructive faithful composition and surface `warning: P<NN> content texture conflicts with consumption_mode <value>` (a judgment, not a checker rule).
+
+**Default — authored texture (may override when information-equivalent)**: start from each §IX block's written texture (`complete`) or expand its block phrasing (`brief`) under the reading mode. Keep prose where continuity carries cause, argument, narrative, qualification, or emphasis. Use bullets or keywords only for genuinely parallel or ordered material or a clearer information-equivalent structure. A list that is merely easier to lay out, or a template slot that expects a list, is not a reason: widen, reflow, or drop the card before converting prose to fill it. The locked mode shapes voice and register, not §IX's authored titles or page order; a user-authored topic label stays a label even when the mode favors assertions. Block-level phrasing applies *within* the page's `page_rhythm` density, not against it.
+
+**Step 3 — topology decision (Mandatory)**: before drawing, read the page's §IX `Relationships` (Quick: the transient relationship statement), then `Visualization` and `Content`, and decide whether geometry must carry that qualitative `order`, `link`, `parent`, `membership`, `contrast`, or `overlap` relationship. Decide from the semantic relationship alone; a suggested carrier, topology, or composition does not decide it, and a Chart/Table reference never substitutes. `no` stays on this base path. `yes` applies the grammar of [`executor-structure.md`](./executor-structure.md) and [`topology-assembly.md`](./topology-assembly.md) (routing table) and keeps the relationship statement in active page context with no catalog reference, lock row, or artifact. A missing line is a Design Spec defect: repair that §IX block first (continuous run) or return upstream; never infer the relationship at execution.
+
+**Step 4 — layout rhythm (`page_rhythm`)**: before drawing, apply the page's tag (key `P<NN>` matching §IX):
 
 | Tag | Layout discipline |
 |-----|-------------------|
-| `anchor` | Structural page (cover / chapter / TOC / ending). Follow the matching template verbatim. |
-| `dense` | Information-heavy. Card grids, multi-column layouts, KPI dashboards, tables, and charts are all permitted. This is the baseline behavior. |
-| `breathing` | Low-density impact page. Avoid **multi-card grid layouts** — do not organize content as multiple parallel rounded containers (3-card row, 4-card KPI grid, 2×2 matrix rendered as cards). Use naked text blocks, dividers, whitespace, or full-bleed imagery as the content structure. Single rounded visual elements (hero image corners, callouts, tags, one emphasis block) are fine — the rule is about grid structure, not about the `rx` attribute. Proportions follow information weight (not a preset ratio). Typical forms: hero quote, single large number with one-line interpretation, full-bleed image with floating caption, section transition. |
+| `anchor` | Structural page (cover / chapter / TOC / ending). `mirror` follows its prototype; `layout` retains its structure system; `style` / free design preserves the §IX cover hook or closing takeaway; the recommended composition is a Reference. |
+| `dense` | Information-heavy: card grids, multi-column layouts, KPI dashboards, tables, and charts are all permitted. The baseline. |
+| `breathing` | Low-density impact page: naked text, dividers, whitespace, or full-bleed imagery carry the structure; proportions follow information weight. Hero quote, single large number with one line, full-bleed image with floating caption, section transition. |
 
-> Without rhythm variation, every page defaults to card grids (the "AI-generated" look). `page_rhythm` is the only narrative lever that survives context compression.
+Mechanical repetition comes from reusing one carrier and topology without a page job, not from cards themselves; vary rhythm when the content relationship changes. Missing or empty `page_rhythm` → `warning: spec_lock.md missing/empty page_rhythm — defaulting all pages to dense` once, all pages `dense`. Tag missing for a page → `warning: spec_lock.md page_rhythm tag not found for P<NN> — falling back to dense` once per deck, `dense`; never invent a tag.
 
-**Missing `page_rhythm` section** → emit `warning: spec_lock.md missing page_rhythm — defaulting all pages to dense` once, fall back to `dense` for all pages.
+**Step 5 — carrier mix (Mandatory, before coordinates)**: in one page-level decision, choose the background field, editable text and optional lettering, native geometry/lines, prepared photos/scenes/illustration/icon assets, and applicable visualizations — their combination, visual weight, z-order, and local construction from the page message and hierarchy. Use only prepared resources and preserve every binding resource job. The resolved style controls treatment and emphasis, never carrier eligibility, image source, or the native vocabulary. Recall the vocabulary here: the style's §1 `Composition geometry`, the Page Expression Core above, and — once triggered — [`svg-effects.md`](./svg-effects.md) §6.1 and [`native-shape-authoring.md`](./native-shape-authoring.md) §2.1.
 
-**Tag not found for current page** → emit `warning: spec_lock.md page_rhythm tag not found for P<NN> — falling back to dense` once per deck (aggregate; do not repeat per page), fall back to `dense`. Do not invent a tag.
+**Step 6 — module line (Mandatory)**: with the carrier mix resolved and before drawing, write one line `P<NN> modules: core[, structure][, native-shape][, effects][, image][, native-data][, chart | table | formula | link | web-image]` naming the triggered modules the page uses. A module the pre-P01 sweep did not read is read completely before that page's first SVG line. A page whose carrier mix uses a module's capability without naming it is a defect the carrier receipt exposes.
 
-**Per-page template lookup — `page_layouts` section**:
+**Step 7 — composition (Default; may override when another page-fit move is stronger)**: an SVG page is a canvas, not a DOM. A preset uses its style's §1 `Composition geometry`. A `custom` executes `visual_style_behavior` first and takes §1 geometry only from the exact `visual_style_references` the behavior assigns a shape or composition job; an unreferenced custom follows its behavior alone. Every listed move is generative vocabulary; a move beyond basic primitives passes [`native-shape-authoring.md`](./native-shape-authoring.md) §2.1's exact-fit gate.
 
-Before drawing each page, look up its entry in `page_layouts` to decide which basename to inherit (the SVG itself was loaded in §1.0):
+**Default — consider the planned motif (may override when another coherent expression serves the deck better)**: when §III `Theme` recommends a cross-page motif, decide whether it earns a continuity job; if adopted, vary scale, crop, density, position, and content interaction by page role. An explicit user/template motif binds.
 
-- Entry present (e.g., `P04: 03a_content_image_text`) → inherit the corresponding SVG already in context. The basename **must match** an actual file in the chosen template directory; if it doesn't, emit `warning: page_layouts P<NN> references missing file <basename>.svg — falling back to free design` and proceed.
-- No entry for this page → free design, no inheritance. **Not an error** — Strategist intentionally left this page free.
-- Whole section absent → see §1 fallback (legacy page-type matching).
+**Image composition (image pages)**: within the same composition decision and before any geometry, apply the per-page image composition decision of [`executor-image.md`](./executor-image.md) §1 once; a deliberate plain placement is valid when it communicates better.
 
-Do **not** invent a layout entry, and do **not** assume a template just because `templates/` exists — if `page_layouts` is present but silent for this page, that silence is the instruction.
+**Step 8 — geometry move (Mandatory)**: after the topology decision and any assembled topology, decide the page's geometry before writing coordinates. A move beyond basic primitives follows [`native-shape-authoring.md`](./native-shape-authoring.md) §2.1 — exact-fit comparison, composition lenses, relationship and carrier fit, contour-family choice, the reader effect of a generic or undrawn result, the running geometry signature, and the materialization boundary for both topology results. Keep the decision in active context; never change the topology decision. Materialize under §3.0.
 
-**Per-page chart reference — `page_charts` section**:
-
-Before drawing each page, look up its entry in `page_charts` to decide which chart structure applies (the SVG itself was loaded in §1.0):
-
-- Entry present (e.g., `P09: timeline_horizontal`) → adapt the corresponding chart SVG already in context. Apply project colors/typography/density; do not copy verbatim. Cross-reference `templates/charts/charts_index.json` for the chart's purpose summary if needed.
-- No entry for this page → either no chart on this page, or a chart that didn't match any catalog template (Strategist's `no-template-match` fallback). Design the visualization from scratch using `design_spec.md §VII` for guidance.
-- Whole section absent → no chart pages in this deck.
+**Step 9 — coordinates and bounds**: Write the sentence first, then the zone; the grouping, bounds, and width-estimation contract is §3 Technical contract.
 
 ---
 
 ## 3. Execution Guidelines
 
-- **Proximity**: group related elements with tight spacing; separate unrelated groups
-- **Spec adherence**: follow color, layout, canvas format, and typography in the spec
-- **Template structure**: if templates exist, inherit the visual framework
-- **Main-agent ownership**: SVG generation must run in the main agent (not sub-agents) — pages share upstream context for cross-page visual continuity
-- **Generation rhythm**: lock global design context first, then generate pages sequentially in one continuous context. No batched groups (e.g., 5 at a time).
-- **Phased batch generation** (recommended):
-  1. **Visual Construction Phase**: generate all SVG pages sequentially for visual consistency. Use layout judgment for chart marks during the draft. **MUST embed plot-area markers** per §3.1 below on every chart page — coordinate calibration is a post-generation step (see [`workflows/verify-charts.md`](../workflows/verify-charts.md)) that depends on these markers.
-  2. **Quality Check Gate**: run `python3 scripts/svg_quality_checker.py <project_path>` on `svg_output/`. Any `error` (banned features, viewBox mismatch, spec_lock drift, non-PPT-safe font, etc.) MUST be fixed on the offending page before proceeding — regenerate and re-check. Address `warning`s when straightforward. Do NOT defer to after `finalize_svg.py` — finalize rewrites SVG and masks some violations.
-  3. **Logic Construction Phase**: after SVGs pass the quality check, batch-generate speaker notes for narrative continuity.
+**Per-page composition craft** (the decision order is §2.2; the vocabulary is the Page Expression Core):
 
-### 3.1 Chart Plot-Area Marker (MANDATORY on every chart page)
+- **Ordinary carriers stay ordinary**: cards, icon-and-label rows, color swatches, soft shadows, and gradient fields are everyday carriers. Use them whenever content groups, compares, enumerates, or names a color, material, or sample, with one shared treatment for peers; reach for a device by page job and let the locked style set its treatment. When the subject is a color or material, draw it: a swatch is content, its value comes from the source, and it needs no lock row.
+- **Reference — semantic geometry over preset stacks**: for ascending, converging, breaking-through, or stacking relationships, compose faithful primitives and exact presets as one geometry system; a Boolean only when the contour must merge, open, or fragment; one page-specific path only when neither works.
+- **Inherited containers**: keep meaningful template frames and restyle radius, fill, stroke, and depth from the Design Spec and lock. Chart/Table reference adaptation belongs to [`executor-visualization.md`](./executor-visualization.md); preview effects never override project styling.
+- **Fact provenance**: resolve each §IX `Fact ID` from `sources/*.facts.json` and keep the value unchanged. Render a compact source footnote (name + short URL/domain) when space permits and state attribution naturally in enabled notes. For `Data class: scenario`, place a visible localized `Scenario data` / `情景数据` label beside the KPI/chart and say in notes that it is illustrative. Never attach a fact ID to scenario data or let an unlabeled invented KPI look factual. An organizing framework, grouping, or label the source does not state is the deck's reading: say so on the page (e.g. `整理` / `our reading`) or in enabled notes, never presented as the source's structure.
 
-> The [`verify-charts`](../workflows/verify-charts.md) workflow enumerates chart pages from `design_spec.md §VII`, then reads each page's plot-area marker to feed `svg_position_calculator.py`. Missing marker → verify-charts has to re-derive the plot area from axis lines, paying the cost on every run.
+**Technical contract (the exporter's needs; the complete SVG boundary is [`shared-standards-core.md`](./shared-standards-core.md))**:
 
-**Hard rule**: every SVG page that contains a data visualization chart includes a plot-area marker inside `<g id="chartArea">`, placed **after axis lines** and **before the first data element** (bar, line, area, point).
+- **Element grouping (Mandatory)**: wrap each logical Slide-local body unit in a descriptive, page-unique top-level `<g id>` with root-coordinate `data-pptx-bounds="x y width height"`. A helper-authored preset atom stays top-level with `data-pptx-frame` and no bounds; nested groups need none. Give a root background image or full-canvas scrim/decoration rectangle a stable `id` plus `data-pptx-role="background"` / `"decoration"` instead of a wrapper. Thresholds, exemptions, and the Morph staging marker: [`shared-standards-core.md`](./shared-standards-core.md) §4.3.
+- **Reference — nested edit groups**: a top-level group may contain descriptive nested `<g>` groups for meaningful subunits; they need no bounds and create no animation step, with no default depth or quota.
+- **Default — bounds are the module zone, not a glyph box (may skip when no text is estimable)**: make each zone as generous as the canvas and siblings allow without overlap. A group's bounds are the union of every child's geometry — text lines, preset frames, image frames, line stroke half-width — plus margin, never the title text alone. An untransformed line spans `y − 0.85 × font_size` to `y + 0.35 × font_size`, so a zone's top sits at or above the first baseline − 0.85 × size and its bottom at or below the last baseline + 0.35 × size (a 16px footer on baseline 676 needs a bottom of 682, not 680). Write the sentence first, then fit the zone to it; recompute the bounds after any font-size, line-count, or child-geometry change.
+- **Width estimation**: width is estimated, never measured per page. The route calibrates every role once before P01 (Default Step 6, Quick §3) and keeps a per-role chars-per-100-px table in context; size each zone as characters ÷ that rate × 100; a line mixing CJK with Latin words or digits adds the two parts, CJK chars ÷ CJK rate + other chars ÷ Latin rate (acronyms and uppercase words use the CAPS rate, numbers the DIGITS rate; the rates are sample averages while the checker measures real glyphs, so keep about 5% below the bounds width; a line rewritten after calibration — an expanded title, a longer label — is re-estimated the same way, the outline column covers planned wording only). Never trim wording to satisfy an estimate. When text does not fit, expand a zone with unused space first, then reflow or switch texture (prose → points) before dropping a qualifier; larger bounds never repair off-canvas text.
+- **Spec adherence**: binding color, canvas, typography, identity, resource, and template anchors hold; layout and other References apply under §2.1 without becoming locks.
+- **Template structure**: inherit the native framework only for `template_reuse_scope: mirror|layout`; `style` uses the flat route.
+- **Main-agent ownership**: the current main agent hand-writes every page SVG — never a sub-agent, and never a generator that writes slide files — because pages share upstream context for cross-page continuity. `preset_shape_svg.py` and `shape_boolean_svg.py` print fragments only after the agent has chosen role, operands, paint, and z-order. Resource, inspection, checker, verification, and export tools are unrestricted.
 
-**Rectangular plot area** (bar / horizontal_bar / grouped_bar / stacked_bar / line / area / stacked_area / scatter / waterfall / pareto / butterfly):
+**Checkpoints**:
 
-```xml
-<!-- chart-plot-area: x_min,y_min,x_max,y_max -->
-```
+- **Phased generation** (recommended):
+  1. **Visual Construction Phase**: generate all pages sequentially, applying every triggered branch while drawing. **MUST embed one object-scoped plot-area marker** per §IX-named or Quick-promoted value-driven chart object ([`executor-chart.md`](./executor-chart.md) §2); calibration follows in [`verify-charts`](../workflows/stages/verify-charts.md). Write every `<object-key>=yes` native marker plus JSON metadata atomically ([`native-data-interface.md`](./native-data-interface.md) §2) and stamp its baseline before the page's gate — `python3 ${SKILL_DIR}/scripts/stamp_native_fallbacks.py <project_path>/svg_output/<page>.svg --write`, rerun after any visible edit inside the marker group, a `compact_svg_styles.py --inplace` rewrite included. **Reach for native presets** per §3.0 as you draw, decided by the object's intent, never by scanning finished paths; several presets for one page go through one `preset_shape_svg.py render-batch --input -` round (gradient/pattern paint stays ordinary SVG; a justified §6.4 shadow/glow stays on the helper-authored shape).
+  2. **Quality gates**: the gate points and their commands are the route's — [`generate-pptx.md`](../workflows/generate-pptx.md) Step 6 or [`quick-generate.md`](../workflows/profiles/quick-generate.md) §3–4. The repair discipline at every gate is the same: run the checker unfiltered, review the complete issue set, fix every error plus the selected warnings in one consolidated pass, verify once. Never check between individual fixes, never `cat` a passing report, never defer errors past `finalize_svg.py` (it rewrites SVG and masks violations). Every `warning` is advisory.
+  3. **Logic Construction Phase (conditional)**: after the gates pass, generate speaker notes for narrative continuity only when the effective Speaker Notes outcome is enabled.
 
-**Radial charts** (pie / donut / radar):
+- **Mandatory — final carrier-receipt review**: after the final checker passes, compare its `[CARRIERS]` summary (per-page detail under `files[].info.carrier_receipt`) with the retained page jobs, resource roles, and geometry signatures. Counts are not quotas. Repair only where a fact contradicts an active decision, then rerun the final checker once:
 
-```xml
-<!-- chart-plot-area: pie | center: cx,cy | radius: r -->
-<!-- chart-plot-area: donut | center: cx,cy | outer-radius: r1 | inner-radius: r2 -->
-<!-- chart-plot-area: radar | center: cx,cy | radius: r -->
-```
+  | Contradiction | Repair |
+  |---|---|
+  | An adopted preset absent from its page | Draw it |
+  | A directional / step / flowchart relationship drawn as a hand path or polygon where §3.0 names a preset | Replace it with the preset |
+  | A primary image reduced to a minor frame | Restore its planned share |
+  | Unrelated page jobs collapsing into one neutral construction | Vary the construction by job |
 
-**How to determine coordinate values**:
+  **Absence needs a reason.** Each of these receipt facts needs one written line — what carries that job instead, and why that serves the reader better: a deck-wide `Presets: (none)`; `inline emphasis 0`, `gradients 0`, or `filters 0` on the `Effects:` line; fewer pages carrying a preset or connector than pages whose relationship line (Default: §IX `Relationships`; Quick: the transient relationship statement) names `order` / `link` / `parent` / `membership`; a `Presets:` line naming no carrier-and-field contour; `icons: 0` while §VI (Quick: the prepared pool) registered an icon pool. Answer per family the presets serve, not for arrows alone:
 
-| Value | Derivation |
-|-------|------------|
-| `x_min` | X coordinate of the Y-axis line (leftmost data boundary) |
-| `y_min` | Y coordinate of the topmost grid line (highest data boundary) |
-| `x_max` | X coordinate of the rightmost axis endpoint or grid line |
-| `y_max` | Y coordinate of the X-axis baseline |
-| `cx, cy` | Center point of pie/donut/radar (accounting for `transform="translate()"`) |
-| `r` | Outer radius of the chart |
+  | Family | Members |
+  |---|---|
+  | Carrier and field | snipped or one-sided rounded rectangles, plaque, bevel, polygons, pie / arc / donut, frames, corners, folded corner, trapezoid, parallelogram, and the [`native-shape-authoring.md`](./native-shape-authoring.md) §7 modelled forms |
+  | Direction and sequence | arrows, chevrons, flow nodes |
+  | Grouping and ownership | brackets, braces, frames, plaques |
+  | Emphasis and annotation | callouts, badges, banners, stars |
 
-**Per-page verification** — after writing each chart SVG, confirm the marker exists:
+  The style, speed, restraint, "text was enough", or "it is editable anyway" are not reasons. Choosing not to use a device is valid; only an unstated reason is not. A family or page without a reason is repaired where the page job calls for it, and the checker reruns.
 
-```bash
-grep "chart-plot-area" <project_path>/svg_output/<current_page>.svg
-```
+### 3.0 Native Shape Selection
 
-> All chart templates in `templates/charts/` include this marker as a reference. If you are drawing a chart and the marker is absent, you have a bug.
-- **Technical specs**: see [shared-standards.md](shared-standards.md) for SVG/PPT constraints
-- **Card containers — use the documented patterns**: when a content page needs section cards (4 quadrants, parallel aspects, capability blocks, info cards), use the patterns codified in [`templates/charts/CHART_STYLE_GUIDE.md`](../templates/charts/CHART_STYLE_GUIDE.md) §11 — half-rounded section tab (§11.1), nested card border without stroke (§11.2), card-grid skeletons (§11.3), diagonal dashed connector for cross-quadrant relationships (§11.5), ground-anchor ellipse as a non-filter depth marker (§11.6), bidirectional interaction arrows for paired protocols (§11.7). Do not reinvent the "tinted full-rounded rect + white cover-rect to hide the bottom corners" hack; it survives in older templates but breaks SVG→PPTX color editing. Reference templates: [`labeled_card.svg`](../templates/charts/labeled_card.svg), [`quadrant_text_bullets.svg`](../templates/charts/quadrant_text_bullets.svg), [`kpi_cards.svg`](../templates/charts/kpi_cards.svg), [`matrix_2x2.svg`](../templates/charts/matrix_2x2.svg), [`team_roster.svg`](../templates/charts/team_roster.svg), [`client_server_flow.svg`](../templates/charts/client_server_flow.svg).
-- **Reference — prefer semantic shapes over preset stacks (not a constraint)**: when a slide needs to express "ascending / converging / breaking through / stacking" — i.e., a relationship that goes beyond a generic arrow — prefer a single custom `<polygon>` or `<path>` that encodes the semantics geometrically, rather than stacking multiple preset arrows. A converging-tip path or a podium polygon reads faster than three arrows pointing at a label. Examples of this technique appear in many imported corporate decks; see `projects/01_template_import/svg_output/slide_01.svg` shape-158 for a reference (gradient-filled inward-pointing arrow). Do not codify these as templates — they are page-specific; the rule is just "consider polygon before stacking presets."
-- **Reference — visual depth through restraint (not a constraint)**: layered depth comes from rhythm (flat vs lifted, dense vs spacious), not from shadows everywhere. Shadow typically suits 2-3 genuinely floating elements per page (cards on photos, primary CTA, overlays); keep peer-grid cards, dividers, body containers flat. Reach for typography weight, spacing, accent bars, subtle tints **before** shadow. Full rules in shared-standards.md §6.
+**Hard rule — contour before encoding**: choose the page-fit contour from the full native vocabulary ([`preset-shape-vocabulary.md`](./preset-shape-vocabulary.md), resident with this core) before its authoring form. A contour beyond rectangle, rounded rectangle, circle, ellipse, and line is chosen with [`native-shape-authoring.md`](./native-shape-authoring.md) in context (routing table). Rectangle, rounded rectangle, circle, and ellipse are preset contours even in short SVG syntax; easier syntax never selects a contour. Every other vocabulary contour — an inflected carrier (snipped, one-sided rounded, plaque, bevel, polygon, pie, frame, folded corner) as much as a block arrow, chevron, banner, callout, flowchart node, or star — comes from `preset_shape_svg.py`, never plain paths or fake rectangles. No Design Spec selection, scorer, or inventory gates this choice.
+
+**Materialization tiers** ([`native-shape-authoring.md`](./native-shape-authoring.md) §1 table):
+
+| Geometry | Materialize as |
+|---|---|
+| A contour the exporter maps from an ordinary primitive | The ordinary primitive |
+| Any other preset contour | The helper fragment |
+| A straight relationship | `<line>` |
+| A stock bend or curve | A `bentConnector*` / `curvedConnector*` preset (both export unconnected) |
+| A page-level system | Independent siblings |
+| A contour that must merge, cut, or fragment | `shape_boolean_svg.py` |
+| Geometry none of those express | Ordinary path/polygon |
+
+A directional solid object is a `shape` preset such as `rightArrow` or `chevron`; `actionButton*` presets are geometry only.
+
+**Hard rule — freeform is the last tier**: before hand-authoring a stock-looking `<path>` / `<polygon>`, complete contour selection, simplest exact materialization, independent composition, and the Boolean gate. Avoiding a helper or drawing faster is not an exception. Data-defined geometry and a genuinely locked organic/hand-drawn contour qualify by semantics. This applies only while drawing a new object; export never scans or upgrades ordinary SVG.
+
+**Hard rule — helper-written metadata and scope**: `data-pptx-authoring`, `data-pptx-prst`, `data-pptx-frame`, adjustment metadata, and registry paths are written only by the preset helper (hand-written values fail the checker). Rerun it when geometry or paint changes and never edit a direct path. Both helpers print only their stdout fragment(s): read and insert each through the normal page edit, never redirect, loop, or batch output into `svg_output/`.
 
 ### SVG File Naming Convention
 
-Format: `<NN>_<page_name>.svg` (two-digit number from 01; name matches the deck's language and the page title in the Design Spec).
-
-Examples: `01_封面.svg` / `02_目录.svg` / `03_核心优势.svg`; `01_cover.svg` / `02_agenda.svg` / `03_key_benefits.svg`.
+`<index>_<page_name>.svg` with one roster-wide zero-padded width (`01_cover.svg` … `12_end.svg`, or `001_cover.svg` … `120_end.svg`), matching the deck language and page title.
 
 ---
 
 ## 4. Icon Usage
 
-Strategist chooses the library and inventory; Executor only implements. Library details and one-library rule: [`../templates/icons/README.md`](../templates/icons/README.md). This section defines placeholder syntax.
-
-**Built-in icons — Placeholder method (recommended)**:
+Executor draws from the complete prepared project-local pool; library rules are the [icon README](../templates/icons/README.md). Any SVG under `<project_path>/icons/<lib>/` is prepared material. Authoring, preview, finalization, and export resolve only complete case-sensitive `library/name` references there (`tabler-outline/award`, never `Award`; custom files keep their exact case), with no global or template-source fallback.
 
 ```xml
-<!-- chunk-filled (straight-line geometry, sharp corners, structured) -->
 <use data-icon="chunk-filled/home" x="100" y="200" width="48" height="48" fill="#005587"/>
-
-<!-- tabler-filled (bezier-curve forms, smooth & rounded contours) -->
-<use data-icon="tabler-filled/home" x="100" y="200" width="48" height="48" fill="#005587"/>
-
-<!-- tabler-outline (light, line-art style — screen-only decks) -->
-<use data-icon="tabler-outline/home" x="100" y="200" width="48" height="48" fill="#005587"/>
-
-<!-- phosphor-duotone (single color + 20% backplate — soft depth without solid weight) -->
-<use data-icon="phosphor-duotone/house" x="100" y="200" width="48" height="48" fill="#005587"/>
-
-<!-- simple-icons (brand logos — used alongside the deck's primary library, only for real company/product marks) -->
 <use data-icon="simple-icons/github" x="100" y="200" width="48" height="48" fill="#181717"/>
-
-<!-- tabler-outline with thin / bold stroke (stroke-style libraries only) -->
-<use data-icon="tabler-outline/home" x="100" y="200" width="48" height="48" fill="#005587" stroke-width="1.5"/>
-<use data-icon="tabler-outline/home" x="100" y="200" width="48" height="48" fill="#005587" stroke-width="3"/>
+<!-- stroke-style libraries (tabler-outline) may add stroke-width 1.5 | 2 | 3 -->
+<use data-icon="tabler-outline/home" x="100" y="200" width="48" height="48" fill="#005587" stroke-width="2"/>
 ```
 
-> ⚠️ **Color**: ALWAYS use `fill="#HEX"` on `<use data-icon="...">`. NEVER use `stroke` or `fill="none"`, even for stroke-style libraries.
->
-> **stroke-width** (stroke-style libraries only, currently `tabler-outline`): allowed values `{1.5, 2, 3}`. If `spec_lock.md icons.stroke_width` is declared, all placeholders MUST use that value deck-wide. Default `2` if absent (legacy). Ignored on non-stroke libraries.
->
-> Icons are auto-embedded by `finalize_svg.py` — no need to run `embed_icons.py` manually.
+**Hard rule — color and stroke**: always `fill="#HEX"` on `<use data-icon>`, never `stroke` or `fill="none"`, even for stroke libraries. `stroke-width` (`tabler-outline` only) is `1.5`, `2`, or `3`. A declared `spec_lock.md icons.stroke_width` applies deck-wide, and new authoring declares it. A legacy stroke-library lock without it uses `2` with one warning.
 
-**Searching for icons** — use terminal, zero token cost:
-```bash
-ls skills/ppt-master/templates/icons/chunk-filled/ | grep home
-ls skills/ppt-master/templates/icons/tabler-filled/ | grep home
-ls skills/ppt-master/templates/icons/tabler-outline/ | grep chart
-ls skills/ppt-master/templates/icons/phosphor-duotone/ | grep house
-ls skills/ppt-master/templates/icons/simple-icons/ | grep github
-```
-
-**Abstract concept → icon name** (names for `chunk-filled`; tabler libraries use their own equivalents — verify with `ls | grep`):
-
-| Concept | chunk-filled | tabler-filled / tabler-outline |
-|---------|-------|-------------------------------|
-| Growth / Increase | `arrow-trend-up` | same |
-| Decline / Decrease | `arrow-trend-down` | same |
-| Success / Complete | `circle-checkmark` | `circle-check` |
-| Warning / Risk | `triangle-exclamation` | `alert-triangle` |
-| Innovation / Idea | `lightbulb` | `bulb` |
-| Strategy / Goal | `target` | same |
-| Efficiency / Speed | `bolt` | same |
-| Collaboration / Team | `users` | same |
-| Settings / Config | `cog` | `settings` |
-| Security / Trust | `shield` | same |
-| Money / Finance | `dollar` | `currency-dollar` |
-| Time / Deadline | `clock` | same |
-| Location / Region | `map-pin` | same |
-| Communication | `comment` | `message` |
-| Analysis / Data | `chart-bar` | same |
-| Process / Flow | `arrows-rotate-clockwise` | `refresh` |
-| Global / World | `globe` | `world` |
-| Excellence / Award | `star` | same |
-| Expand / Scale | `maximize` | same |
-| Problem / Issue | `bug` | same |
-
-> For self-evident names (home, user, file, search, arrow, etc.) — just `grep chunk-filled/` directly without consulting the table.
-
-> ⚠️ **Icon validation**: only use icons from the Design Spec's approved inventory. Verify each via `ls | grep` before use. Mixing libraries within one deck is FORBIDDEN.
+**Missing project-local icon** (`test -f "<project_path>/icons/<lib>/<name>.svg"`) → return to Strategist's preparation / `icon_sync.py` gate. Executor never searches the global library, picks an alternative, or copies a candidate. Executor may combine project-local icons freely across namespaces and styles but may not acquire a new one or treat a globally resolvable file as prepared.
 
 ---
 
-## 5. Visualization Reference
+## 5. Font Usage
 
-Chart SVGs referenced in **VII. Visualization Reference List** are loaded once via the §1.0 batch read. This section governs adaptation only.
+Default reads typography from `spec_lock.md` (Quick: its transient §2 anchor): `<role>_family` → `title_family` / `body_family` → legacy `font_family`; sparse accents follow §2.1. Under [`native-formula.md`](./native-formula.md), blocks use marker style and inline math inherits size and solid fill, exporting in Cambria Math with the project text language.
 
-**Hard rule**: adapt the loaded chart SVG; do not improvise from memory and do not replicate verbatim. Apply project colors, typography, content; preserve visualization type.
+**Default — locked-stack realization (may vary treatment)**: express the Design Spec Character Reference through scale, weight, spacing, color, and composition while keeping the locked family. Put the common stack on root `<svg>`, omit matching descendants, and override at the nearest clear `<g>`, `<text>`, or `<tspan>`.
 
-**Adaptation rules**:
-- **Preserve**: visualization type (bar/line/pie/timeline/process/framework…) as specified
-- **Adapt**: data, labels, colors (project scheme), dimensions
-- **Freely adjust**: composition, axis ranges, grid, legend, spacing, decoration — as long as the chart stays accurate and readable
-- **Forbidden**: changing visualization type without spec justification; omitting data points or structural elements from the outline
-
-> Templates: `templates/charts/` (70 types). Index: `templates/charts/charts_index.json`
-
-### 5.1 Chart Coordinate Calibration
-
-Coordinate calibration runs as a **standalone post-generation workflow**, not inside the executor pipeline. After SVG generation completes, if the deck contains data charts, run [`workflows/verify-charts.md`](../workflows/verify-charts.md) before post-processing.
-
-The executor's only obligation here is upstream: embed the `<!-- chart-plot-area ... -->` marker on every chart page during initial draft (§3.1). Verify-charts enumerates chart pages from `design_spec.md §VII` (authoritative deck plan) and uses the marker to feed `svg_position_calculator.py`.
-
-> Do NOT run `svg_position_calculator.py` during the initial draft. The calculator calibrates already-generated SVGs against their declared plot areas; running it before the SVG exists has nothing to compare against.
+**Hard rule — target faces**: every `font-family` stack names faces installed or approved on the delivery target ([`shared-standards-core.md`](./shared-standards-core.md) §4.1); export takes the first named Latin face and the first named CJK face of a stack. **Missing `typography.font_family`** → stop and return to Generate Step 4 / [`strategist.md`](strategist.md) §6.2; never infer a stack from `design_spec.md`.
 
 ---
 
-## 6. Image Handling
+## 6. Completion and Export (Default only)
 
-Handle images by their status in the Design Spec's Image Resource List. Status enum and lifecycle: [`svg-image-embedding.md`](svg-image-embedding.md).
-
-| Status | Source | Handling |
-|--------|--------|----------|
-| **Existing** | User-provided | Reference images directly from `../images/` directory |
-| **Generated** | Generated by Image_Generator | Reference images directly from `../images/` directory |
-| **Sourced** | Web-acquired by Image_Searcher | Reference from `../images/`. **Read [`image_sources.json`](image-searcher.md) to decide attribution** — see §6.1 below. |
-| **Rendered** | Deterministic formula PNG | Reference from `../images/`; use `preserveAspectRatio="xMidYMid meet"` |
-| **Needs-Manual** | Acquisition failed and file is absent | Use dashed border placeholder unless the expected file exists |
-| **Placeholder** | Not yet prepared | Use dashed border placeholder |
-
-**Reference syntax**: see [`svg-image-embedding.md`](svg-image-embedding.md).
-
-**Template-bundled images**: when a template (deck / layout / brand) is applied, its bitmaps are copied into the project's `images/` alongside every other runtime image (SKILL.md Step 3). Reference them the same way — `../images/<name>` — and do **not** reproduce a template SVG's bare sibling href (e.g. `href="cover_bg.png"`): the template SVG is reference material, the rendered page lives in `svg_output/` and must point at `../images/`. Mirror templates (§1.1) are the one exception — they copy hrefs verbatim, and the exporter resolves those bare hrefs against `images/`.
-
-**Placeholder**: Dashed border `<rect stroke-dasharray="8,4" .../>` + description text
-
-**`no-crop` images**: when a `spec_lock.md images` entry ends with ` | no-crop`, size the container to the image's native ratio (from `analyze_images.py` or file dims) and use `preserveAspectRatio="xMidYMid meet"`. Untagged entries are croppable — default to `slice`.
-
-**Formula images**: rows with `Acquire Via: formula` or `Type: Latex Formula` MUST be treated as no-crop even if a legacy `spec_lock.md` forgot the flag. Use the dimensions from `design_spec.md §VIII`, `image_analysis.csv`, or `images/formula_manifest.json`; do not normalize all formulas to one height unless the spec explicitly states that layout choice.
-
-### 6.1 Inline Attribution for Sourced Images (web path)
-
-Whenever the slide uses an image with `Status: Sourced`, look up the corresponding entry in `project/images/image_sources.json` and act on `license_tier`:
-
-| `license_tier` | Action on this slide |
-|---|---|
-| `no-attribution` | Embed the `<image>` element only. **No credit element needed.** |
-| `attribution-required` | Embed the `<image>` element **plus** a small inline `<text>` credit element per the visual spec in [image-searcher.md §7](./image-searcher.md). |
-
-The credit text is **not** rendered by post-processing or export — it must be present in the SVG you produce. The shape of the credit element (size, position, color, multi-image source line, hero gradient overlay) is specified in [image-searcher.md §7](./image-searcher.md). Do not invent a different style.
-
-Use `attribution_text` from the manifest entry as the **starting point**, then compress for the small-text constraint (drop URL, drop filename, keep "via Provider / License"). For CC0/PD images that landed in the `attribution-required` tier only because of upstream metadata quirks (rare), credits are still safe to render.
-
-`svg_quality_checker.py` treats missing CC BY / CC BY-SA inline attribution as an **error**. Fix the offending SVG before post-processing.
-
-**The manifest is the single source of truth for credits.** Do not duplicate license info into speaker notes or any other artifact.
-
----
-
-## 7. Font Usage
-
-Source of truth: `spec_lock.md typography`. Use `font_family` as default; override per role with `title_family` / `body_family` / `emphasis_family` / `code_family` if declared. LaTeX formulas that Strategist rendered are PNG images, not a `code_family` text role.
-
-If `spec_lock.md` is absent, consult [`strategist.md`](strategist.md) §g — do not invent a stack.
-
-**Hard rule**: every SVG `font-family` stack MUST end with a pre-installed family (Microsoft YaHei / SimHei / SimSun / Arial / Calibri / Segoe UI / Times New Roman / Georgia / Consolas / Courier New / Impact / Arial Black). PPTX has no runtime fallback — missing fonts degrade to Calibri.
-
----
-
-## 8. Speaker Notes Generation Framework
-
-### Task 1. Generate Complete Speaker Notes Document
-
-After all SVG pages are finalized, enter Logic Construction Phase and write the full notes to `notes/total.md`. Batch-writing (not per-page) lets transitions plan coherently.
-
-**Pure spoken narration**: notes are read aloud verbatim by `notes_to_audio.py` (TTS). Write only what should be spoken. No visible markers, no labeled meta-lines, no enumerated key-point lists, no duration annotations — anything you write outside the heading will be vocalized.
-
-**Per-page structure**: `# <number>_<page_title>` heading (the `#` heading line is the only thing stripped before TTS), pages separated by `---`. Body is 2–5 natural sentences carrying the page's core message. Page-to-page transitions live inside the opening sentence as natural prose ("接下来……" / "Having framed X, let's turn to Y") — no bracketed `[过渡]` / `[Transition]` tags.
-
-**Concrete examples** — same shape applies to any language; just write naturally in that language.
-
-中文 deck：
-
-```
-# 02_市场格局
-
-在明确了行业背景之后，我们来看具体的市场格局。当前线上零售集中度持续上升，前三大平台合计份额已经达到百分之六十八，腰部玩家正在被快速挤压，留给新进入者的窗口期不超过十八个月。这意味着我们的策略必须聚焦，而不是铺开。
-```
-
-英文 deck：
-
-```
-# 02_market_landscape
-
-Having framed the industry backdrop, let's look at the actual market landscape. Online retail concentration keeps rising — the top three platforms now hold sixty-eight percent of combined share, mid-tier players are being squeezed fast, and the window for new entrants is under eighteen months. This means our strategy has to focus, not spread.
-```
-
-> 日本語 / 한국어 / 其他语言：照搬同样的结构，用对应语言自然书写即可。
-
-**Number readability**: TTS reads digits and symbols literally. Prefer fully-spelled forms in the language being spoken when literal pronunciation would be awkward (e.g. Chinese "百分之六十八" reads better than "68%"; "1-2分钟" reads as "一减二分钟"). Plain integers and percentages in English are fine as-is.
-
-**Common mistakes to avoid**:
-- Leaving any bracketed stage marker (`[过渡]` / `[Transition]` / `[Pause]` / `[Data]` / `[Scan Room]` / `[Interactive]` / `[Benchmark]` etc.) in the text — they will be read aloud literally.
-- Adding `要点：① …` / `Key points: (1) …` / `时长：2分钟` / `Duration: 2 minutes` / `Flex: …` lines — TTS will speak "要点 一 …".
-- Mixing languages within one deck's notes.
-
-### Task 2. Split Into Per-Page Note Files
-
-Auto-split `notes/total.md` into per-page files in `notes/`.
-
-**Naming**: match SVG names (`01_cover.svg` → `notes/01_cover.md`); `slide01.md` also supported (legacy).
-
----
-
-## 9. Next Steps After Completion
-
-> **Auto-continuation**: After Visual Construction Phase (all SVG pages) and Logic Construction Phase (all notes) are complete, the Executor proceeds directly to the post-processing pipeline.
-
-**Post-processing & Export** (same canonical pipeline as [shared-standards.md §5](shared-standards.md)):
-
-```bash
-# 1. Split speaker notes
-python3 scripts/total_md_split.py <project_path>
-
-# 2. SVG post-processing (auto-embed icons, images, etc.)
-python3 scripts/finalize_svg.py <project_path>
-
-# 3. Export PPTX
-python3 scripts/svg_to_pptx.py <project_path>
-# Output (default-flow mode):
-#   exports/<project_name>_<timestamp>.pptx           ← native pptx (canonical output)
-#   backup/<timestamp>/svg_output/                    ← Executor SVG source backup (always written)
-#
-# Add --svg-snapshot to additionally emit:
-#   exports/<project_name>_<timestamp>_svg.pptx      ← SVG snapshot pptx (sibling of native pptx)
-```
+After every page passes the final quality check, load [`executor-notes.md`](./executor-notes.md) only when the effective Speaker Notes outcome in `design_spec.md §I` is enabled, then proceed to the route's conditional motion handling and [`generate-pptx.md`](../workflows/generate-pptx.md) Step 7, which owns post-processing and export.

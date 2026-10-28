@@ -1,72 +1,57 @@
 # Deck Templates
 
-**Deck = full-PPT replica.** Each deck reverse-engineers a specific organization's branded presentation and bundles its **identity + structure + middle** segments into one atomic asset. Use a deck when you want the complete look of a particular institution (color, typography, logo, page structure, voice) preserved as a whole.
+**Deck = a reusable solution for a recurring presentation family**: descriptive application context (which situations it serves, which outcomes it supports, which narrative/page roles commonly appear) together with presentation identity and reusable structure. It describes the resource without deciding which pages or content a future presentation must keep; a deck template is not a finished content deck, and `kind: deck` does not mean "mirror the source PPT" — the creation strategy decides whether the system is newly authored or materialized from validated facts. The shared kind and workspace model lives in the parent [`README.md`](../README.md).
 
-Single source of truth for what decks exist: [`decks_index.json`](./decks_index.json) (`deck_id → { summary, canvas_format, page_count, primary_color }`). This README explains the kind; it does **not** enumerate decks.
+| Axis | Deck behavior |
+|---|---|
+| Template kind | `deck`: application context + integrated identity + structure |
+| Internal creation strategy | AI-derived `standard` / `fidelity` for a new system or `mirror` for validated source materialization; tool provenance, not a user choice |
+| Application planning | Strategist decides which prototypes to select, repeat, skip, or reorganize and derives the exporter behavior |
+| PPTX structure | The workspace is `structured`; the plan decides whether pages compile its structure or use it as visual reference |
 
-Full data model: [`docs/zh/templates-architecture.md`](../../../../docs/zh/templates-architecture.md).
+[`decks_index.json`](./decks_index.json) (`deck_id → { summary, canvas_format, page_count, primary_color }`) is the discovery source of truth; this README enumerates no decks. Index summaries lead with the presentation family and outcome — visual tone alone never selects a Deck; open its Template Overview to judge fit.
 
----
+## Selection and installation
 
-## Trigger rule
+Selection and installation follow [`routing.md`](../../workflows/routing.md) §7 and [`apply-template-workspace`](../../workflows/stages/apply-template-workspace.md).
 
-Deck selection is **opt-in by explicit path**. The main workflow defaults to free design. A deck is only used when the user gives an explicit directory path in their initial message (e.g. `skills/ppt-master/templates/decks/招商银行/`). Bare names do not trigger. See [`SKILL.md`](../../SKILL.md) Step 3.
+## `design_spec.md` contract
 
-`decks_index.json` is a **discovery aid**, not a trigger — it lets the AI answer "what decks exist?" by listing ids and paths. Listing alone never advances the pipeline.
-
----
-
-## design_spec.md schema
-
-Decks carry the full set of segments (identity + structure + middle). Minimum schema:
+Portable metadata plus package-owned application, identity, and structure rules; no generic SVG rules, spacing libraries, font-ratio bands, or the canonical placeholder table.
 
 ```markdown
 ---
 deck_id: <slug>
 kind: deck
-summary: <one-line use cases>
-canvas_format: ppt169
-page_count: 5
+category: brand | general | scenario | government | special
+summary: <one-line recurring presentation family and intended outcome>
 primary_color: "#XXXXXX"
+canvas_format: ppt169
+canvas_width: 1280
+canvas_height: 720
+canvas_viewbox: "0 0 1280 720"
+replication_mode: standard | fidelity | mirror
+native_structure_mode: structured
+page_count: <N>
 ---
 
-# [Brand / Organization Name] - Design Specification
+# [Template Name] — Design Specification
 
-## I. Template Overview          # Middle — Use cases / Design intent
-## II. Canvas Specification      # Structure
-## III. Color Scheme             # Identity — role / HEX / provenance / notes
-## IV. Typography                # Identity — role / family / weight
-## V. Logo                       # Identity — file / form / usage rules (if logo bundled)
-## VI. Page Structure            # Structure — layout grid / decorative DNA
-## VII. Page Types               # Structure — per-page roles
-## VIII. SVG Page Roster         # Structure — file list + per-file purpose
+## I. Template Overview
+## II. Color Scheme
+## III. Typography                 # omit only when the shared default is used
+## IV. Signature Design Elements
+## V. Page Roster
+## VI. Assets                      # omit when none
+## VII. Placeholder Overrides      # omit when none
 ```
 
-Decks may include additional supporting sections (Voice & Tone, Icon Style, Layout Modes, Spacing Specification, SVG Technical Constraints, Placeholder Specification, Asset Specification, Usage Notes). Use them when meaningful for the replica.
+`replication_mode` records how the workspace was produced. `Template Overview` is descriptive application context — family, intended audiences/outcomes, delivery/reading assumptions, representative roles — broad when the source supports related uses yet specific enough to help Strategist understand the resource. `Page Roster` lists every SVG with its Master/Layout identity, role, visual character, reusable slots, and capacity, never marking pages required/optional/repeatable or content fixed/replaceable/example-only. Every additional authored Master is a distinct reusable design family.
 
----
+## Structured SVG contract
 
-## Fusion behavior at Step 3
+Every SVG is a complete Slide preview under the contract of [`pptx-structure-interface.md`](../../references/pptx-structure-interface.md) §2; `{{...}}` is the authoring vocabulary and `data-pptx-placeholder*` the native contract. `standard` / `fidelity` author new SVGs and structure; `mirror` preserves source identities, parentage, assignments, placeholder facts, and supported visuals without synthesis; legacy contracts are never upgraded in place, and a flat directory shape alone is not a legacy signal.
 
-When the user gives a deck path **alone**, Strategist locks all segments; Eight Confirmations narrows to deck-content fields (target audience / page count / outline / tone tweaks).
+## Workspace and creation
 
-When the user gives a deck path **with** a brand path or layout path, identity / structure segments are overridden by the higher-priority source (brand wins on identity, layout wins on structure). See [`SKILL.md`](../../SKILL.md) Step 3 fusion table.
-
----
-
-## Creating a new deck
-
-1. Run [`workflows/create-template.md`](../../workflows/create-template.md) (default kind is `deck`)
-2. Resulting directory lands under `templates/decks/<id>/`
-3. Validate: `python3 skills/ppt-master/scripts/svg_quality_checker.py templates/decks/<id> --template-mode --format ppt169`
-4. Register: `python3 skills/ppt-master/scripts/register_template.py <id> --kind deck`
-
-The register step updates [`decks_index.json`](./decks_index.json) — the single source of truth for deck discovery.
-
----
-
-## See also
-
-- [`templates/layouts/`](../layouts/) — structure-only templates without identity
-- [`templates/brands/`](../brands/) — identity-only presets without page rosters
-- [`docs/zh/templates-architecture.md`](../../../../docs/zh/templates-architecture.md) — three-class data model + fusion rules
+`templates/` (spec + prototypes), optional `images/` (`../images/<name>`), optional `icons/imported/`, and `exports/<deck_id>_template_preview.pptx` as review evidence. Library scope writes `skills/ppt-master/templates/decks/<deck_id>/` and updates the index; project scope uses an initialized `projects/<name>/` root without registration. Enter [`create-template.md`](../../workflows/create-template.md) (dispatching to [`create-deck.md`](../../workflows/create-template/create-deck.md)), validate with `svg_quality_checker.py --template-mode`, run `template_preview_pptx.py` on request and always for multiple Masters, and in library scope register with `register_template.py <id> --kind deck`. See [`styles/`](../styles/), [`layouts/`](../layouts/), and [`brands/`](../brands/) for the other kinds.

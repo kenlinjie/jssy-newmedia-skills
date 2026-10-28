@@ -28,6 +28,11 @@ import argparse
 import re
 from pathlib import Path
 
+from console_encoding import configure_utf8_stdio
+from slide_roster import discover_slide_svgs
+
+configure_utf8_stdio()
+
 HEADING_RE = re.compile(r'^(#{1,6})\s*(.+?)\s*$')
 HR_RE = re.compile(r'^\s*[-*]{3,}\s*$')
 
@@ -118,7 +123,7 @@ def find_svg_files(project_path: Path) -> list[Path]:
         project_path: Project directory path
 
     Returns:
-        List of SVG files (sorted by filename)
+        List of SVG files in numeric filename order
     """
     svg_dir = project_path / 'svg_output'
 
@@ -126,7 +131,7 @@ def find_svg_files(project_path: Path) -> list[Path]:
         print(f"Error: {svg_dir} directory does not exist")
         return []
 
-    return sorted(svg_dir.glob('*.svg'))
+    return discover_slide_svgs(svg_dir)
 
 
 def parse_total_md(
@@ -353,6 +358,16 @@ Features:
 
     # Split notes
     success = split_notes(notes, output_dir, verbose)
+
+    # A renamed, dropped, or renumbered page leaves its old per-page file
+    # behind; nothing reads it now, but a page that returns to that stem would.
+    stale = sorted(
+        p.name for p in output_dir.glob('*.md')
+        if p.stem not in notes and extract_leading_number(p.stem) is not None
+    )
+    if stale:
+        print(f"[ADVISORY] {len(stale)} per-page notes file(s) match no current page; "
+              f"delete them if they are leftovers: {', '.join(stale)}")
 
     if success:
         if verbose:

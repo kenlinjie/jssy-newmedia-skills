@@ -1,109 +1,106 @@
-> See shared-standards.md for common technical constraints.
+> See [`shared-standards-core.md`](./shared-standards-core.md) for common technical constraints.
 
 # Template Designer — Template Design Role
 
 ## Core Mission
 
-Generate reusable page templates for the **global template library** based on a finalized template brief.
-
-> This is a standalone role: only triggered via the `/create-template` workflow. It is **not** the project-level template selection/customization step in the main PPT generation pipeline.
+Generate reusable structured page templates inside the workspace selected by Create Template's Create Layout or Create Deck child, and write the Design Spec that captures the source-derived rules making the template reusable — for Deck with descriptive recurring-application context, for Layout brand-neutral and application-neutral. A standalone role triggered only by those two children; Create Brand never invokes it, and this is not the template-selection step of the main pipeline.
 
 ## Usage
 
-- **Trigger**: `/create-template` workflow
-- **Output location**: `templates/<kind_dir>/<template_name>/` where `<kind_dir>` is `decks` (default — full-PPT replica with identity) or `layouts` (structure-only, no identity segment)
-- **Input**: finalized template brief (template ID, display name, kind, applicable scenarios, tone, theme mode, canvas format, optional reference assets)
+- **Workspace root**: `library` → `skills/ppt-master/templates/<kind_dir>/<template_name>/`; `project` → the confirmed `<target_project>/`; template source is `<template_workspace>/templates/` in both; the Design Spec is the parent-resolved `<design_spec_path>` (library `templates/design_spec.md`, project `templates/design_spec.<kind>.<id>.md`).
+- **Input**: the finalized brief (scope, target project, template ID, display name, kind, structural use cases or Deck application context, tone, theme mode, canvas, optional reference assets, accepted norms) plus, for a PPTX reference, the import workspace described in [`template-tools.md`](../scripts/docs/template-tools.md).
 
-When the workflow provides a PPTX reference source, the effective input package comes from the unified `pptx_template_import.py` preparation workspace and becomes:
+**Hard rule — scope is execution metadata**: route files by `output_scope` / `target_project` but never write them into frontmatter. Deck/layout output always declares `native_structure_mode: structured`; never invent another structure mode.
 
-- finalized template brief
-- `manifest.json` — single source of truth (slide size, theme, per-master themes, assets, asset map, placeholders, layouts, masters, slides, SVG file paths, page-type candidates)
-- `summary.md` — short orientation digest derived from manifest.json
-- exported `assets/`
-- `svg/master_*.svg` / `svg/layout_*.svg` — every master / layout in the deck rendered once as standalone SVG, including ones no sample slide references (template packages often ship more design surfaces than the embedded samples exercise)
-- `svg/slide_NN.svg` — each slide's own shapes and slide-local background only; master / layout decoration and backgrounds are **not** inlined here
-- `svg/inheritance.json` — which layout / master each slide consumes
-- `svg-flat/slide_NN.svg` — companion view; each slide is self-contained so you can preview or screenshot a single page without losing the surrounding chrome. Use it as a sanity check for "what would PowerPoint actually show", not as an authoring source — the master/layout chrome will be duplicated across every flat slide.
-- optional screenshots for visual cross-checking
+**Workspace precondition**: the parent has resolved `<design_spec_path>` and checked all destinations (library `templates/` empty; the authoring root free of a bare spec, selected-kind spec, or roster; collision-free `images/`, `icons/imported/`, `exports/`; an isolated project-shaped root supplied when the other structural kind exists). Never begin final writes before that preflight passes.
 
-PPTX import interpretation:
+**PPTX import interpretation**:
 
-- Placeholder guides in master / layout SVGs are layout signals. Use `manifest.json` placeholder records for type / index / geometry / base style; do not copy dashed guide boxes into final templates unless the visual design truly uses dashed boxes.
-- Charts, SmartArt, diagrams, and OLE objects may appear as typed placeholders in layered SVGs. In flat SVGs they may show preview images. Treat them as source intent markers, not reusable decorative assets.
-- The asset filenames referenced by SVGs are governed by the manifest asset map. Prefer those references over inventing duplicate asset names.
+| Import artifact | Reading |
+|---|---|
+| Placeholder guides in master/layout SVGs | Layout signals — use manifest placeholder records for type/index/geometry/base style and copy no dashed boxes unless the design uses them |
+| Charts, SmartArt, diagrams, OLE objects | Source intent markers, not reusable decoration |
+| Asset filenames | Follow the manifest map |
+| Manifest facts | Orientation; open screenshots or the PPTX only for visual cross-checking |
 
-Input priority for PPTX-backed template creation:
+| Mode | Authoritative inputs | Model-facing inputs |
+|---|---|---|
+| `standard` / `fidelity` | The brief for the newly designed output; `analysis/manifest.json` for canvas/theme/resources | `authoring_summary.json`, every layered source Master/Layout as structural and visual evidence, layered Slides, optional flat spot checks, exported resources — never `authoring_manifest.json`. `standard` authors a compact result, `fidelity` broader source-aligned coverage; neither copies source identities merely because they exist |
+| `mirror` | Unchanged Type-A import workspace, consumed by the [publication tools](../scripts/docs/template-tools.md#mirror-publication) | Source summaries and asset evidence needed for reuse/Design Spec judgment, plus the publication receipt |
 
-1. `manifest.json` for all factual metadata (theme, assets, unique layout/master structure, slide reuse, page-type guidance)
-2. `svg/master_*.svg` + `svg/layout_*.svg` — the **primary source for the deck's shared visual language**: backgrounds, page chrome, decorative bars, recurring brand motifs. These are what the new template's fixed structure should adopt or reinterpret. Read these before any slide SVG.
-3. `svg/inheritance.json` for confirming which slide uses which layout / master
-4. exported `assets/` for reusable visual resources
-5. `svg/slide_NN.svg` — each slide's unique content, useful for judging composition rhythm and content density (not for fixed structure)
-6. `summary.md` only as a fast scan; never as the canonical fact source
-7. screenshots / original PPTX only for style verification
+**Mandatory — authored construction bundle**: as soon as `replication_mode` resolves to `standard` or `fidelity`, and before selecting any contour, read [`native-shape-authoring.md`](./native-shape-authoring.md) and [`preset-shape-vocabulary.md`](./preset-shape-vocabulary.md) completely; never load them for `mirror`.
+
+**Hard rule — native objects are compiled output**: Theme, Master, Layout, and Placeholder are PowerPoint implementation objects, not template kinds. Compile the rules into one native graph without merging ownership.
+
+| Owner | Owns |
+|---|---|
+| Layout | Topology, placement, semantic text roles, and spatial text behavior |
+| Deck identity | Paint, typeface identity, and fixed identity assets, with application context describing the recurring family |
+| Downstream `layout` scope | Resolves placeholder formatting from the Layout roles plus confirmed identity, reading mode, and type scale |
+| Downstream `mirror` scope | Preserves source structure and comparable presentation in compact SVG |
+
+| Mode | Output structure contract |
+|---|---|
+| `standard` / `fidelity` | Review the complete source Master/Layout inventory, then author complete Slide SVG prototypes and an intentional new Master/Layout/slot system; every retained Layout has at least one prototype; `standard` stays compact, `fidelity` retains broader useful families; source identities never define output topology. Choose page-fit contours from the full native vocabulary before their authoring forms: exact native atoms independent, a Boolean result only where one contour requires it, freeform last |
+| `mirror` | Publishes unchanged Type-A importer output through the [tool chain](../scripts/docs/template-tools.md#mirror-publication), then completes Design Spec judgment and reports source limitations |
+
+Every output is a complete standalone Slide preview resolving Master + Layout + Slide context with explicit layer markers; standalone Master/Layout definition SVGs are not template artifacts.
+
+**Authored preset rule**: in `standard` / `fidelity`, when one registered preset exactly expresses one complete object, use `preset_shape_svg.py` per [`native-shape-authoring.md`](./native-shape-authoring.md). Its compact canonical `<g>` is one semantic atom after validation — Slide-local, the one carrier of an `object` slot, or a Master/Layout fixed layer — and the only `<g>` exception to fixed-layer atomicity. Paint comes from the brief and spec color scheme. Never copy an expanded import carrier/preview/fingerprint bundle into an authored template; `mirror` publishes importer output through the tool path. When one preset is insufficient, apply the same reference's compound-page gate. Syntax and validation are owned by `shared-standards-core.md` and the native-shape reference.
+
+**Mirror scope**: source Slides and their reachable structure define the published roster; [the publisher](../scripts/docs/template-tools.md#mirror-publication) validates that closure. Re-author other useful identities through `standard` / `fidelity`.
+
+**Hard rule — no duplicate authored Layout contracts**: distinct authored keys differ in fixed atoms or slot topology/type/index/bounds/binding; topic, sample wording, or Slide-local content never justifies another key. Mirror keeps distinct reachable source identities even when visibly equivalent.
+
+**Downstream boundary**: Stage 1 independently confirms the communication contract; Strategist inspects the installed prototypes, Deck context, and content, authors one application plan, and records `mirror` / `layout` / `style` and `strict` / `adaptive` only as internal exporter values. Template_Designer never preselects that plan. For `mirror`, `§V` is followed by a `Source Preservation Map` (each Slide's retained Master/Layout assignment and output file, one optional sentence for unmaterialized identities); authored modes record only their new roster.
 
 ---
 
 ## Page Roster
 
-The output page set is determined by **replication mode**, declared in the finalized template brief:
+| Mode | When | Roster |
+|------|------|--------|
+| `standard` (default) | A clean, reusable, compact system | Cover, chapter, ending, optional TOC, and one or a small required set of distinct content Layouts; typically 4–6 prototypes |
+| `fidelity` | Broader, source-aligned but newly designed coverage | Canonical roles plus intentionally designed variants covering the useful source composition range |
+| `mirror` | Preserving validated native source facts and a similar presentation | One compact prototype per source slide, `<NNN>_<page_type>.svg` in source order |
 
-| Mode | When to use | Roster |
-|------|-------------|--------|
-| `standard` (default) | Most templates — clean, reusable, balanced coverage | `01_cover`, `02_chapter`, `03_content`, `04_ending`, optional `02_toc` |
-| `fidelity` | User explicitly wants strict replication of a source PPTX, but still wants the AI to clean / cluster / cap variants | Standard roster + one variant per distinct layout cluster found in `manifest.json` |
-| `mirror` | User wants every source slide preserved 1:1 as a reference page (someone else's polished deck used as a library template). Verbatim copy, no abstraction, no placeholders | One SVG per source slide, named `<NNN>_<page_type>.svg` by source order |
+**Hard rule — mode controls authorship**: `standard` / `fidelity` inspect source evidence and author new SVGs and structure; Type-A `mirror` publishes unchanged importer output. Its model work is reuse judgment, asset adoption and Design Spec completion.
 
 ### Standard mode
 
-| # | Filename | Purpose | Description |
-|---|----------|---------|-------------|
-| 01 | `01_cover.svg` | Cover | Fixed structure: title, subtitle, date, organization |
-| 02 | `02_chapter.svg` | Chapter page | Fixed structure: chapter number, chapter title |
-| 03 | `03_content.svg` | Content page | Flexible structure: only defines header/footer; content area freely laid out by AI |
-| 04 | `04_ending.svg` | Ending page | Fixed structure: thank-you message, contact info |
-| -- | `02_toc.svg` | Table of contents | Optional: TOC title, chapter list (number + title) |
+`01_cover.svg` (title, subtitle, date, organization), `02_chapter.svg` (chapter number and title), `03_content.svg` (header/footer only; content area free), `04_ending.svg` (thank-you, contact), optional `02_toc.svg` (TOC title, chapter list) which shifts later types by one (`01_cover`, `02_toc`, `03_chapter`, `04_content`, `05_ending`).
 
-**Design philosophy**: Templates define visual consistency and structural pages; content pages maintain maximum flexibility.
+**Default — compact authored roster (may override when the confirmed Deck application requires distinct roles)**: keep Layout content pages structurally flexible; for Deck add only the prototypes its confirmed roles need, never variants from hypothetical uses.
 
-**Naming note**: TOC page keeps `02_toc.svg` naming for template library compatibility and sort order.
+**Sibling Layouts in `standard`**: `standard` may hold several Layouts for one canonical role when the brief requires genuinely different structures (two-column evidence vs three-card KPI), suffixing every sibling (`03a_content_two_col.svg`, `03b_content_three_card.svg`) rather than leaving one unsuffixed; this does not require `fidelity`. The numeric prefix is the template's own order with a contiguous base sequence; tooling reads the page type from the token after the underscore.
 
 ### Fidelity mode
 
-When the brief sets `Replication mode: fidelity`, derive the page roster from `manifest.json` page-type clusters and emit one SVG per distinct visual cluster.
+Design a broader roster close to the source's visual language with an independently authored Master/Layout system. Choose variants from useful composition types (two-column, hero image, icon grid, data card, quote); keep only genuinely useful authored compositions — source Layout keys and repeated chrome are not clustering inputs. Design each variant's contract from its reusable behavior; record every page in `§V` (library registration derives the index entry from `templates/*.svg`). Variants reuse the parent placeholder set (§4).
 
-**Variant naming**: append a lowercase letter suffix to the parent type's index, preserving sort order:
-
-| Parent type | Example variants |
-|-------------|------------------|
-| Chapter | `02a_chapter_full.svg`, `02b_chapter_minimal.svg` |
-| Content | `03a_content_two_col.svg`, `03b_content_data_card.svg`, `03c_content_quote.svg` |
-| Ending | `04a_ending_thanks.svg`, `04b_ending_contact.svg` |
-
-Extension page types beyond the canonical four (transition / appendix / disclaimer / divider) take the next free index: `05_section_break.svg`, `06_appendix.svg`, `07_disclaimer.svg`.
-
-**Roster decision**:
-
-- Cluster slides from `manifest.json` by `pageType` + visual structure (column count, hero-image vs. icon-grid vs. quote, etc.)
-- One SVG per cluster — do **not** emit a variant for a cluster represented by a single source slide unless that slide is structurally distinct from existing variants
-- One variant per visually distinct cluster — let the source's structural diversity drive the count. Collapse only **near-duplicates** (same column count, same hero element, same content density); do not collapse genuine structural differences just to keep the variant count down. If you find yourself wanting one variant per source slide, that is the signal the user should be in `mirror` mode, not `fidelity`
-- Record every emitted page in `design_spec.md §V Page Roster`; the corresponding index entry (`decks_index.json` or `layouts_index.json`) is generated automatically by `register_template.py` from the directory's actual SVG files
-
-> Variants reuse the parent type's placeholder set — see §4 (Placeholder Reference) below.
+| Page kind | Naming |
+|---|---|
+| Variants | Append a lowercase letter to the parent index (`02a_chapter_full.svg`, `02b_chapter_minimal.svg`, `03a_content_two_col.svg`, `03b_content_data_card.svg`, `03c_content_quote.svg`, `04a_ending_thanks.svg`) |
+| Extension types (transition / appendix / disclaimer / divider) | Take the next free index (`05_section_break.svg`, `06_appendix.svg`) |
 
 ### Mirror mode
 
-When the brief sets `Replication mode: mirror`, the role does **not** abstract or reconstruct. Each source slide becomes one template page **byte-for-byte**:
+Use the Type-A [mirror publication tools](../scripts/docs/template-tools.md#mirror-publication) without editing importer output. Create Layout mirror is legal only when the source contract is already brand-neutral and application-neutral; otherwise return to dispatch (author a Layout through `standard` / `fidelity`, or retain a Deck) — removing, repainting, retyping, or discarding rules is never mirror.
 
-- Source: `<import_workspace>/svg-flat/slide_NN.svg` (the self-contained "what PowerPoint shows" view). Do **not** read or use `svg/master_*.svg`, `svg/layout_*.svg`, or `svg/inheritance.json` — chrome / content separation is irrelevant because mirror does not insert placeholders.
-- Output: `templates/<kind_dir>/<template_id>/<NNN>_<page_type>.svg`, where `<NNN>` is the zero-padded source slide index (3 digits) and `<page_type>` is derived from `manifest.json` `pageTypeCandidates` — `cover` / `toc` / `chapter` / `content` / `ending`. When the page-type heuristic is ambiguous, fall back to `content`. Preserve source slide order via the numeric prefix.
-- Modifications allowed: **only** rewriting `<image href="...">` paths to point at the local `assets/` copy, and renaming asset files to semantic names. Everything else — geometry, decoration, sprite-sheet wrappers, original example text, chart placeholders, embedded fonts — is copied as-is.
-- Modifications forbidden: inserting `{{TITLE}}` / `{{CONTENT_AREA}}` / any other placeholder; "cleaning up" decorative complexity; merging similar slides; dropping master/layout chrome (it's already baked into the flat SVG, leave it).
-- `design_spec.md` §V Page Roster lists every emitted file with **a one-line description** of what the page contains and what content slot it suits — Strategist selects mirror pages purely from these descriptions, since the SVG itself carries no placeholder contract.
+**Model-facing evidence**: source summaries, selected assets and the publication receipt support reuse and Design Spec decisions; tools consume and validate the complete importer workspace.
 
-**Why mirror has no placeholders**: it is consumed as a **visual reference** rather than a templated form. Executor's mirror path (see [executor-base.md](executor-base.md) §1.1) copies the chosen mirror page into the project and edits text elements in place against the project content — no `{{}}` substitution happens. This keeps the library asset 100% verbatim and lets the user re-discover the source deck by browsing `templates/<kind_dir>/<template_id>/` directly.
+**Precondition**: the publication chain succeeds; report source-recovery limitations and do not invent missing facts.
 
-**What mirror is not**: a pixel-perfect re-rendering pipeline test. Charts, SmartArt, OLE objects, and EMF / WMF media that fail to round-trip in `pptx_template_import.py` will fail the same way in mirror. If the import workspace has missing media or unsupported objects, mirror inherits those gaps — the user should be told before generation begins.
+**Output**: use the tool-generated roster and Source Preservation Map as facts; complete the Design Spec judgment.
+
+| Mirror boundary | Content |
+|---|---|
+| Preserve within the closure | Keys and picker names, parentage, assignments, placeholder type/index/bounds, example meaning, sprite-sheet crop behavior, supported native facts; imported Chart/Table JSON is authoritative with an approximate preview |
+| Allowed | Tool normalization during publication; model-authored reuse judgment, asset adoption and Design Spec prose |
+| Forbidden | Commonality extraction, synthesis, promotion/demotion, renaming, re-parenting, placeholder invention, JSON changes without intent, visible redesign |
+
+Mirror describes source-to-workspace fidelity and only makes literal reuse possible; Strategist independently decides selection, repetition, order, and reorganization. Mirror is not a recovery mode: report charts, SmartArt, OLE, and EMF/WMF gaps from the import/publication receipt before completing the Design Spec.
 
 ---
 
@@ -111,269 +108,173 @@ When the brief sets `Replication mode: mirror`, the role does **not** abstract o
 
 ### 1. Must Generate design_spec.md
 
-**Scope rule — personality only.** A template `design_spec.md` describes **what makes this template recognizable**: brand colors, signature decorative motifs, page-by-page visual character, bundled assets. It does **not** restate generic constraints — those live in the canonical references and are already loaded by every downstream role:
+**Scope rule — package-specific rules only.** A Deck spec describes its recurring application plus integrated identity and structure; a Layout spec only brand-neutral reusable structure with supported content shapes. Neither restates generic constraints already in every downstream reader's context — SVG rules and module routing (`shared-standards-core.md`), the layout-structure vocabulary (`executor-base.md`), spacing bands and font-size ratio bands (`strategist.md`), the canonical placeholder table (§4), content methodology (`strategist.md`), usage-instruction boilerplate, created-date / page-count rows. If a rule is generic, omit it; if the template breaks a generic rule, write only the deviation. When rewriting an existing template, delete such sections rather than leaving pointers.
 
-- SVG technical constraints, PPT compatibility rules → [`shared-standards.md`](shared-standards.md)
-- Generic layout pattern library, spacing bands, font-size ratio bands → [`templates/design_spec_reference.md`](../templates/design_spec_reference.md) (read by Strategist when authoring the **project** design_spec)
-- Canonical placeholder vocabulary → §4 below
-- Content methodology (pyramid / SCQA / MECE) → [`strategist.md`](strategist.md)
+Frontmatter is portable across scopes: never `output_scope`, `target_project`, or a generic `template_id`; use `deck_id` / `layout_id`.
 
-Re-declaring any of these in a template `design_spec.md` is noise — Strategist already has them in context, and duplication forces every relaxation to sweep N templates instead of one source. **If a rule is generic, omit it. If this template breaks a generic rule, write only the deviation.**
-
-**Required skeleton:**
+**Deck**:
 
 ```markdown
 ---
-template_id: <id>
+deck_id: <id>
+kind: deck
 category: brand | general | scenario | government | special
-summary: <one-line tone & use case>
+summary: <one-line recurring presentation family and intended outcome>
 keywords: [tag1, tag2, tag3]
 primary_color: "#......"
 canvas_format: ppt169
+canvas_width: 1280
+canvas_height: 720
+canvas_viewbox: "0 0 1280 720"
+source_canvas_width: 1280        # required when a PPTX/SVG source canvas is known
+source_canvas_height: 720
+source_viewbox: "0 0 1280 720"
 replication_mode: standard | fidelity | mirror
-# Optional — only when this template overrides canonical placeholder vocabulary.
-# Omit entirely for `mirror` mode (mirror has no placeholders).
-# placeholders:
+native_structure_mode: structured
+page_count: <N>
+# placeholders:                  # optional vocabulary override; [] asserts an intentional zero-marker page
 #   01_cover: ["{{TITLE}}", "{{SUBTITLE}}", "{{BRAND_LOGO}}"]
-#   03_content: ["{{KEY_MESSAGE}}", "{{CONTENT_AREA}}"]
 ---
 
 # [Template Name] — Design Specification
 
 ## I. Template Overview
-- Use cases, design tone, theme mode (light / dark / mixed)
-- One paragraph: what visually identifies this template at a glance
+| Application context | Definition |
+|---|---|
+| Recurring presentation family | <repeatable situations> |
+| Intended audiences and outcomes | <who and what it enables> |
+| Delivery and reading assumptions | <presented / close-read / handoff / mixed> |
+| Representative narrative/page roles | <descriptive, not mandatory> |
+- Design tone, theme mode, and the visual identity visible at a glance
 
 ## II. Color Scheme
-- HEX values with role labels (primary / accent / background / text / etc.)
-- Brand-specific application rules when present (e.g. "KPI cards rotate blue→green→red→yellow")
+- HEX values with role labels; brand-specific application rules when present
 
-## III. Typography (omit when using the default `Arial, "Microsoft YaHei", sans-serif` stack)
-- Per-role font stacks ONLY when the template intentionally diverges (display serif title, brand typeface, etc.)
-- Font-install or embedding requirement when a non-preinstalled font leads any stack
-- Body baseline px (informational; `spec_lock.md` owns the actual values per project)
+## III. Typography (omit without template-owned typeface identity)
+- Per-role stacks; a non-preinstalled face leads only after user-confirmed installation, no auto-embedding; otherwise a safe face, with proprietary faces as references (CSS tails aid preview only); body baseline px (informational — `spec_lock.md` owns project values)
 
 ## IV. Signature Design Elements
-- Decorative motifs that ARE this template — top bar, gradient underline, logo treatment, brand emblem placement
-- Optional XML snippet for any reusable component unique to this template
+- Motifs that ARE this template; source-derived grammar — grid/column rhythm, chrome, image zones, crop/clip, scrim/overlay or baked alpha, density rhythm; optional XML for a unique reusable component
 
 ## V. Page Roster
-One row per emitted SVG describing what this template's version of cover / chapter / content / ending looks like (background treatment, decorative anchors, layout rhythm). For `fidelity` mode, also note the cluster source and visual differentiator. For `mirror` mode the roster is the **load-bearing artifact** — Strategist picks mirror pages purely from these descriptions, so each row must include enough detail to distinguish it from siblings (column count, hero element, content density, what kind of content slot it fits — "three-column KPI grid with large numbers, suits quarterly summary"). Roster entries must match the actual SVG files on disk.
+One row per Slide SVG: background, anchors, rhythm, image behavior, density, role, slot bounds/typography/wrapping, and Layout key/picker name (mirror: preserved keys); consult the advisory [capacity report](../scripts/docs/template-tools.md#advisory-slot-capacity) before review. No required/optional/repeatable status or fixed/replaceable/example-only policy. Entries match every SVG on disk. Mirror retains the tool-generated `### Source Preservation Map` and its omitted-identity scope; add judgment only where source limitations require it.
 
 ## VI. Assets (omit when none)
-Logos, cover backgrounds, brand textures bundled with the template package — file name, dimensions, intended usage.
-
 ## VII. Placeholder Overrides (omit when none)
-Reference the `placeholders:` frontmatter declaration and explain the rationale (e.g. "consulting decks lead with `{{KEY_MESSAGE}}` instead of `{{PAGE_TITLE}}`").
 ```
 
-Sections to **omit** from template `design_spec.md` (sourced elsewhere — listing them here is noise):
+**Layout**:
 
-| Don't write | Source |
+| Part | Content |
 |---|---|
-| SVG technical constraints / Mandatory rules / Prohibited elements | `shared-standards.md` §1 |
-| PPT compatibility rules (`<g opacity>`, inline-styles-only, etc.) | `shared-standards.md` |
-| Generic layout pattern library (centered card / 三栏 / timeline / …) | `design_spec_reference.md` §V |
-| Generic spacing bands (margin 40-60px, card gap 20-32px, etc.) | `design_spec_reference.md` §V |
-| Generic font-size hierarchy (cover 2.5-5x body, page title 1.5-2x, …) | `design_spec_reference.md` §IV |
-| Canonical placeholder table (`{{TITLE}}`, `{{PAGE_NUM}}`, …) | §4 below |
-| Content methodology (pyramid / SCQA / MECE / 金字塔) | `strategist.md` |
-| "Usage Instructions" boilerplate (copy template / select page / …) | `create-template.md` |
-| Created Date / Page Count rows | not a library-level field |
+| Frontmatter | `layout_id`, `kind: layout`, `category: general | scenario | government | special`, `summary`, `keywords`, the canvas and source-canvas fields, `replication_mode`, `native_structure_mode: structured`, `page_count`, `page_types: [cover, toc, chapter, content, ending]`, optional `placeholders:` |
+| **IV** | Structure-specific grid, zones, chrome, image behavior, density, semantic text roles, alignment/wrapping/capacity, slot conventions; neutral preview paint is not identity |
+| **V** | One row per SVG with Layout key, picker name, content shape, slot behavior; mirror map as above |
+| **VII** | Only when overrides exist |
+| Omitted | Template Overview, Color Scheme, Typography, Logo, Voice & Tone, Icon Style |
 
-When rewriting an existing template that contains the omitted sections, delete them — do not leave a "see XXX" pointer behind. The pointer is what this scope rule replaces.
+A scenario category records geometric fit only. Never prescribe objectives, outcomes, narrative order, boilerplate, or example retention — the frontmatter `summary` carries selection context.
 
 ### 2. Inherit Design Specification
 
-Templates must strictly follow the finalized template brief and the generated `design_spec.md`:
-- **Canvas dimensions**: viewBox matches the design spec
-- **Color scheme**: Uses primary, secondary, and accent colors from the spec
-- **Font plan**: Uses the per-role font families declared in the spec
-- **Layout principles**: Margins and spacing conform to the spec
+Templates strictly follow the brief and `<design_spec_path>`: root `viewBox` equals `canvas_viewbox` (`width` / `height` optional and non-authoritative). With a PPTX/SVG reference record `source_canvas_*` and `source_viewbox`, and normalize all geometry, typography, strokes, and crops explicitly when the output canvas differs. Colors, fonts, margins, image system, and Deck application follow the spec. With import output, prefer imported theme values over guesses, reuse exported `images/` directly, and treat `pageTypeCandidates` as hints.
 
-If PPTX import output exists:
-- Prefer imported theme colors and fonts over visually guessed values
-- Reuse exported `assets/` images directly — `<image>` references in `svg/` already point at canonical files
-- Treat page-type candidates from `manifest.pageTypeCandidates` as hints, not guarantees
+| Mode | Inspection precondition |
+|---|---|
+| `standard` | The complete lightweight Master/Layout inventory plus enough page IR to understand direction and assets |
+| `fidelity` | Every Master/Layout and page |
+| `mirror` | Run the [publication chain](../scripts/docs/template-tools.md#mirror-publication), retain its factual roster, and report source limitations |
 
-**Precondition**:
+#### 2.1 PPTX Import Mode Rule
 
-- When PPTX import output is provided, do not generate any template SVG or `design_spec.md` until every file under `<import_workspace>/svg/` has been read — including `master_*.svg`, `layout_*.svg`, and every `slide_*.svg`
-- Before template generation begins, explicitly report the read slide indexes
+| Mode | Authoring |
+|---|---|
+| `standard` | Reviews complete evidence, then authors a compact canonical roster and structure |
+| `fidelity` | Authors a broader source-aligned roster matching the visual language without one-to-one identity retention |
+| `mirror` | Publishes unchanged importer output through the tool path; the model completes reuse judgment, asset adoption and the Design Spec |
 
-### 2.1 PPTX Import Simplification Rule
+**Mirror publication**: [template-tools.md](../scripts/docs/template-tools.md#mirror-publication) owns validation, normalization and publication.
 
-The imported PPTX is a **reference source**, not a direct conversion target.
+#### 2.2 Native Shape Payload and Authoring IR
 
-Do:
-- preserve brand assets, recurring backgrounds, and stable structural motifs
-- rebuild the layout into a clean SVG structure aligned with PPT Master constraints
-- simplify repeated decorative fragments into a smaller number of maintainable SVG elements
-- use a background image asset when the original decorative layer is too complex to recreate cleanly
-- use cleaned slide SVG references to inspect composition, spacing, text hierarchy, and fixed decorative structure only after factual metadata has been anchored
-- read every reference SVG under `svg/` — `master_*.svg`, `layout_*.svg`, and every `slide_*.svg` regardless of slide count. Master / layout files describe the deck's shared visual language (read first); slide files describe per-page content (read after). Partial coverage drops template fidelity.
-- rename adopted assets to semantic names (`cover_bg.png`, `brand_emblem.png`) rather than carrying raw `image3.png` into the final template
+| Representation | Purpose | Payload rule |
+|---|---|---|
+| Lossless import SVG | Immutable evidence | Retains complete metadata, native boundaries, hidden carriers, scope identity for validation and non-visible recovery; its visible subtree is never copied into templates |
+| Authoring IR bundle | Editable source | Compact SVG from parsed evidence without opaque payload or duplicate carriers; retains visible intent and document-local source refs; models read the summary, tools the manifest |
+| `standard` / `fidelity` output | Newly authored contract | Editable primitives, compact canonical preset groups for exact matches, `shape_boolean_svg.py` only where one compound contour must become an object, necessary freeform last; paint from the brief/spec; exported assets reused, never opaque payload or source topology |
+| `mirror` output | Tool-published preservation contract | [Publication behavior](../scripts/docs/template-tools.md#mirror-publication) |
 
-Do not:
-- attempt 1:1 translation of every PowerPoint shape, group, shadow, or decorative fragment
-- mirror PPT-specific complexity when it makes the resulting SVG brittle or hard to edit
-- introduce dense low-value vector detail that does not materially improve template reuse
+Materialization and source-limitation reporting follow [template-tools.md](../scripts/docs/template-tools.md#mirror-publication). `data-pptx-replace-with` stays reserved for Chart/Table replacement markers.
+
+Every template SVG satisfies the structured metadata contract of [`pptx-structure-interface.md`](./pptx-structure-interface.md) §2, and a legacy contract (its §3) never enters a package. Template-side additions:
+
+| Concern | Template rule |
+|---|---|
+| Fixed atoms | Authored Master/Layout atoms also carry `data-pptx-editable="false"`; preserved source atoms keep their ownership and comparable paint order (grouping and spelling may differ, regrouping may not) |
+| Keys | `standard` / `fidelity` write authored keys; `mirror` preserves the source keys, picker names, placeholder types/indices/bounds, and carrier identity exactly (never replacing `subTitle`, `obj`, `media`, or `dt` with generic body) |
+| Slot roles | Authored modes assign `title`, `subtitle`, `body`, `picture`, `chart`, `table`, `object`, `media`, `date`, `footer`, `slide-number` deliberately, with indices only to disambiguate repeated roles |
+| Slot bounds | Authored slots derive `data-pptx-bounds` from the intended safe area, column, panel inset, or media frame — never from character count, glyph width, wrapping, or the sample-content box; leave recurring page types some Slide-local field, since a structured deck pairs Morph only on Slide-local groups, never on slots; mirror keeps the source Layout frame |
+| Inherited visuals | Repeated in every standalone SVG so preview stays complete; export validates their equality and infers no ownership |
+| Source refs | Final templates contain no `data-pptx-source-ref` |
 
 ### 3. Placeholder Markers
 
-> **Mirror mode skips this section entirely.** Mirror SVGs are verbatim copies of the source flat slides — they carry no `{{}}` markers. Executor reads them as visual references and edits text in place (see [executor-base.md](executor-base.md) §1.1). The rest of this section applies to `standard` and `fidelity` only.
-
-Use clear placeholder markers for replaceable content:
+Mirror retains literal source text and placeholder metadata and inserts no `{{...}}`. Authored modes mark replaceable content:
 
 ```xml
-<!-- Text placeholder -->
-<text x="80" y="320" fill="#FFFFFF" font-size="48" font-weight="bold">
-  {{TITLE}}
-</text>
-
-<!-- Content area placeholder (content page only) -->
+<g id="title-slot" data-pptx-placeholder="title" data-pptx-bounds="80 280 1120 96">
+  <text id="title-carrier" data-pptx-carrier="true" x="80" y="320" fill="#FFFFFF" font-size="48" font-weight="bold">{{TITLE}}</text>
+</g>
 <rect x="40" y="90" width="1200" height="550" fill="#FFFFFF" rx="8"/>
-<text x="640" y="365" text-anchor="middle" fill="#CBD5E1" font-size="16">
-  {{CONTENT_AREA}}
-</text>
+<g id="body-slot" data-pptx-placeholder="body" data-pptx-bounds="40 90 1200 550">
+  <text id="body-carrier" data-pptx-carrier="true" x="64" y="122" fill="#CBD5E1" font-size="16">{{CONTENT_AREA}}</text>
+</g>
 ```
 
 ### 4. Placeholder Reference (canonical convention, overridable per template)
 
-This is the **default vocabulary** used across the library. Newly created templates SHOULD prefer these names so projects that consume the library find familiar slots; designers MAY substitute or extend them when a style genuinely needs different vocabulary (e.g. consulting decks lead with `{{KEY_MESSAGE}}` instead of `{{PAGE_TITLE}}`; a brand cover may need `{{BRAND_LOGO}}`).
+Default vocabulary; new templates SHOULD prefer it and MAY substitute or extend when a style genuinely needs different names (`{{KEY_MESSAGE}}`, `{{BRAND_LOGO}}`). `svg_quality_checker.py --template-mode` warns when a page lacks its conventional placeholder; a `placeholders:` frontmatter map (`03a_content_dual_col: []` asserts none) silences it and documents the contract.
 
-`svg_quality_checker.py --template-mode` emits **advisory warnings** when a page lacks the conventional placeholder for its type. To silence those warnings — and document the template's actual contract — declare a `placeholders:` map in `design_spec.md` frontmatter:
+| Placeholder | Purpose | Page | Role |
+|------------|---------|------|------|
+| `{{TITLE}}`, `{{SUBTITLE}}`, `{{DATE}}`, `{{AUTHOR}}` | Title, subtitle, date, author/organization | Cover | Default |
+| `{{CHAPTER_NUM}}`, `{{CHAPTER_TITLE}}` / `{{CHAPTER_DESC}}` | Chapter number, title / description | Chapter | Default / Optional |
+| `{{PAGE_TITLE}}`, `{{CONTENT_AREA}}`, `{{PAGE_NUM}}` | Page title, content area, page number | Content (page number also ending) | Default |
+| `{{KEY_MESSAGE}}` | Key takeaway | Content (consulting) | Style-specific |
+| `{{SECTION_NAME}}`, `{{SOURCE}}` | Section name, data source | Content footer | Optional |
+| `{{THANK_YOU}}`, `{{CONTACT_INFO}}` / `{{ENDING_SUBTITLE}}`, `{{COPYRIGHT}}` / `{{CLOSING_MESSAGE}}` | Ending content | Ending | Default / Optional / Style-specific |
 
-```yaml
-placeholders:
-  01_cover: ["{{TITLE}}", "{{SUBTITLE}}", "{{BRAND_LOGO}}"]
-  03_content: ["{{KEY_MESSAGE}}", "{{CONTENT_AREA}}"]
-  03a_content_dual_col: []   # explicitly assert "no required placeholders"
-```
-
-| Placeholder | Purpose | Applicable page | Convention role |
-|------------|---------|-------------------|--------|
-| `{{TITLE}}` | Main title | Cover | Default |
-| `{{SUBTITLE}}` | Subtitle | Cover | Default |
-| `{{DATE}}` | Date | Cover | Default |
-| `{{AUTHOR}}` | Author / Organization | Cover | Default |
-| `{{CHAPTER_NUM}}` | Chapter number | Chapter page | Default |
-| `{{CHAPTER_TITLE}}` | Chapter title | Chapter page | Default |
-| `{{CHAPTER_DESC}}` | Chapter description | Chapter page | Optional |
-| `{{PAGE_TITLE}}` | Page title | Content page | Default |
-| `{{CONTENT_AREA}}` | Content area | Content page | Default |
-| `{{PAGE_NUM}}` | Page number | Content page, ending page | Default |
-| `{{KEY_MESSAGE}}` | Key takeaway | Content page (consulting style) | Style-specific |
-| `{{SECTION_NAME}}` | Section name | Content page footer | Optional |
-| `{{SOURCE}}` | Data source | Content page footer | Optional |
-| `{{THANK_YOU}}` | Thank-you message | Ending page | Default |
-| `{{CONTACT_INFO}}` | Contact info | Ending page | Default |
-| `{{ENDING_SUBTITLE}}` | Ending subtitle | Ending page | Optional |
-| `{{CLOSING_MESSAGE}}` | Closing message | Ending page | Style-specific |
-| `{{COPYRIGHT}}` | Copyright | Ending page | Optional |
-
-For TOC pages in **newly created library templates**, use indexed placeholders:
-
-- `{{TOC_ITEM_1_TITLE}}`, `{{TOC_ITEM_1_DESC}}`
-- `{{TOC_ITEM_2_TITLE}}`, `{{TOC_ITEM_2_DESC}}`
-- ...
-
-Do **not** create new TOC placeholder families such as `{{CHAPTER_01_TITLE}}` for new templates. Existing templates may contain legacy placeholder variants, but new library assets should converge on the indexed TOC contract.
-
-Variants reuse their parent type's placeholder set by default: every `03*_content*.svg` shares the content placeholder list above, unless the spec frontmatter declares an override for that specific stem.
-
-When rebuilding from imported PPTX references, placeholder insertion takes priority over visual mimicry. If the original layout leaves insufficient room for canonical placeholders, adjust the layout instead of inventing one-off placeholder families — or, if the deviation is intentional and meaningful, declare it in frontmatter.
+TOC pages use indexed `{{TOC_ITEM_N_TITLE}}` / `{{TOC_ITEM_N_DESC}}`, never new families such as `{{CHAPTER_01_TITLE}}`. Variants reuse the parent set unless the frontmatter overrides that stem. In authored modes canonical insertion takes priority over visual mimicry; mirror preserves source placeholders and text.
 
 ---
 
 ## Output Requirements
 
-### File Save Location
-
-Standard mode (default):
+Both scopes share one workspace shape; only the root differs:
 
 ```
-templates/<kind_dir>/<template_name>/
-├── design_spec.md     # Design specification (required)
-├── 01_cover.svg
-├── 02_chapter.svg
-├── 02_toc.svg          # Optional
-├── 03_content.svg
-├── 04_ending.svg
-└── *.png / *.jpg       # Image assets (if any)
+<template_workspace>/
+├── templates/   design_spec.md (project: design_spec.<kind>.<id>.md) + 01_cover.svg, [02_toc.svg,] 02|03_chapter.svg, 03|04_content.svg, 04|05_ending.svg
+│                fidelity adds lettered variants and extension pages; mirror emits 001_cover.svg … 050_ending.svg
+├── images/      optional; SVG href ../images/<name>
+├── icons/imported/   optional canonical imported vectors
+└── exports/     <deck_id|layout_id>_template_preview.pptx when requested or multi-Master
 ```
 
-Fidelity mode adds variants and extension pages, e.g.:
+**Hard rule — common routing**:
 
-```
-templates/<kind_dir>/<template_name>/
-├── design_spec.md
-├── 01_cover.svg
-├── 02a_chapter_full.svg
-├── 02b_chapter_minimal.svg
-├── 02_toc.svg
-├── 03a_content_two_col.svg
-├── 03b_content_data_card.svg
-├── 03c_content_quote.svg
-├── 04_ending.svg
-├── 05_section_break.svg
-└── *.png / *.jpg
-```
+| Asset | Location |
+|---|---|
+| Spec, SVGs, non-bitmap template-source assets | `templates/` |
+| Every bitmap | `images/` |
+| Each imported vector | Once in `icons/imported/`, referenced as `data-icon="imported/<name>"`; never `templates/icons/` |
+| Review deck | `exports/` on request and always for multi-Master |
 
-Mirror mode emits one SVG per source slide, named by source order:
+No optional directory is created merely to exist; no asset placement branches by scope.
 
-```
-templates/<kind_dir>/<template_name>/
-├── design_spec.md
-├── 001_cover.svg
-├── 002_toc.svg
-├── 003_content.svg
-├── 004_content.svg
-├── 005_chapter.svg
-├── 006_content.svg
-├── ...
-├── 049_content.svg
-├── 050_ending.svg
-└── *.png / *.jpg
-```
+**Template Preview**: on request or for multiple Masters, run `template_preview_pptx.py <template_workspace>` after validation ([`template-tools.md`](../scripts/docs/template-tools.md#template_preview_pptxpy)); include the path in the completion summary and omit `exports/` only for an unrequested one-Master package. For import-based templates, note which extracted assets were reused, which references influenced the authored roster, what mirror could not preserve, and any page-type mapping that needed judgment.
 
-Filenames preserve the source slide order via the 3-digit prefix; `<page_type>` is derived from `manifest.json` `pageTypeCandidates`. No `{{}}` placeholders appear in any mirror SVG.
-
-### Template Preview
-
-After each template is generated, provide a brief summary table listing each template's status.
-
-If the template is based on PPTX import output, briefly note:
-- which extracted assets were reused directly
-- which complex original decorations were intentionally simplified
-- whether any page-type mapping required judgment beyond the import heuristic
-
----
-
-## Using Pre-built Template Library (Optional)
-
-If suitable template resources already exist, use them directly instead of generating new ones:
-
-1. **Copy template**: copy the spec + template SVGs into the project's `templates/`, and any bundled bitmaps into the project's `images/` (the runtime image pool, referenced as `../images/`)
-2. **Adjust colors**: Modify colors per the project design spec
-3. **Customize**: Make project-specific adjustments
-
-This section describes downstream reuse. The `Template_Designer` role itself is responsible for creating or normalizing the reusable library asset first.
-
-**Example library structure** (query the appropriate kind's index — `templates/layouts/layouts_index.json` for structure-only templates, `templates/decks/decks_index.json` for full-PPT replicas, `templates/brands/brands_index.json` for identity-only presets):
-
-```
-templates/
-├── brands/
-│   ├── anthropic/         # Anthropic brand identity (logo + colors + typography)
-│   └── google/            # Google brand identity
-├── layouts/
-│   ├── academic_defense/  # Academic-defense structure (no identity)
-│   └── pixel_retro/       # Pixel retro / cyberpunk structure (no identity)
-└── decks/
-    ├── 招商银行/          # China Merchants Bank full PPT replica
-    └── 中国电建_常规/      # PowerChina full PPT replica
-```
+**Using an existing library workspace** (downstream reuse, not this role's authoring): copy or stage `templates/` plus `images/` / `icons/` (never `exports/`), adjust colors to the project spec, then customize; query the matching kind index (`brands_index.json`, `styles_index.json`, `layouts_index.json`, `decks_index.json`).
 
 ---
 
@@ -381,12 +282,14 @@ templates/
 
 ```markdown
 ## Template_Designer Phase Complete
-
-- [x] Read `references/template-designer.md`
-- [x] Replication mode confirmed: `standard` | `fidelity` | `mirror`
-- [x] Every page listed in `design_spec.md §V Page Roster` saved to `templates/<layouts|decks>/<template_name>/` (decks for full-PPT replicas, layouts for structure-only)
-- [x] Naming convention applied (standard / fidelity: letter-suffix variants; mirror: `<NNN>_<page_type>.svg`)
-- [x] Templates follow design spec (colors, fonts, layout)
-- [x] Placeholder markers are clear and standardized (standard / fidelity); mirror SVGs contain **no** `{{}}` markers
-- [ ] **Next step**: Validate assets and register the template via `register_template.py <id> --kind <deck|layout>`
+- [x] Scope confirmed (`library` | `project`); preflight passed before final writes
+- [x] Strategy derived from natural-language intent: `standard` | `fidelity` | `mirror`; Layout mirror source is brand/application-neutral
+- [x] Every §V page saved to `<template_workspace>/templates/` with the naming convention applied
+- [x] Templates follow the spec (colors, fonts, layout); Deck Overview and Roster describe without mandatory policy; Layout carries no application or identity contract
+- [x] Authored modes inspected complete source evidence and represented each retained Layout through a new prototype; mirror preserved only Slides and their reachable structure
+- [x] Placeholder markers clear and standardized for authored modes; mirror preserved literal text and source placeholder facts
+- [x] Every SVG is a complete preview with explicit root identity and `native_structure_mode: structured`; authored Layout keys non-duplicative
+- [x] Creation used the authoring IR; lossless imports stayed immutable; authored modes used helper-generated preset groups and spec paint
+- [x] Bitmaps in `images/`, one canonical copy of each imported vector in `icons/imported/`
+- [ ] **Next**: validate assets, export review evidence when requested or required, register library scope only
 ```

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Voice Loop"
-  short_description: "Build an evidence-backed personal writing and speaking voice"
-  default_prompt: "Use $voice-loop to build or improve a writing and spoken-voice profile from authorized examples."

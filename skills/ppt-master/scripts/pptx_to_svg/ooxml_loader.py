@@ -8,6 +8,7 @@ accessible for downstream shape conversion.
 from __future__ import annotations
 
 import posixpath
+import re
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
@@ -57,8 +58,8 @@ def _parse_rels(zf: zipfile.ZipFile, rels_path: str) -> dict[str, dict[str, str]
         return {}
     try:
         root = ET.fromstring(zf.read(rels_path))
-    except ET.ParseError:
-        return {}
+    except ET.ParseError as exc:
+        raise RuntimeError(f"Invalid relationships XML in {rels_path}: {exc}") from exc
 
     base = rels_path.replace("/_rels/", "/")  # source part path
     base = base[:-len(".rels")]  # strip .rels suffix
@@ -82,8 +83,30 @@ def _load_xml(zf: zipfile.ZipFile, part_path: str) -> ET.Element | None:
         return None
     try:
         return ET.fromstring(zf.read(part_path))
-    except ET.ParseError:
-        return None
+    except ET.ParseError as exc:
+        raise RuntimeError(f"Invalid OOXML part {part_path}: {exc}") from exc
+
+
+def blip_embed_relationship_ids(blip: ET.Element) -> tuple[str, ...]:
+    """Return embedded image relationships in fidelity-preferred order.
+
+    Modern Office stores an editable SVG relationship in ``asvg:svgBlip``
+    while keeping a raster fallback on the owning ``a:blip``. Consumers must
+    try the SVG relationship first and retain the raster relationship only as
+    a compatibility fallback.
+    """
+    embed_attr = f"{{{NS['r']}}}embed"
+    candidates = [
+        node.attrib.get(embed_attr)
+        for node in blip.findall(".//asvg:svgBlip", NS)
+    ]
+    candidates.append(blip.attrib.get(embed_attr))
+
+    ordered: list[str] = []
+    for rel_id in candidates:
+        if rel_id and rel_id not in ordered:
+            ordered.append(rel_id)
+    return tuple(ordered)
 
 
 # ---------------------------------------------------------------------------
@@ -118,6 +141,53 @@ class SlideRef:
     master: PartRef | None
 
 
+def parse_ooxml_boolean(
+    raw: str | None,
+    *,
+    default: bool,
+    context: str,
+) -> bool:
+    """Parse one XML Schema boolean without silently accepting bad OOXML."""
+    if raw is None:
+        return default
+    token = raw.strip()
+    if token in {"1", "true"}:
+        return True
+    if token in {"0", "false"}:
+        return False
+    raise RuntimeError(f"{context}: invalid boolean value {raw!r}")
+
+
+def part_show_master_sp(part: PartRef) -> bool:
+    """Return one slide/layout part's raw ``showMasterSp`` semantic value."""
+    return parse_ooxml_boolean(
+        part.xml.attrib.get("showMasterSp"),
+        default=True,
+        context=f"{part.path} showMasterSp",
+    )
+
+
+def inherited_shape_visibility(slide: SlideRef) -> tuple[bool, bool]:
+    """Return effective ``(layout_shapes, master_shapes)`` visibility.
+
+    A slide-level false value suppresses both inherited shape trees. A
+    layout-level false value suppresses only its parent Master's shape tree.
+    Background inheritance is separate and intentionally not represented by
+    these booleans.
+    """
+    show_layout_shapes = part_show_master_sp(slide.part)
+    layout_shows_master_shapes = (
+        part_show_master_sp(slide.layout)
+        if slide.layout is not None else True
+    )
+    show_master_shapes = (
+        show_layout_shapes
+        and slide.master is not None
+        and layout_shows_master_shapes
+    )
+    return show_layout_shapes, show_master_shapes
+
+
 # ---------------------------------------------------------------------------
 # OoxmlPackage
 # ---------------------------------------------------------------------------
@@ -129,6 +199,7 @@ REL_TYPES = {
     "slideLayout": "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout",
     "slideMaster": "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster",
     "theme": "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme",
+    "tableStyles": "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles",
     "image": "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image",
     "media": "http://schemas.openxmlformats.org/officeDocument/2006/relationships/media",
 }
@@ -150,10 +221,13 @@ class OoxmlPackage:
         self.presentation: PartRef | None = None
         self.slide_size_px: tuple[float, float] = (1280.0, 720.0)
         self.slide_size_emu: tuple[int, int] = (12192000, 6858000)
+        self.first_slide_number: int = 1
         self._slides: list[SlideRef] = []
         self._layouts: dict[str, PartRef] = {}
         self._masters: dict[str, PartRef] = {}
         self._themes: dict[str, PartRef] = {}
+        self._table_styles: PartRef | None = None
+        self._table_styles_loaded = False
 
     # ------------------- context manager -------------------
 
@@ -186,12 +260,20 @@ class OoxmlPackage:
         rels = _parse_rels(self.zip, _rels_path_for(part_path))
         return PartRef(path=part_path, xml=xml, rels=rels)
 
-    def read_media(self, part_path: str) -> bytes | None:
-        """Return raw bytes of an embedded media part (e.g. ppt/media/image1.png)."""
+    def load_part(self, part_path: str) -> PartRef | None:
+        """Load an arbitrary XML part by package path."""
+        return self._load_part(part_path)
+
+    def read_part_bytes(self, part_path: str) -> bytes | None:
+        """Return the unchanged bytes of one internal package part."""
         assert self.zip is not None
         if part_path not in self.zip.namelist():
             return None
         return self.zip.read(part_path)
+
+    def read_media(self, part_path: str) -> bytes | None:
+        """Return raw bytes of an embedded media part (e.g. ppt/media/image1.png)."""
+        return self.read_part_bytes(part_path)
 
     def media_filename(self, part_path: str) -> str:
         """Last segment of the media path, e.g. 'image1.png'."""
@@ -214,6 +296,25 @@ class OoxmlPackage:
         self.presentation = self._load_part(pres_path)
         if self.presentation is None:
             raise RuntimeError(f"presentation.xml missing in {self.path}")
+
+        raw_first_slide_number = self.presentation.xml.attrib.get("firstSlideNum")
+        if raw_first_slide_number is not None:
+            first_slide_token = raw_first_slide_number.strip(" \t\r\n")
+            if re.fullmatch(r"[+-]?[0-9]+", first_slide_token) is None:
+                raise RuntimeError(
+                    f"Invalid presentation firstSlideNum: {raw_first_slide_number!r}"
+                )
+            digits = first_slide_token.lstrip("+-").lstrip("0") or "0"
+            if len(digits) > 10:
+                raise RuntimeError("Presentation firstSlideNum is outside xsd:int")
+            first_slide_number = int(digits)
+            if first_slide_token.startswith("-"):
+                first_slide_number = -first_slide_number
+            if not -(2**31) <= first_slide_number <= 2**31 - 1:
+                raise RuntimeError(
+                    f"Presentation firstSlideNum is outside xsd:int: {first_slide_number}"
+                )
+            self.first_slide_number = first_slide_number
 
         # slide size
         size = self.presentation.xml.find("p:sldSz", NS)
@@ -286,6 +387,32 @@ class OoxmlPackage:
                 return cached
         return None
 
+    def resolve_table_styles(self) -> PartRef | None:
+        """Return the presentation-level table style list, when usable.
+
+        Table style definitions are optional and some producers emit only the
+        built-in style id.  A missing or malformed style part must therefore
+        not prevent otherwise valid slides from being converted.
+        """
+        if self._table_styles_loaded:
+            return self._table_styles
+        self._table_styles_loaded = True
+
+        target: str | None = None
+        if self.presentation is not None:
+            for info in self.presentation.rels.values():
+                if info.get("type") == REL_TYPES["tableStyles"]:
+                    target = info.get("target")
+                    break
+        if target is None:
+            target = "ppt/tableStyles.xml"
+
+        try:
+            self._table_styles = self._load_part(target)
+        except RuntimeError:
+            self._table_styles = None
+        return self._table_styles
+
     # ------------------- public iteration -------------------
 
     def iter_slides(self) -> Iterator[SlideRef]:
@@ -300,6 +427,11 @@ class OoxmlPackage:
         if 1 <= index <= len(self._slides):
             return self._slides[index - 1]
         return None
+
+    @property
+    def slide_index_by_part(self) -> dict[str, int]:
+        """Return final presentation-order indices keyed by slide part path."""
+        return {slide.part.path: slide.index for slide in self._slides}
 
     def iter_all_masters(self) -> Iterator[PartRef]:
         """Yield every slideMaster declared in presentation.xml, regardless of
@@ -372,4 +504,3 @@ class OoxmlPackage:
                         continue
                     self._layouts[target] = cached
                 yield cached, master
-

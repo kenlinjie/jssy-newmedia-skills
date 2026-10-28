@@ -8,8 +8,8 @@ Usage:
     python3 scripts/svg_finalize/embed_images.py *.svg
 
 Examples:
-    python3 scripts/svg_finalize/embed_images.py examples/ppt169_demo/svg_output/01_cover.svg
-    python3 scripts/svg_finalize/embed_images.py examples/ppt169_demo/svg_output/*.svg
+    python3 scripts/svg_finalize/embed_images.py projects/ppt169_demo/svg_output/01_cover.svg
+    python3 scripts/svg_finalize/embed_images.py projects/ppt169_demo/svg_output/*.svg
 """
 
 import os
@@ -17,6 +17,27 @@ import base64
 import re
 import sys
 import argparse
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from console_encoding import configure_utf8_stdio  # noqa: E402
+
+configure_utf8_stdio()
+
+
+_SVG_DOCUMENT_START_RE = re.compile(
+    br"\A(?:\xef\xbb\xbf)?[ \t\r\n]*"
+    br"(?:<\?xml(?=[ \t\r\n])(?:[^?]|\?(?!>))*\?>[ \t\r\n]*)?"
+    br"(?:(?:"
+    br"<!--(?:[^-]|-(?!-))*-->"
+    br"|<!DOCTYPE[ \t\r\n]+svg(?=[ \t\r\n\[>])"
+    br"(?:[^>\"']|\"[^\"]*\"|'[^']*')*>"
+    br")[ \t\r\n]*)*"
+    br"<svg(?:[ \t\r\n:]|/?>|\Z)"
+)
 
 
 def get_mime_type(filename: str, file_bytes: bytes | None = None) -> str:
@@ -30,7 +51,7 @@ def get_mime_type(filename: str, file_bytes: bytes | None = None) -> str:
             return 'image/gif'
         if file_bytes.startswith(b"RIFF") and file_bytes[8:12] == b"WEBP":
             return 'image/webp'
-        if file_bytes.lstrip().startswith(b"<svg"):
+        if _SVG_DOCUMENT_START_RE.match(file_bytes):
             return 'image/svg+xml'
 
     ext = filename.lower().split('.')[-1]
@@ -66,6 +87,7 @@ def _optimize_image_bytes(img_bytes: bytes, mime_type: str,
 
     try:
         from PIL import Image as PILImage
+        from PIL import ImageOps
         import io
     except ImportError:
         return img_bytes
@@ -75,6 +97,21 @@ def _optimize_image_bytes(img_bytes: bytes, mime_type: str,
     except Exception:
         return img_bytes
 
+    # Multi-frame images (animated GIF / WebP / APNG): resize/re-save below
+    # keeps frame 0 only, silently flattening the animation. Pass the
+    # original bytes through — animations are exempt from compression and
+    # the size cap.
+    if getattr(img, 'is_animated', False):
+        if max_dimension:
+            w, h = img.size
+            if w > max_dimension or h > max_dimension:
+                print(f"  [WARN] Animated image kept as-is ({w}x{h} exceeds "
+                      f"max dimension {max_dimension}px); animations are "
+                      f"exempt from size limits")
+        return img_bytes
+
+    source_format = img.format
+    img = ImageOps.exif_transpose(img)
     changed = False
 
     # Downscale if exceeding max_dimension
@@ -97,7 +134,7 @@ def _optimize_image_bytes(img_bytes: bytes, mime_type: str,
             img.save(buf, format='PNG', optimize=True)
         else:
             # For other formats, just re-save
-            fmt = img.format or 'PNG'
+            fmt = source_format or 'PNG'
             img.save(buf, format=fmt)
 
         optimized = buf.getvalue()
@@ -205,7 +242,8 @@ def embed_images_in_svg(svg_path: str, dry_run: bool = False,
         with open(svg_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
     
-    return (images_embedded, new_size)
+    processed_count = len(images_found) if dry_run else images_embedded
+    return (processed_count, new_size)
 
 def main() -> None:
     """Run the CLI entry point."""
