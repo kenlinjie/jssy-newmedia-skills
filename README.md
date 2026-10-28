@@ -4,11 +4,11 @@
 
 ## 固定下载入口
 
-[国内镜像下载 · 主分支](https://gh-proxy.org/https://github.com/kenlinjie/xdf-province-new-media-skills/archive/refs/heads/main.zip)
+[国内镜像下载 · 主分支](https://gitee.com/Ken-Lin-Jie/jssy-newmedia-skills/repository/archive/main.zip)
 
-这个地址始终指向主分支，后续更新沿用同一入口。解压完整项目后按下方说明使用。镜像由第三方运营，服务可用性与缓存刷新由服务方决定。
+这个地址始终指向主分支，后续更新沿用同一入口。解压完整项目后按下方说明使用。镜像与 GitHub 仓库保持同步，可用性取决于 Gitee 平台。
 
-备用入口：[GitHub 原始下载](https://github.com/kenlinjie/xdf-province-new-media-skills/archive/refs/heads/main.zip)；[项目仓库](https://github.com/kenlinjie/xdf-province-new-media-skills)。
+备用入口：[GitHub 原始下载](https://github.com/kenlinjie/jssy-newmedia-skills/archive/refs/heads/main.zip)；[项目仓库](https://github.com/kenlinjie/jssy-newmedia-skills)。
 
 ## 怎么使用
 
@@ -82,4 +82,4 @@ python3 scripts/skillpack.py package
 
 2026-10-28 的来源核对、更新内容与保留的定制流程见 [来源更新记录](docs/来源更新记录.md)。PPT 仅保留 `ppt-master`，已更新至官方 6.7.3；未确认公开上游的技能单独标明核对范围。
 
-项目同步到 [GitHub 仓库](https://github.com/kenlinjie/xdf-province-new-media-skills)，只维护通用技能、公开参考和空白模板。后续更新先执行检查，再提交并推送 `main` 分支。
+项目同步到 [GitHub 仓库](https://github.com/kenlinjie/jssy-newmedia-skills) 与 [Gitee 镜像](https://gitee.com/Ken-Lin-Jie/jssy-newmedia-skills)，只维护通用技能、公开参考和空白模板。后续更新先执行检查，再提交并推送 `main` 分支；推送到 `main` 后由 GitHub Actions 自动同步到 Gitee。
