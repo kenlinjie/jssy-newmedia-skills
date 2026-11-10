@@ -1,6 +1,6 @@
 # 省域新媒体技能包
 
-本项目包含 **17 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。PPT 统一使用 `ppt-master`。
+本项目包含 **18 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、差旅报销、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。PPT 统一使用 `ppt-master`。
 
 ## 固定下载入口
 
@@ -28,6 +28,7 @@
 | 团队通用日报 | [daily-report-universal](skills/daily-report-universal/SKILL.md) |
 | 公开抖音账号对标 | [douyin-benchmark](skills/douyin-benchmark/SKILL.md) |
 | 直播后台数据填表 | [live-backend-to-sheet](skills/live-backend-to-sheet/SKILL.md) |
+| ego Lite 差旅报销 | [egolite-travel-reimbursement](skills/egolite-travel-reimbursement/SKILL.md) |
 | 文案修改与去AI腔 | [write](skills/write/SKILL.md) |
 | 看视频与按时间点复盘 | [watch](skills/watch/SKILL.md) |
 | 本地中文音视频转写 | [local-sota-transcription](skills/local-sota-transcription/SKILL.md) |
@@ -54,7 +55,7 @@ python3 scripts/skillpack.py install --target workbuddy --profile core --apply
 python3 scripts/skillpack.py package
 ```
 
-`core` 是 8 个常用技能，`team` 是全部 17 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
+`core` 是 8 个常用技能，`team` 是全部 18 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
 
 日常下载直接使用上面的固定入口，无需等待单独的安装包。需要自行分发时可运行打包命令，生成的文件保存在本地 `dist/`，不会自动上传。
 
@@ -67,6 +68,14 @@ python3 scripts/skillpack.py package
 `live-backend-to-sheet` 会用 ego Lite 检查真实登录状态，再引导确定目标表链接或 Excel 文件、直播周期。字段默认按老师提供的表头，能确定的先填，不确定的留空或保留原值；填后用大白话指出哪场、哪列拿不准，主动问老师后续怎么处理。扫码、切号或授权由老师在官方界面完成；填写后读回核对，重跑先查重，已明确的任务信息直接沿用。
 
 浏览器从 [ego Lite 官网](https://www.egolite.ai/download)按当前说明安装，操作前读取 `ego-browser skill`。目标是钉钉表时使用 `dws`，其他在线表使用可见编辑界面，本地 Excel 在后台处理。账号、表链接和执行记录保存在使用者自己的项目外目录。
+
+## 差旅报销怎么用
+
+老师可以直接说：
+
+> 用 egolite-travel-reimbursement 帮我填这次差旅单，先带我登录，不确定的地方用大白话问我，先存草稿不要提交。
+
+老师准备本次发票、实际行程，以及当地同类旧单或财务要求。不同地区、单位和单据类型不套同一填法；旧单只作参考，当前财务要求和页面提示优先。agent 会引导本人在官方页面登录，不索取密码或验证码；首次上传发票前会说明查验及可能锁定的影响，征得同意再传。填好后重新打开核对，默认只存草稿，关键内容未核清或老师没有明确授权时不提交。
 
 ## 共享内容与个人状态
 

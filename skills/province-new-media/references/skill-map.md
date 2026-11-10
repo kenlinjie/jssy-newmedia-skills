@@ -9,6 +9,7 @@
 | 团队通用日报 | [daily-report-universal](../../daily-report-universal/SKILL.md) | 本人历史日报与真实工作素材；钉钉读取用 dws |
 | 公开抖音账号对标 | [douyin-benchmark](../../douyin-benchmark/SKILL.md) | ego Lite；Node.js；只采公开资料 |
 | 直播后台数据填表 | [live-backend-to-sheet](../../live-backend-to-sheet/SKILL.md) | ego Lite；老师确认账号、目标表与场次；钉钉写表用 dws |
+| ego Lite 差旅报销 | [egolite-travel-reimbursement](../../egolite-travel-reimbursement/SKILL.md) | ego Lite；本人或获授权的报销账号；本次发票、行程和当地要求 |
 | 文案修改与去AI腔 | [write](../../write/SKILL.md) | 用户原稿或明确的写作事实 |
 | 看视频与按时间点复盘 | [watch](../../watch/SKILL.md) | Python、ffmpeg、ffprobe；无字幕时需要本地转写运行时 |
 | 本地中文音视频转写 | [local-sota-transcription](../../local-sota-transcription/SKILL.md) | 仅 Apple Silicon Mac；uv、本地模型与语言资源按需配置 |

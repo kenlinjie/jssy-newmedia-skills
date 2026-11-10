@@ -1,6 +1,6 @@
 {
   "name": "省域新媒体技能包",
-  "version": "2026.10.28",
+  "version": "2026.11.10",
   "python_minimum": "3.9",
   "skills": [
     {
@@ -26,7 +26,7 @@
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "77153ebeb119b660cc53f7ca04340106878cc95a0835c5c3140250f987ccfa3d",
+      "sha256": "d5779192ea7b3a1b5291d315f10e9bd87a2dc9fef286a505b044d48564a2b6ca",
       "external_tools": [
         "dingtalk-cli",
         "ego-browser"
@@ -170,6 +170,35 @@
       ],
       "file_count": 3,
       "sha256": "ca5c19e7947d88ea4559d42581a764abdb5e598f8dc9173e14566b233f4a0e9b"
+    },
+    {
+      "id": "egolite-travel-reimbursement",
+      "title": "ego Lite 差旅报销",
+      "category": "07 财务与行政",
+      "scope": "team",
+      "path": "skills/egolite-travel-reimbursement",
+      "core": false,
+      "requirements": "ego Lite 与 ego-browser；本人或获授权的报销账号；本次发票、行程和当地要求",
+      "source": {
+        "kind": "bundled-skill",
+        "reference": "egolite-travel-reimbursement",
+        "last_checked": "2026-11-10",
+        "check_result": "local-source-reviewed-adapted"
+      },
+      "adaptations": [
+        "当前财务要求和实际页面优先，旧单只作参考，不跨地区套填法",
+        "引导老师本人登录；不确定的信息用大白话集中确认；首次上传发票前说明查验与可能锁定并取得同意",
+        "分别核对票据、补助或扣减与支付金额；保存后读回；关键项未核清不提交"
+      ],
+      "required_files": [
+        "agents/openai.yaml"
+      ],
+      "license_files": [],
+      "external_tools": [
+        "ego-browser"
+      ],
+      "file_count": 2,
+      "sha256": "ae956a801d44e322f19db9c0a266f9ec3d30e350ca4d99a045994f0c34278653"
     },
     {
       "id": "write",
