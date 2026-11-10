@@ -1,6 +1,6 @@
 # 省域新媒体技能包
 
-本项目包含 **18 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、差旅报销、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。PPT 统一使用 `ppt-master`。
+本项目包含 **20 个通用技能**，覆盖 AI 工作环境、公众号、直播后台填表、竞品直播监控、业务台账同步、差旅报销、公开抖音对标、视频处理、日报、培训汇报、笔记管理和钉钉协作。只提供通用流程、公开参考和空白模板。PPT 统一使用 `ppt-master`。
 
 ## 固定下载入口
 
@@ -28,6 +28,8 @@
 | 团队通用日报 | [daily-report-universal](skills/daily-report-universal/SKILL.md) |
 | 公开抖音账号对标 | [douyin-benchmark](skills/douyin-benchmark/SKILL.md) |
 | 直播后台数据填表 | [live-backend-to-sheet](skills/live-backend-to-sheet/SKILL.md) |
+| 竞品直播间监控运维 | [douyin-live-competitor-monitor](skills/douyin-live-competitor-monitor/SKILL.md) |
+| 业务台账同步 | [ledger-sync-sop](skills/ledger-sync-sop/SKILL.md) |
 | ego Lite 差旅报销 | [egolite-travel-reimbursement](skills/egolite-travel-reimbursement/SKILL.md) |
 | 文案修改与去AI腔 | [write](skills/write/SKILL.md) |
 | 看视频与按时间点复盘 | [watch](skills/watch/SKILL.md) |
@@ -55,7 +57,7 @@ python3 scripts/skillpack.py install --target workbuddy --profile core --apply
 python3 scripts/skillpack.py package
 ```
 
-`core` 是 8 个常用技能，`team` 是全部 18 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
+`core` 是 8 个常用技能，`team` 是全部 20 个随附技能。`--target` 可选 `agents`、`codex`、`claude`、`workbuddy`；`--skill` 可指定单个技能，所需技能依赖会一并选择。安装后新开或重载 agent 会话。
 
 日常下载直接使用上面的固定入口，无需等待单独的安装包。需要自行分发时可运行打包命令，生成的文件保存在本地 `dist/`，不会自动上传。
 

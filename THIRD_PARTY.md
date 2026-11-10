@@ -13,6 +13,7 @@
 | `agent-reach` | https://github.com/Panniantong/Agent-Reach ，合入 1.6.0 统一 CLI 和能力参考，保留 MIT LICENSE 与本项目工具偏好 |
 | `obsidian-markdown`、`obsidian-bases`、`obsidian-cli`、`json-canvas`、`defuddle` | https://github.com/kepano/obsidian-skills ，各技能随附上游 MIT LICENSE |
 | `daily-report-universal` | 通用日报技能分发包，仅保留通用流程与空白模板 |
+| `ledger-sync-sop`、`douyin-live-competitor-monitor` | 2026-11-10 团队同事分享的技能分发包，未随附独立 LICENSE；本包只改入口名称、本机配置占位与隐私内容，业务流程原文保留 |
 
 `write`、`local-sota-transcription` 与通用日报按本机通用源或已有分发包核对，尚无可确认的独立公开上游地址；不将“本机没有新增内容”称作“全网最新版”。
 

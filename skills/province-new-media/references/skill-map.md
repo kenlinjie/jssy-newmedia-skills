@@ -9,6 +9,8 @@
 | 团队通用日报 | [daily-report-universal](../../daily-report-universal/SKILL.md) | 本人历史日报与真实工作素材；钉钉读取用 dws |
 | 公开抖音账号对标 | [douyin-benchmark](../../douyin-benchmark/SKILL.md) | ego Lite；Node.js；只采公开资料 |
 | 直播后台数据填表 | [live-backend-to-sheet](../../live-backend-to-sheet/SKILL.md) | ego Lite；老师确认账号、目标表与场次；钉钉写表用 dws |
+| 竞品直播间监控运维 | [douyin-live-competitor-monitor](../../douyin-live-competitor-monitor/SKILL.md) | 已部署的监控程序目录与常开工作机；本机配置先填 `local-config.md` |
+| 业务台账同步 | [ledger-sync-sop](../../ledger-sync-sop/SKILL.md) | 源系统与共享台账的本人编辑权限；ego Lite 复用登录态；写入方式按各环境工具链 |
 | ego Lite 差旅报销 | [egolite-travel-reimbursement](../../egolite-travel-reimbursement/SKILL.md) | ego Lite；本人或获授权的报销账号；本次发票、行程和当地要求 |
 | 文案修改与去AI腔 | [write](../../write/SKILL.md) | 用户原稿或明确的写作事实 |
 | 看视频与按时间点复盘 | [watch](../../watch/SKILL.md) | Python、ffmpeg、ffprobe；无字幕时需要本地转写运行时 |

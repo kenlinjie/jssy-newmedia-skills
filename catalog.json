@@ -26,7 +26,7 @@
       ],
       "license_files": [],
       "file_count": 3,
-      "sha256": "d5779192ea7b3a1b5291d315f10e9bd87a2dc9fef286a505b044d48564a2b6ca",
+      "sha256": "3a91089897ef1babf159fecdcb88f9f20d7f26b581f49710bd3b6a8267056735",
       "external_tools": [
         "dingtalk-cli",
         "ego-browser"
@@ -482,6 +482,65 @@
       "sha256": "eb6d61891441f748737c9331bcb41b3b16cd41d3251d6830ab839153154e70e2",
       "license_files": [
         "LICENSE"
+      ]
+    },
+    {
+      "id": "douyin-live-competitor-monitor",
+      "title": "竞品直播间监控运维",
+      "category": "03 抖音与调研",
+      "scope": "team",
+      "path": "skills/douyin-live-competitor-monitor",
+      "core": false,
+      "requirements": "一台常开的 Windows 工作机与已部署的监控程序目录；Python 3.11+；发信与站点部署按各环境实际平台",
+      "source": {
+        "kind": "team-contribution",
+        "reference": "2026-11-10 团队成员分享的竞品直播间 24h 监控技能（运维手册版）",
+        "last_checked": "2026-11-10",
+        "check_result": "reviewed-adapted"
+      },
+      "adaptations": [
+        "本机路径、站点地址、分享码与收件人移入 local-config.md，正文改用占位符",
+        "竞品账号名与地市信息改为通用描述",
+        "healthcheck.py 的默认程序目录改为必填参数或环境变量，避免落到他人机器路径"
+      ],
+      "required_files": [
+        "local-config.example.md",
+        "references/runbook.md",
+        "references/architecture.md",
+        "scripts/healthcheck.py"
+      ],
+      "license_files": [],
+      "file_count": 10,
+      "sha256": "08b0a6f954103cd55a8054db3f1ace269d40af3714f54b6335963a2fb9b3d2d5",
+      "external_tools": []
+    },
+    {
+      "id": "ledger-sync-sop",
+      "title": "台账同步助手",
+      "category": "08 业务数据与台账",
+      "scope": "team",
+      "path": "skills/ledger-sync-sop",
+      "core": false,
+      "requirements": "业务系统与共享台账的本人登录权限；ego Lite 等可复用登录态的浏览器；写入方式按各环境自身工具链",
+      "source": {
+        "kind": "team-contribution",
+        "reference": "2026-11-10 团队成员分享的 WorkBuddy 台账同步技能 v1.1.1",
+        "last_checked": "2026-11-10",
+        "check_result": "reviewed-adapted"
+      },
+      "adaptations": [
+        "入口 frontmatter 名称统一为本包技能 id，正文内容保持 v1.1.1 原样",
+        "六步流程与新手收料话术按各环境现有工具执行，不含具体系统、表格或账号"
+      ],
+      "required_files": [
+        "references/judgment-rules.md",
+        "references/beginner-onboarding.md"
+      ],
+      "license_files": [],
+      "file_count": 5,
+      "sha256": "ce226fdf557caa51b60d357c77891ccffc9bcdc25a977e3c12e9c074ca973aec",
+      "external_tools": [
+        "ego-browser"
       ]
     }
   ],
